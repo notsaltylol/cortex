@@ -14,6 +14,7 @@ export default {
     if (url.pathname === "/api/ro-auth") return roAuth(request, env);
     if (url.pathname === "/api/elimu-intake") return elimuIntake(request, env);
     if (url.pathname === "/api/ticket-risk") return handleTicketRisk(request, env);
+    if (url.pathname === "/api/stc-request") return stcRequest(request, env);
     if (url.pathname !== "/api/categorize") return env.ASSETS.fetch(request);
     if (request.method !== "POST") return json({ error: "POST only" }, 405);
     if (!env.TYPESAFE_API_KEY) return json({ error: "TYPESAFE_API_KEY not configured" }, 503);
@@ -216,6 +217,46 @@ async function elimuIntake(request, env) {
         confidence: answers[`k${i}`]?.confidence ?? null,
         urgent: answers[`u${i}`]?.noul ?? null,
       })),
+    });
+  } catch (e) {
+    return json({ error: "TypeSafe request failed" }, 502);
+  }
+}
+
+// St. Catherine's Health: classify a synthetic, non-clinical operational request and suggest an owner.
+// The page runs its own PHI check first and refuses to send text that matches identifier rules.
+const STC_KINDS = {
+  facilities: "Facilities or maintenance: building, room, heating/cooling, cleaning, furniture, parking or a physical repair.",
+  it_access: "IT access request: a new account, password reset, permission or role change, or access to a system or shared folder.",
+  it_incident: "IT incident: a system, application, network, printer or device that is down, slow or broken.",
+  supplies: "Supplies or procurement: ordering, restocking, a purchase request, vendor or delivery question for non-clinical items.",
+  scheduling: "Scheduling or staffing (non-clinical): shifts, rooms or meeting bookings, onboarding logistics, timesheets.",
+  privacy_security: "Privacy or security concern: a suspected data exposure, lost device, phishing email, badge or physical-security issue.",
+  other: "None of the above.",
+};
+
+async function stcRequest(request, env) {
+  if (request.method !== "POST") return json({ error: "POST only" }, 405);
+  if (!env.TYPESAFE_API_KEY) return json({ error: "TYPESAFE_API_KEY not configured" }, 503);
+  let body;
+  try { body = await request.json(); } catch { return json({ error: "Invalid JSON" }, 400); }
+  const text = typeof body?.text === "string" ? body.text.trim().slice(0, 1500) : "";
+  if (!text) return json({ error: "text required" }, 400);
+  try {
+    const client = new TypeSafeClient({ apiKey: env.TYPESAFE_API_KEY });
+    const { answers } = await client.systemOne({
+      state: { request: text },
+      questions: {
+        kind: choice("`request` is an internal, non-clinical operational request at a hospital system. Which type of request is it?", STC_KINDS),
+        urgent: noul("Does `request` describe something that stops work now, affects safety or security, or needs action today?"),
+        clinical: noul("Does `request` ask for or describe clinical care, a diagnosis, treatment or a specific patient's health information?"),
+      },
+    });
+    return json({
+      kind: answers.kind?.choice ?? null,
+      confidence: answers.kind?.confidence ?? null,
+      urgent: answers.urgent?.noul ?? null,
+      clinical: answers.clinical?.noul ?? null,
     });
   } catch (e) {
     return json({ error: "TypeSafe request failed" }, 502);
