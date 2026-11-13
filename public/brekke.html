@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Job Pricing Check | Cortex for Brekke Brothers</title>
+<title>Patio &amp; Wall Job Check | Brekke Brothers</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -47,37 +47,61 @@ button.btn{font-size:13px;padding:6px 12px;border:1px solid var(--line);backgrou
 .msg{font-size:13px;color:var(--muted)}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 footer{text-align:center;color:var(--muted);font-size:13px;padding:4px 16px 24px}footer a{color:var(--muted)}
+#chk-status{border-radius:10px;padding:12px 14px;font-weight:600;border:1px solid}
+#chk-status.bad{background:var(--red-bg);color:var(--red);border-color:var(--red)}#chk-status.ok{background:var(--green-bg);color:var(--green);border-color:var(--green)}
+.impact{border-radius:10px;padding:12px 14px;border:1px solid var(--line);background:var(--bg)}.impact.loss{border-color:var(--red);background:var(--red-bg);color:var(--red)}
+.impact strong{font-family:var(--font-num)}
+textarea{font:13px/1.45 var(--font-num);padding:8px 10px;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:8px;width:100%;min-height:150px;resize:vertical}
+select{font:inherit;padding:7px 9px;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:8px}
+.chip.amber{background:var(--amber-bg);color:var(--amber)}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden}.seg button{border:0;background:var(--bg);color:var(--ink);padding:6px 14px;cursor:pointer;font-size:14px}.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+h3{margin:0 0 8px;font-size:15px}
 </style>
 </head>
 <body>
 <main class="wrap">
-  <a class="back" href="/">&larr; Back to Cortex</a>
   <header>
-    <h1>Job pricing check</h1>
-    <p class="sub">Price the job. Every cost you haven't priced stays flagged until you do. No login. Nothing leaves this browser.</p>
+    <h1>Patio &amp; wall job check</h1>
+    <p class="sub">Paste the estimate from your spreadsheet. It shows what's missing (disposal, equipment, the second day on the skid steer) and what that does to your profit, before the quote goes out. No login. Nothing leaves this browser.</p>
   </header>
 
+  <section class="panel" aria-labelledby="h-chk">
+    <h2 id="h-chk">1. Check an estimate you already have</h2>
+    <div class="row" style="margin-bottom:10px"><span class="muted" style="font-size:14px">Job type</span>
+      <div class="seg" role="group" aria-label="Job type for the check"><button type="button" id="ck-patio" aria-pressed="true">Patio</button><button type="button" id="ck-wall" aria-pressed="false">Retaining wall</button></div></div>
+    <label class="field" for="ck-text">Select the cost rows in your spreadsheet, copy, and paste here. Any layout works: each row needs a description and a dollar amount.<textarea id="ck-text" spellcheck="false" placeholder="Paste your estimate rows here"></textarea></label>
+    <div class="grid" style="margin-top:10px" id="ck-grid"></div>
+    <div class="row" style="margin-top:10px"><button type="button" class="primary" id="ck-go">Check this estimate</button><span id="ck-msg" class="msg" role="status" aria-live="polite"></span></div>
+    <div id="ck-out" hidden style="display:grid;gap:12px;margin-top:14px">
+      <div id="chk-status" role="status"></div>
+      <div id="ck-impact"></div>
+      <div id="ck-warns" style="display:grid;gap:8px"></div>
+      <div class="scroll"><table style="min-width:620px"><thead><tr><th scope="col">Cost</th><th scope="col">In your estimate</th><th scope="col">Status</th><th class="num" scope="col">If missing, at your rates</th></tr></thead><tbody id="ck-body"></tbody></table></div>
+      <details><summary class="muted" style="cursor:pointer;font-size:14px">How each pasted row was read</summary>
+        <div class="scroll"><table style="min-width:560px;margin-top:6px"><thead><tr><th scope="col">Row</th><th class="num" scope="col">Amount</th><th scope="col">Read as</th></tr></thead><tbody id="ck-rows"></tbody></table></div></details>
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="h-rates">
+    <h2 id="h-rates">2. Your rates (saved, used every time)</h2>
+    <p class="hint" style="margin:0 0 8px">Enter these once. They price anything missing from a pasted estimate, and they fill in the job builder below so disposal and equipment are never left blank.</p>
+    <div class="grid" id="rate-grid"></div>
+  </section>
+
   <section class="panel" aria-labelledby="h-job">
-    <h2 id="h-job">The job</h2>
+    <h2 id="h-job">3. Or price a job here</h2>
+    <div class="row" style="margin-bottom:10px"><span class="muted" style="font-size:14px">Job type</span>
+      <div class="seg" role="group" aria-label="Job type for the builder"><button type="button" id="jb-patio" aria-pressed="true">Patio</button><button type="button" id="jb-wall" aria-pressed="false">Retaining wall</button></div></div>
     <div class="grid" id="job-grid"></div>
     <details style="margin-top:10px"><summary class="muted" style="cursor:pointer;font-size:14px">Conversion assumptions (change if yours differ)</summary>
       <div class="grid" id="asm-grid" style="margin-top:8px"></div></details>
-  </section>
-
-  <div id="status" role="status" aria-live="polite"></div>
-  <div id="warns" aria-live="polite"></div>
-
-  <section class="panel" aria-labelledby="h-cost">
-    <h2 id="h-cost">Costs</h2>
-    <p class="hint" style="margin:0 0 8px">Quantities fill in from the job above when they can; type over one to change it. Leave a cost blank and it shows as <strong>not priced</strong>. If a cost truly doesn't apply, tick N/A.</p>
+    <div id="status" role="status" aria-live="polite" style="margin-top:12px"></div>
+    <div id="warns" aria-live="polite" style="margin-top:8px"></div>
+    <p class="hint" style="margin:10px 0 8px">Quantities fill in from the job; rates fill in from your rates. Type over either to change it. Tick N/A only if a cost really doesn't apply.</p>
     <div class="scroll"><table>
       <thead><tr><th scope="col">Cost</th><th class="num" scope="col">Qty</th><th scope="col">Unit</th><th class="num" scope="col">$ per unit</th><th class="num" scope="col">Total</th><th scope="col">N/A</th></tr></thead>
       <tbody id="lines"></tbody></table></div>
-  </section>
-
-  <section class="panel" aria-labelledby="h-price">
-    <h2 id="h-price">Price</h2>
-    <div class="grid" style="margin-bottom:12px">
+    <div class="grid" style="margin:12px 0">
       <label class="field">Overhead (% on cost)<input id="oh" type="number" min="0" step="0.5" inputmode="decimal"></label>
       <label class="field">Target margin (% of price)<input id="mg" type="number" min="0" max="95" step="0.5" inputmode="decimal"></label>
     </div>
@@ -89,100 +113,218 @@ footer{text-align:center;color:var(--muted);font-size:13px;padding:4px 16px 24px
     </div>
   </section>
 </main>
-<footer>Cortex by Pitch, Pray, Ship. Typesafe.</footer>
+<footer>Built for Brekke Brothers Landscape &amp; Stone by Pitch, Pray, Ship.</footer>
 <script>
 "use strict";
 (()=>{
-const KEY="brekke.job.v1",$=id=>document.getElementById(id);
-const el=(t,a={},...k)=>{const e=document.createElement(t);for(const[x,y]of Object.entries(a))e.setAttribute(x,y);e.append(...k);return e};
-const usd=x=>new Intl.NumberFormat("en-US",{style:"currency",currency:"USD",maximumFractionDigits:2}).format(x);
+const KEY="brekke.v2",$=id=>document.getElementById(id);
+const el=(t,a={},...k)=>{const e=document.createElement(t);for(const[x,y]of Object.entries(a))if(y!==null)e.setAttribute(x,y);e.append(...k);return e};
+const usd=x=>new Intl.NumberFormat("en-US",{style:"currency",currency:"USD",maximumFractionDigits:0}).format(Math.round(x));
+const usd2=x=>new Intl.NumberFormat("en-US",{style:"currency",currency:"USD"}).format(x);
 const nf=new Intl.NumberFormat("en-US",{maximumFractionDigits:2});
-const JOB=[["name","Job / customer","text"],["sqft","Area (sq ft)","n"],["perim","Perimeter / edge (lin ft)","n"],["excavIn","Excavation depth (in)","n"],["baseIn","Base gravel depth (in)","n"],["bedIn","Bedding sand depth (in)","n"],["waste","Material waste (%)","n"],["crew","Crew size (people)","n"],["hrs","Hours per day","n"],["days","Days on site","n"]];
-const ASM=[["tpcy","Gravel / sand, tons per cu yd","n",1.4],["comp","Base compaction allowance (%)","n",15],["loadCy","Truck load size (cu yd)","n",10]];
-const G=(s,k)=>Number(s.job[k])||0;
-// qty suggestions come from the job numbers; null = nothing to suggest
-const LINES=[
- ["Materials","pavers","Pavers / surface material","sq ft",s=>G(s,"sqft")>0?G(s,"sqft")*(1+G(s,"waste")/100):null],
- ["Materials","gravel","Base gravel","tons",s=>G(s,"sqft")>0&&G(s,"baseIn")>0?G(s,"sqft")*G(s,"baseIn")/12/27*s.asm.tpcy*(1+s.asm.comp/100):null],
- ["Materials","sand","Bedding sand","tons",s=>G(s,"sqft")>0&&G(s,"bedIn")>0?G(s,"sqft")*G(s,"bedIn")/12/27*s.asm.tpcy:null],
- ["Materials","edge","Edge restraint","lin ft",s=>G(s,"perim")>0?G(s,"perim"):null],
- ["Materials","small","Fabric, polymeric sand, adhesive, fasteners","lump",()=>null],
- ["Materials","freight","Delivery / freight on materials","loads",()=>null],
- ["Labour","labour","Crew labour (loaded rate)","labour hrs",s=>G(s,"crew")*G(s,"hrs")*G(s,"days")||null],
- ["Equipment","skid","Skid steer","days",s=>G(s,"days")||null],
- ["Equipment","compactor","Plate compactor","days",s=>G(s,"days")||null],
- ["Equipment","rental","Saw, rentals and other equipment","lump",()=>null],
- ["Equipment","trailer","Hauling equipment to site (trailer, fuel, travel)","trips",()=>null],
- ["Disposal","spoil","Haul away excavated spoil","loads",s=>G(s,"sqft")>0&&G(s,"excavIn")>0&&s.asm.loadCy>0?Math.ceil(G(s,"sqft")*G(s,"excavIn")/12/27/s.asm.loadCy):null],
- ["Disposal","tip","Dump / tipping fees and old material removal","lump",()=>null],
- ["Other","permit","Permits and utility locates","lump",()=>null],
- ["Other","subs","Subcontractors (irrigation, electrical, etc.)","lump",()=>null],
- ["Other","clean","Site protection and cleanup","lump",()=>null],
- ["Other","callback","Callback / warranty allowance","lump",()=>null]];
-const blank=()=>({job:{},asm:Object.fromEntries(ASM.map(a=>[a[0],a[3]])),oh:"",mg:"",lines:{}});
-let S=blank();try{const v=JSON.parse(localStorage.getItem(KEY));if(v&&v.job&&v.lines)S={...blank(),...v,asm:{...blank().asm,...v.asm}}}catch{}
+const RATES=[["labour_hr","Crew labour (loaded)","$ / hour"],["skid_day","Skid steer","$ / day"],["compactor_day","Plate compactor","$ / day"],["saw_day","Saw and blades","$ / day"],
+ ["trailer_trip","Trailering equipment to site and back","$ / round trip"],["haul_load","Hauling spoil away (truck + driver)","$ / load"],["dump_load","Dump / tipping fee","$ / load"],["delivery_load","Material delivery","$ / load"],
+ ["pavers_sqft","Pavers","$ / sq ft"],["base_ton","Base gravel","$ / ton"],["sand_ton","Bedding sand","$ / ton"],["edge_lf","Edge restraint","$ / lin ft"],
+ ["wallblock_sqft","Wall block","$ / face sq ft"],["cap_lf","Wall caps","$ / lin ft"],["drainrock_ton","Drain rock","$ / ton"],["drainpipe_lf","Drain pipe","$ / lin ft"]];
+const blank=()=>({rates:{},asm:{tpcy:1.4,comp:15,loadCy:10},ck:{type:"patio",text:"",days:"",area:"",depth:"",len:"",height:"",quote:""},
+ jt:"patio",job:{patio:{},wall:{}},lines:{patio:{},wall:{}},oh:"",mg:""});
+let S=blank();try{const v=JSON.parse(localStorage.getItem(KEY));if(v&&v.job){const b=blank();S={...b,...v,asm:{...b.asm,...v.asm},ck:{...b.ck,...v.ck},job:{...b.job,...v.job},lines:{...b.lines,...v.lines}}}}catch{}
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch{}};
-const L=id=>S.lines[id]||(S.lines[id]={qty:"",rate:"",na:false});
-const sugg=l=>{const v=l[4](S);return v==null?null:v};
-const qtyOf=(l,st)=>st.qty!==""&&st.qty!=null?Number(st.qty):(sugg(l)??0);
+const R=k=>Number(S.rates[k])||0;
 
-function calc(){
- let cost=0;const missing=[],lines=[];
- for(const l of LINES){const st=L(l[1]),q=qtyOf(l,st),r=Number(st.rate)||0,tot=st.na?0:q*r;
-  const priced=st.na||(q>0&&r>0);if(!priced)missing.push(l[2]);cost+=tot;lines.push({l,st,q,r,tot,priced})}
- return{cost,missing,lines}}
+// ================= 1. estimate check =================
+const CATS=[
+ ["summary",/\b(?:sub-?total|total|tax|mark-?up|overhead|profit|margin|contingency|price|quote|bid|contract)\b/i],
+ ["disposal",/dump|dispos|haul[\s-]?(?:off|away|out)|spoil|tipping|debris|waste|removal|\bremove|\bdemo\b|tear[\s-]?out/i],
+ ["trailer",/trailer|mobili[sz]|move[\s-]?in|(?:skid|bobcat|excavator|machine|equipment|loader)[^,;]{0,15}(?:deliver|haul|transport|drop)|(?:deliver|haul|transport)\w*\s+(?:of\s+)?(?:the\s+)?(?:skid|bobcat|excavator|machine|equipment)/i],
+ ["delivery",/deliver|freight|trucking/i],
+ ["poly",/polymeric|poly\s?sand|joint\s?sand/i],
+ ["drainrock",/drain(?:age)?\s?(?:rock|gravel|aggregate|stone)|clean\s?rock|washed\s?(?:rock|gravel|stone)|#?\b57\b/i],
+ ["drainpipe",/drain\s?(?:pipe|tile|line)|perf(?:orated)?|corrugated|\bsock\b/i],
+ ["geogrid",/geo-?grid|\bgrid\b/i],
+ ["fabric",/fabric|geotextile|filter\s?cloth/i],
+ ["caps",/\bcaps?\b|coping/i],
+ ["wallblock",/wall\s?block|retaining|\bblocks?\b|allan|versa-?lok|keystone|boulders?/i],
+ ["pavers",/pavers?|flagstone|\bslabs?\b|brick|travertine|porcelain|bluestone|natural\s?stone/i],
+ ["sand",/bedding|\bsand\b|screenings|stone\s?dust/i],
+ ["base",/road\s?base|\bbase\b|crushed|gravel|aggregate|3\/4|class\s?ii|\babc\b/i],
+ ["edge",/edg(?:e|ing)|restraint|spikes/i],
+ ["skid",/skid|bobcat|track\s?loader|\bloader|mini[\s-]?ex|excavat|\bdig\b|dingo|toro/i],
+ ["compactor",/compact|\bplate\b|tamper|jumping\s?jack|rammer/i],
+ ["saw",/\bsaws?\b|blades?|cutting/i],
+ ["labour",/labou?r|crew|man[\s-]?hours?|\bhours?\b|\bhrs\b|install|\bguys\b|\bmen\b/i],
+ ["permit",/permit|locate|\b811\b|engineer|inspection/i],
+ ["cleanup",/clean[\s-]?up|protection|restor|\bseed\b|sod\s?repair|final\s?grade/i]];
+const LABEL={pavers:"Pavers / surface",base:"Base gravel",sand:"Bedding sand",edge:"Edge restraint",poly:"Polymeric / joint sand",wallblock:"Wall block",caps:"Wall caps",
+ drainrock:"Drain rock",drainpipe:"Drain pipe",geogrid:"Geogrid",fabric:"Filter fabric",labour:"Crew labour",skid:"Skid steer / digging machine",compactor:"Plate compactor",saw:"Saw and blades",
+ trailer:"Trailering equipment to site",disposal:"Disposal: haul-off and dump fees",delivery:"Material delivery",permit:"Permits / 811 locates / engineering",cleanup:"Cleanup and site protection",other:"Other",summary:"Total / markup (not a cost)"};
+function needs(type,h){
+ if(type==="wall")return{must:["wallblock","caps","base","drainrock","drainpipe","labour","skid","compactor","disposal","delivery","trailer",...(h>3?["geogrid"]:[]),...(h>4?["permit"]:[])],
+  often:[...(h>3?[]:["geogrid"]),...(h>4?[]:["permit"]),"fabric","saw","cleanup"]};
+ return{must:["pavers","base","sand","labour","skid","compactor","disposal","delivery","trailer"],often:["edge","poly","saw","permit","cleanup"]}}
+const money=s=>{const m=String(s).replace(/[$,\s]/g,"");return/^-?\d+(?:\.\d+)?$/.test(m)?Number(m):null};
+const UNIT=/^(?:days?|hrs?|hours?|tons?|loads?|sq\.?\s?ft|sf|lf|lin\.?\s?ft|ea|each|yds?|cy|cu\.?\s?yds?|trips?|bags?|pallets?|ft)$/i;
+function parseRows(text){
+ const out=[];
+ for(const raw of text.split(/\r?\n/)){const line=raw.trim();if(!line)continue;
+  let cells=line.includes("\t")?line.split("\t").map(c=>c.trim()):null,desc="",nums=[],unit="";
+  if(cells){for(const c of cells){if(!c)continue;const n=money(c);if(n!==null)nums.push({n,dollar:/\$/.test(c)});else if(UNIT.test(c))unit=c;else if(/[a-z]/i.test(c)&&!desc)desc=c;else if(/[a-z]/i.test(c))desc+=" "+c}}
+  else{const re=/\$?\s?\d[\d,]*(?:\.\d+)?/g;let m;while(m=re.exec(line)){const n=money(m[0]);if(n!==null)nums.push({n,dollar:/\$/.test(m[0]),i:m.index})}
+   desc=(nums.length?line.slice(0,nums[0].i):line).replace(/[-:|,]+\s*$/,"").trim()||line.replace(/\$?\s?\d[\d,]*(?:\.\d+)?/g,"").trim()}
+  if(!nums.length||!desc)continue;
+  const amt=(nums.filter(x=>x.dollar).pop()||nums[nums.length-1]).n;
+  let days=null,m;if(/^days?$/i.test(unit)&&nums.length>1)days=nums[0].n;else if(m=line.match(/(\d+(?:\.\d+)?)\s*days?\b/i))days=Number(m[1]);
+  const cat=(CATS.find(c=>c[1].test(desc))||["other"])[0];
+  out.push({desc:desc.slice(0,80),amt,days,cat,line})}
+ return out}
+function estimate(cat,ctx){
+ const d=ctx.days||1;
+ switch(cat){
+  case"skid":return R("skid_day")?{v:R("skid_day")*d,how:`${nf.format(d)} day${d===1?"":"s"} x ${usd(R("skid_day"))}`}:null;
+  case"compactor":return R("compactor_day")?{v:R("compactor_day")*d,how:`${nf.format(d)} day${d===1?"":"s"} x ${usd(R("compactor_day"))}`}:null;
+  case"saw":return R("saw_day")?{v:R("saw_day"),how:`1 day x ${usd(R("saw_day"))}`}:null;
+  case"trailer":return R("trailer_trip")?{v:R("trailer_trip"),how:`1 round trip`}:null;
+  case"delivery":return R("delivery_load")?{v:R("delivery_load"),how:`1 load`}:null;
+  case"disposal":{const per=R("haul_load")+R("dump_load");if(!per)return null;const L=ctx.loads||1;return{v:per*L,how:`${ctx.loads?L:"at least 1"} load${L===1?"":"s"} x ${usd(per)}`}}
+  case"labour":return null;
+  default:return null}}
+const CKF={patio:[["days","Days on site","n"],["area","Area (sq ft)","n"],["depth","Excavation depth (in)","n"],["quote","Quote price, if not in the paste ($)","n"]],
+ wall:[["days","Days on site","n"],["len","Wall length (ft)","n"],["height","Wall height (ft)","n"],["quote","Quote price, if not in the paste ($)","n"]]};
+function buildCk(){
+ $("ck-patio").setAttribute("aria-pressed",String(S.ck.type==="patio"));$("ck-wall").setAttribute("aria-pressed",String(S.ck.type==="wall"));
+ $("ck-grid").replaceChildren(...CKF[S.ck.type].map(([k,l])=>{const i=el("input",{type:"number",min:"0",step:"any",inputmode:"decimal",value:S.ck[k]??""});i.oninput=()=>{S.ck[k]=i.value;save();if(!$("ck-out").hidden)runCheck()};return el("label",{class:"field"},l+" (optional)",i)}))}
+$("ck-text").value=S.ck.text;$("ck-text").oninput=e=>{S.ck.text=e.target.value;save()};
+$("ck-patio").onclick=()=>{S.ck.type="patio";save();buildCk();if(!$("ck-out").hidden)runCheck()};$("ck-wall").onclick=()=>{S.ck.type="wall";save();buildCk();if(!$("ck-out").hidden)runCheck()};
+function runCheck(){
+ const rows=parseRows(S.ck.text),m=$("ck-msg");
+ if(!rows.length){$("ck-out").hidden=true;m.textContent="Nothing to check: paste rows that each have a description and a dollar amount.";return}
+ m.textContent="";$("ck-out").hidden=false;
+ const costs=rows.filter(r=>r.cat!=="summary"),have=new Set(costs.map(r=>r.cat));
+ const labourDays=(costs.find(r=>r.cat==="labour"&&r.days)||{}).days,days=Number(S.ck.days)||labourDays||null;
+ const h=Number(S.ck.height)||0;let cy=0;
+ if(S.ck.type==="patio"&&Number(S.ck.area)>0&&Number(S.ck.depth)>0)cy=Number(S.ck.area)*Number(S.ck.depth)/12/27;
+ if(S.ck.type==="wall"&&Number(S.ck.len)>0&&h>0)cy=Number(S.ck.len)*3*(h*0.5+0.5)/27;
+ const ctx={days,loads:cy>0&&S.asm.loadCy>0?Math.ceil(cy/S.asm.loadCy):null};
+ const nd=needs(S.ck.type,h),miss=[],soft=[];let estTotal=0,estUnknown=0;
+ const body=[];
+ for(const[tier,list]of[["must",nd.must],["often",nd.often]])for(const c of list){
+  const found=costs.filter(r=>r.cat===c),ok=found.length>0,est=ok?null:estimate(c,ctx);
+  if(!ok){(tier==="must"?miss:soft).push(LABEL[c]);if(tier==="must"){if(est)estTotal+=est.v;else estUnknown++}}
+  body.push(el("tr",{class:ok?"":tier==="must"?"miss":""},el("td",{},LABEL[c]),
+   el("td",{},ok?found.map(r=>`${r.desc} (${usd2(r.amt)})`).join("; "):el("span",{class:"muted"},"Not found")),
+   el("td",{},el("span",{class:"chip "+(ok?"green":tier==="must"?"red":"amber")},ok?"Priced":tier==="must"?"Missing":"Often missed")),
+   el("td",{class:"num"},ok?"":est?el("span",{},usd(est.v),el("div",{class:"hint"},est.how)):el("span",{class:"hint"},c==="labour"?"needs hours":"add your rate below"))))}
+ $("ck-body").replaceChildren(...body);
+ const st=$("chk-status");
+ if(miss.length){st.className="bad";st.textContent=`Missing from this estimate: ${miss.join(", ")}.`}else{st.className="ok";st.textContent="Nothing essential missing for a "+(S.ck.type==="wall"?"retaining wall":"patio")+" job."}
+ // warnings
+ const w=[];
+ const skid=costs.filter(r=>r.cat==="skid"),skidDays=skid.reduce((a,r)=>a+(r.days||0),0);
+ if(skid.length&&days&&skidDays&&skidDays<days){const extra=R("skid_day")*(days-skidDays);estTotal+=extra;w.push(`Skid steer is priced for ${nf.format(skidDays)} day${skidDays===1?"":"s"}, but the job runs ${nf.format(days)} days. Second day?${extra?` That's another ${usd(extra)} at your rate.`:""}`)}
+ if(soft.length)w.push(`Often missed, check if they apply: ${soft.join(", ")}.`);
+ const other=costs.filter(r=>r.cat==="other");if(other.length)w.push(`Not recognised (counted as cost, not checked): ${other.map(r=>r.desc).join(", ")}.`);
+ $("ck-warns").replaceChildren(...w.map(t=>el("div",{class:"warn"},t)));
+ // profit impact
+ const costSum=costs.reduce((a,r)=>a+r.amt,0),qRow=[...rows].reverse().find(r=>r.cat==="summary"&&/price|quote|bid|contract|\btotal\b/i.test(r.desc)&&!/sub-?total/i.test(r.desc));
+ const quote=Number(S.ck.quote)||(qRow?qRow.amt:0),imp=$("ck-impact");
+ if(quote>0&&quote>=costSum*0.5){const prof=quote-costSum,after=prof-estTotal,pct=x=>Math.round(x/quote*100)+"%";
+  const lines=[el("div",{},`Quote ${usd(quote)}${!Number(S.ck.quote)&&qRow?` (from your row “${qRow.desc}”)`:""}. Costs in the estimate: ${usd(costSum)}.`),
+   el("div",{},"As priced: ",el("strong",{},usd(prof))," profit (",pct(prof),").")];
+  if(estTotal>0)lines.push(el("div",{},"With the missing items at your rates: ",el("strong",{},usd(after))," (",pct(after),")",after<0?". This job loses money.":"."));
+  if(estUnknown)lines.push(el("div",{class:"hint"},`${estUnknown} missing item${estUnknown===1?"":"s"} not costed: add your rates in step 2.`));
+  if(!Number(S.ck.quote)&&qRow&&Math.abs(quote-costSum)<1)lines.push(el("div",{class:"hint"},"That row equals your cost total. Enter the quote price above to see profit."));
+  imp.className="impact"+(estTotal>0&&after<0?" loss":"");imp.replaceChildren(...lines)}
+ else{imp.className="impact";imp.replaceChildren(el("div",{},`Costs in the estimate: ${usd(costSum)}.`+(estTotal?` Missing items at your rates add about ${usd(estTotal)}.`:"")),el("div",{class:"hint"},"Enter the quote price above to see what the missing items do to your profit."))}
+ $("ck-rows").replaceChildren(...rows.map(r=>el("tr",{},el("td",{},r.desc),el("td",{class:"num"},usd2(r.amt)),el("td",{},LABEL[r.cat]+(r.days?` (${nf.format(r.days)} day${r.days===1?"":"s"})`:"")))));
+}
+$("ck-go").onclick=runCheck;
+
+// ================= 2. rate book =================
+$("rate-grid").replaceChildren(...RATES.map(([k,l,u])=>{const i=el("input",{type:"number",min:"0",step:"any",inputmode:"decimal",value:S.rates[k]??""});
+ i.oninput=()=>{S.rates[k]=i.value;save();update();if(!$("ck-out").hidden)runCheck()};return el("label",{class:"field"},`${l} (${u})`,i)}));
+
+// ================= 3. builder =================
+const ASM=[["tpcy","Gravel / sand, tons per cu yd"],["comp","Base compaction allowance (%)"],["loadCy","Truck load size (cu yd)"]];
+const JOB={patio:[["name","Job / customer","text"],["sqft","Area (sq ft)"],["perim","Edge length (lin ft)"],["excavIn","Excavation depth (in)"],["baseIn","Base gravel depth (in)"],["bedIn","Bedding sand depth (in)"],["waste","Material waste (%)"],["crew","Crew size"],["hrs","Hours per day"],["days","Days on site"]],
+ wall:[["name","Job / customer","text"],["len","Wall length (ft)"],["height","Exposed height (ft)"],["excavFt","Trench + backfill dig depth (ft)"],["baseIn","Base gravel depth (in)"],["waste","Block waste (%)"],["crew","Crew size"],["hrs","Hours per day"],["days","Days on site"]]};
+const J=k=>Number(S.job[S.jt][k])||0;
+const tons=cy=>cy*S.asm.tpcy;
+const LINES={
+ patio:[["Materials","pavers","Pavers / surface","sq ft",()=>J("sqft")?J("sqft")*(1+J("waste")/100):null,"pavers_sqft","must"],
+  ["Materials","base","Base gravel","tons",()=>J("sqft")&&J("baseIn")?tons(J("sqft")*J("baseIn")/12/27)*(1+S.asm.comp/100):null,"base_ton","must"],
+  ["Materials","sand","Bedding sand","tons",()=>J("sqft")&&J("bedIn")?tons(J("sqft")*J("bedIn")/12/27):null,"sand_ton","must"],
+  ["Materials","edge","Edge restraint","lin ft",()=>J("perim")||null,"edge_lf","often"],
+  ["Materials","poly","Polymeric / joint sand","lump",null,null,"often"],
+  ["Materials","delivery","Material delivery","loads",()=>1,"delivery_load","must"]],
+ wall:[["Materials","wallblock","Wall block","face sq ft",()=>J("len")&&J("height")?J("len")*J("height")*(1+J("waste")/100):null,"wallblock_sqft","must"],
+  ["Materials","caps","Wall caps","lin ft",()=>J("len")||null,"cap_lf","must"],
+  ["Materials","base","Base gravel (2 ft wide trench)","tons",()=>J("len")&&J("baseIn")?tons(J("len")*2*J("baseIn")/12/27)*(1+S.asm.comp/100):null,"base_ton","must"],
+  ["Materials","drainrock","Drain rock (1 ft behind wall)","tons",()=>J("len")&&J("height")?tons(J("len")*1*J("height")/27):null,"drainrock_ton","must"],
+  ["Materials","drainpipe","Drain pipe","lin ft",()=>J("len")||null,"drainpipe_lf","must"],
+  ["Materials","geogrid","Geogrid","lump",null,null,()=>J("height")>3?"must":"often"],
+  ["Materials","fabric","Filter fabric","lump",null,null,"often"],
+  ["Materials","delivery","Material delivery","loads",()=>1,"delivery_load","must"]]};
+const COMMON=[["Labour","labour","Crew labour","labour hrs",()=>J("crew")*J("hrs")*J("days")||null,"labour_hr","must"],
+ ["Equipment","skid","Skid steer","days",()=>J("days")||null,"skid_day","must"],
+ ["Equipment","compactor","Plate compactor","days",()=>J("days")||null,"compactor_day","must"],
+ ["Equipment","saw","Saw and blades","days",()=>1,"saw_day","often"],
+ ["Equipment","trailer","Trailering equipment to site and back","trips",()=>1,"trailer_trip","must"],
+ ["Disposal","haul","Haul spoil away","loads",()=>spoilLoads(),"haul_load","must"],
+ ["Disposal","dump","Dump / tipping fees","loads",()=>spoilLoads(),"dump_load","must"],
+ ["Other","permit","Permits, 811 locates, engineering","lump",null,null,()=>S.jt==="wall"&&J("height")>4?"must":"often"],
+ ["Other","clean","Cleanup and site protection","lump",null,null,"often"]];
+function spoilLoads(){const cy=S.jt==="wall"?J("len")*3*J("excavFt")/27:J("sqft")*J("excavIn")/12/27;return cy>0&&S.asm.loadCy>0?Math.ceil(cy/S.asm.loadCy):null}
+const lines=()=>[...LINES[S.jt],...COMMON];
+const tier=l=>typeof l[6]==="function"?l[6]():l[6];
+const L=id=>S.lines[S.jt][id]||(S.lines[S.jt][id]={qty:"",rate:"",na:false});
+const qtyOf=(l,st)=>l[3]==="lump"?1:(st.qty!==""&&st.qty!=null?Number(st.qty):(l[4]?l[4]()??0:0));
+const rateOf=(l,st)=>st.rate!==""&&st.rate!=null?Number(st.rate):(l[5]?R(l[5]):0);
+let refs={};
 function update(){
- const c=calc();
- // row states and placeholders
- for(const x of c.lines){const o=refs[x.l[1]];
-  o.tr.className=x.priced?"":"miss";
-  o.chip.className="chip "+(x.st.na?"na":x.priced?"green":"red");o.chip.textContent=x.st.na?"N/A":x.priced?"Priced":"Not priced";
-  const sg=sugg(x.l);o.qty.placeholder=sg==null?"":nf.format(sg);o.qty.disabled=x.st.na;o.rate.disabled=x.st.na;
-  o.tot.textContent=x.st.na?"-":usd(x.tot)}
+ let cost=0;const must=[],often=[],rows=[];
+ for(const l of lines()){const st=L(l[1]),q=qtyOf(l,st),r=rateOf(l,st),tot=st.na?0:q*r,priced=st.na||(q>0&&r>0);
+  if(!priced)(tier(l)==="must"?must:often).push(l[2]);cost+=tot;rows.push({l,st,q,r,tot,priced})}
+ for(const x of rows){const o=refs[x.l[1]];if(!o)continue;const t=tier(x.l);
+  o.tr.className=x.priced?"":t==="must"?"miss":"";
+  o.chip.className="chip "+(x.st.na?"na":x.priced?"green":t==="must"?"red":"amber");o.chip.textContent=x.st.na?"N/A":x.priced?"Priced":t==="must"?"Not priced":"Often missed";
+  const sg=x.l[3]==="lump"?null:(x.l[4]?x.l[4]():null);o.qty.placeholder=sg==null?"":nf.format(sg);o.qty.disabled=x.st.na||x.l[3]==="lump";
+  o.rate.placeholder=x.l[5]&&R(x.l[5])?nf.format(R(x.l[5])):"";o.rate.disabled=x.st.na;o.tot.textContent=x.st.na?"-":usd2(x.tot)}
  const s=$("status");
- if(c.missing.length){s.className="bad";s.textContent=`${c.missing.length} cost${c.missing.length===1?"":"s"} not priced: ${c.missing.join(", ")}.`}
- else{s.className="ok";s.textContent="Every cost is priced or marked N/A."}
- // cross-checks
- const w=[],ski=L("skid"),skiQ=qtyOf(LINES.find(l=>l[1]==="skid"),ski),days=G(S,"days");
- if(!ski.na&&days>1&&skiQ>0&&skiQ<days)w.push(`Skid steer is priced for ${nf.format(skiQ)} day${skiQ===1?"":"s"} but the crew is on site ${nf.format(days)} days. Second day?`);
- const exc=G(S,"excavIn")*G(S,"sqft")/12/27;
- if(exc>0&&(L("spoil").na||L("tip").na))w.push(`You marked disposal N/A but the job digs out about ${nf.format(exc)} cu yd of spoil.`);
- if(G(S,"sqft")>0&&G(S,"excavIn")===0)w.push("Excavation depth is blank, so spoil and disposal can't be worked out.");
- if(G(S,"days")>1&&!L("trailer").na&&!(Number(L("trailer").rate)>0))w.push("Multi-day job: have you priced moving the equipment to site and back?");
+ if(must.length){s.className="bad";s.textContent=`${must.length} cost${must.length===1?"":"s"} not priced: ${must.join(", ")}.`}else{s.className="ok";s.textContent="Every essential cost is priced or marked N/A."}
+ const w=[],skid=L("skid"),skQ=qtyOf(lines().find(l=>l[1]==="skid"),skid),days=J("days");
+ if(!skid.na&&days>1&&skQ>0&&skQ<days)w.push(`Skid steer is priced for ${nf.format(skQ)} day${skQ===1?"":"s"} but the crew is on site ${nf.format(days)} days. Second day?`);
+ if(spoilLoads()===null)w.push(S.jt==="wall"?"Enter wall length and dig depth so disposal loads can be worked out.":"Enter area and excavation depth so disposal loads can be worked out.");
+ if(often.length)w.push(`Often missed: ${often.join(", ")}. Price them or tick N/A.`);
  $("warns").replaceChildren(...w.map(t=>el("div",{class:"warn"},t)));
- // price
- const oh=Number(S.oh)||0,mg=Number(S.mg)||0,ohAmt=c.cost*oh/100,base=c.cost+ohAmt,price=mg<100?base/(1-mg/100):base,sq=G(S,"sqft");
+ const oh=Number(S.oh)||0,mg=Number(S.mg)||0,ohAmt=cost*oh/100,base=cost+ohAmt,price=mg<100?base/(1-mg/100):base;
+ const size=S.jt==="wall"?J("len")*J("height"):J("sqft");
  const tile=(cls,l,v,n)=>{const d=el("div",{class:"tile "+cls},el("div",{class:"tile-label"},l),el("div",{class:"tile-value"},v));if(n)d.append(el("div",{class:"hint"},n));return d};
- const setOk=S.oh!==""&&S.mg!=="";
- $("tiles").replaceChildren(tile("","Direct cost",usd(c.cost)),tile("","Overhead",usd(ohAmt),S.oh===""?"Not set":oh+"% of cost"),tile("","Margin",usd(price-base),S.mg===""?"Not set":mg+"% of price"),
-  tile("main","Quote price",usd(price),!setOk?"Set overhead and margin":c.missing.length?"Incomplete: costs not priced":""),sq>0?tile("","Per sq ft",usd(price/sq)):"");
- return{c,price,ohAmt,base}}
-const refs={};
+ $("tiles").replaceChildren(tile("","Direct cost",usd(cost)),tile("","Overhead",usd(ohAmt),S.oh===""?"Not set":oh+"% of cost"),tile("","Margin",usd(price-base),S.mg===""?"Not set":mg+"% of price"),
+  tile("main","Quote price",usd(price),S.oh===""||S.mg===""?"Set overhead and margin":must.length?"Incomplete: costs not priced":""),size>0?tile("",S.jt==="wall"?"Per face sq ft":"Per sq ft",usd2(price/size)):"");
+ return{cost,price,ohAmt,must,rows}}
 function build(){
- const jg=$("job-grid"),ag=$("asm-grid");
- jg.replaceChildren(...JOB.map(([k,l,t])=>{const i=el("input",{type:t==="n"?"number":"text",...(t==="n"?{min:"0",step:"any",inputmode:"decimal"}:{maxlength:"80"}),value:S.job[k]??"",id:"j-"+k});
-  i.oninput=()=>{S.job[k]=i.value;save();update()};return el("label",{class:"field",for:"j-"+k},l,i)}));
- ag.replaceChildren(...ASM.map(([k,l])=>{const i=el("input",{type:"number",min:"0",step:"any",value:S.asm[k]??"",id:"a-"+k});
-  i.oninput=()=>{S.asm[k]=Number(i.value)||0;save();update()};return el("label",{class:"field",for:"a-"+k},l,i)}));
- const tb=$("lines");tb.replaceChildren();let grp="";
- for(const l of LINES){
+ $("jb-patio").setAttribute("aria-pressed",String(S.jt==="patio"));$("jb-wall").setAttribute("aria-pressed",String(S.jt==="wall"));
+ $("job-grid").replaceChildren(...JOB[S.jt].map(([k,l,t])=>{const i=el("input",{type:t==="text"?"text":"number",...(t==="text"?{maxlength:"80"}:{min:"0",step:"any",inputmode:"decimal"}),value:S.job[S.jt][k]??""});
+  i.oninput=()=>{S.job[S.jt][k]=i.value;save();update()};return el("label",{class:"field"},l,i)}));
+ $("asm-grid").replaceChildren(...ASM.map(([k,l])=>{const i=el("input",{type:"number",min:"0",step:"any",value:S.asm[k]??""});i.oninput=()=>{S.asm[k]=Number(i.value)||0;save();update()};return el("label",{class:"field"},l,i)}));
+ const tb=$("lines");tb.replaceChildren();refs={};let grp="";
+ for(const l of lines()){
   if(l[0]!==grp){grp=l[0];tb.append(el("tr",{class:"grp"},el("th",{colspan:"6",scope:"colgroup"},grp)))}
-  const st=L(l[1]),qty=el("input",{type:"number",min:"0",step:"any",inputmode:"decimal",value:st.qty,"aria-label":l[2]+": quantity"}),
+  const st=L(l[1]),qty=el("input",{type:"number",min:"0",step:"any",inputmode:"decimal",value:l[3]==="lump"?"1":st.qty,"aria-label":l[2]+": quantity"}),
    rate=el("input",{type:"number",min:"0",step:"any",inputmode:"decimal",value:st.rate,"aria-label":l[2]+": $ per "+l[3]}),
-   na=el("input",{type:"checkbox",checked:st.na?"":null,"aria-label":l[2]+": not applicable"}),chip=el("span",{class:"chip red"},"Not priced"),tot=el("td",{class:"num"},"-");
-  if(!st.na)na.removeAttribute("checked");
+   na=el("input",{type:"checkbox","aria-label":l[2]+": not applicable"}),chip=el("span",{class:"chip red"},"Not priced"),tot=el("td",{class:"num"},"-");
   na.checked=!!st.na;
   qty.oninput=()=>{st.qty=qty.value;save();update()};rate.oninput=()=>{st.rate=rate.value;save();update()};na.onchange=()=>{st.na=na.checked;save();update()};
-  const tr=el("tr",{},el("td",{},l[2]," ",chip),el("td",{class:"num"},qty),el("td",{class:"hint"},l[3]),el("td",{class:"num"},rate),tot,el("td",{},na));
+  const tr=el("tr",{},el("td",{},l[2]," ",chip),el("td",{class:"num"},qty),el("td",{class:"hint"},l[3]==="lump"?"lump sum":l[3]),el("td",{class:"num"},rate),tot,el("td",{},na));
   tb.append(tr);refs[l[1]]={tr,chip,qty,rate,tot}}
- $("oh").value=S.oh;$("mg").value=S.mg;
-}
+ $("oh").value=S.oh;$("mg").value=S.mg}
+$("jb-patio").onclick=()=>{S.jt="patio";save();build();update()};$("jb-wall").onclick=()=>{S.jt="wall";save();build();update()};
 $("oh").oninput=e=>{S.oh=e.target.value;save();update()};$("mg").oninput=e=>{S.mg=e.target.value;save();update()};
-$("reset").onclick=()=>{S=blank();save();build();update();$("cmsg").textContent="Cleared. Ready for the next job."};
-$("copy").onclick=async()=>{const{c,price,ohAmt}=update(),n=S.job.name||"Job",rows=c.lines.filter(x=>!x.st.na&&x.tot>0).map(x=>`${x.l[2]}: ${nf.format(x.q)} ${x.l[3]} x ${usd(x.r)} = ${usd(x.tot)}`);
- const txt=[`${n}`,...rows,`Direct cost: ${usd(c.cost)}`,`Overhead: ${usd(ohAmt)}`,`Quote price: ${usd(price)}`,c.missing.length?`NOT PRICED: ${c.missing.join(", ")}`:"All costs priced or marked N/A"].join("\n");
- try{await navigator.clipboard.writeText(txt);$("cmsg").textContent="Copied."}catch{$("cmsg").textContent="Couldn't copy. Select the numbers by hand."}};
-build();update();
+$("reset").onclick=()=>{S.job[S.jt]={};S.lines[S.jt]={};S.oh=S.oh;save();build();update();$("cmsg").textContent="Cleared. Your rates are kept."};
+$("copy").onclick=async()=>{const{cost,price,ohAmt,must,rows}=update(),n=S.job[S.jt].name||"Job",it=rows.filter(x=>!x.st.na&&x.tot>0).map(x=>`${x.l[2]}: ${nf.format(x.q)} ${x.l[3]} x ${usd2(x.r)} = ${usd2(x.tot)}`);
+ const txt=[n,...it,`Direct cost: ${usd2(cost)}`,`Overhead: ${usd2(ohAmt)}`,`Quote price: ${usd2(price)}`,must.length?`NOT PRICED: ${must.join(", ")}`:"All essential costs priced"].join("\n");
+ try{await navigator.clipboard.writeText(txt);$("cmsg").textContent="Copied."}catch{$("cmsg").textContent="Couldn't copy."}};
+buildCk();build();update();
 })();
 </script>
 </body>
