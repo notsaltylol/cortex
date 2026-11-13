@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Patio &amp; Wall Job Check | Cortex for Brekke Brothers</title>
+<title>Patio &amp; Wall Quotes | QuoteCraft for Brekke Brothers</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -56,19 +56,91 @@ select{font:inherit;padding:7px 9px;background:var(--bg);color:var(--ink);border
 .chip.amber{background:var(--amber-bg);color:var(--amber)}
 .seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden}.seg button{border:0;background:var(--bg);color:var(--ink);padding:6px 14px;cursor:pointer;font-size:14px}.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
 h3{margin:0 0 8px;font-size:15px}
+.eyebrow{margin:0 0 2px;font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.steps{font-size:13px;display:flex;gap:6px 14px;flex-wrap:wrap}
+.paper{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:22px;display:grid;gap:16px;max-width:780px;margin-top:12px}
+.paper table{min-width:0}.paper td,.paper th{padding:7px 4px}
+.paper .pt-head{display:flex;justify-content:space-between;gap:12px 24px;flex-wrap:wrap}
+.paper .biz{font-size:18px;font-weight:600}.paper .doc{font-size:20px;font-weight:600;letter-spacing:.02em}
+.paper .lbl{font-size:12px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin:0 0 3px}
+.paper .scope{white-space:pre-wrap;margin:0}
+.paper tr.sum td{border-top:0;padding-top:3px;padding-bottom:3px}.paper tr.sum.first td{border-top:1px solid var(--line);padding-top:8px}
+.paper tr.grand td{border-top:2px solid var(--ink);font-weight:600;font-size:17px}
+.sig{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:18px}.sigline{border-bottom:1px solid var(--ink);height:30px}
+textarea.plain{font:inherit;min-height:80px}
+@media print{
+ :root,:root:not([data-theme="light"]){color-scheme:light;--bg:#fff;--surface:#fff;--ink:#000;--muted:#444;--line:#bbb}
+ body{background:#fff}footer,.wrap>*:not(#sec-prop),#sec-prop>*:not(#proposal){display:none!important}
+ .wrap{padding:0;max-width:none}#sec-prop{border:0;padding:0;background:none}.paper{border:0;padding:0;margin:0;max-width:none}}
 </style>
 </head>
 <body>
 <main class="wrap">
-  <a class="back" href="/">&larr; Back to Cortex</a>
   <header>
-    <p class="muted" style="margin:0 0 2px;font-size:13px;text-transform:uppercase;letter-spacing:.08em">Cortex for Brekke Brothers Landscape &amp; Stone</p>
-    <h1>Patio &amp; wall job check</h1>
-    <p class="sub">Paste the estimate from your spreadsheet. It shows what's missing (disposal, equipment, the second day on the skid steer) and what that does to your profit, before the quote goes out. No login. Nothing leaves this browser.</p>
+    <p class="eyebrow">QuoteCraft &middot; Quotes &amp; proposals for Brekke Brothers Landscape &amp; Stone</p>
+    <h1>Patio &amp; wall quotes</h1>
+    <p class="sub">Build an itemized quote from your own rates, with disposal and equipment filled in so nothing gets left off, add any discount and sales tax, then hand the customer a clean proposal. No login. Nothing leaves this browser.</p>
   </header>
+  <nav class="steps" aria-label="Steps"><a href="#h-rates">1. Your rates</a><a href="#h-job">2. Build the quote</a><a href="#h-prop">3. Customer proposal</a><a href="#h-chk">4. Check a spreadsheet estimate</a></nav>
+
+  <section class="panel" aria-labelledby="h-rates">
+    <h2 id="h-rates">1. Your rates (saved, used every time)</h2>
+    <p class="hint" style="margin:0 0 8px">Enter these once. They fill in every quote so disposal and equipment are never left blank, and they price anything missing from a pasted spreadsheet estimate.</p>
+    <div class="grid" id="rate-grid"></div>
+  </section>
+
+  <section class="panel" aria-labelledby="h-job">
+    <h2 id="h-job">2. Build the quote</h2>
+    <div class="row" style="margin-bottom:10px"><span class="muted" style="font-size:14px">Job type</span>
+      <div class="seg" role="group" aria-label="Job type for the builder"><button type="button" id="jb-patio" aria-pressed="true">Patio</button><button type="button" id="jb-wall" aria-pressed="false">Retaining wall</button></div></div>
+    <div class="grid" id="job-grid"></div>
+    <details style="margin-top:10px"><summary class="muted" style="cursor:pointer;font-size:14px">Rules of thumb (change if yours differ)</summary>
+      <div class="grid" id="asm-grid" style="margin-top:8px"></div></details>
+    <div id="status" role="status" aria-live="polite" style="margin-top:12px"></div>
+    <div id="warns" aria-live="polite" style="margin-top:8px"></div>
+    <p class="hint" style="margin:10px 0 8px">Quantities fill in from the job; rates fill in from your rates. Type over either to change it. Tick N/A only if a cost really doesn't apply.</p>
+    <div class="scroll"><table>
+      <thead><tr><th scope="col">Cost</th><th class="num" scope="col">Qty</th><th scope="col">Unit</th><th class="num" scope="col">$ per unit</th><th class="num" scope="col">Total</th><th scope="col">N/A</th></tr></thead>
+      <tbody id="lines"></tbody></table></div>
+    <div class="grid" style="margin:12px 0">
+      <label class="field">Overhead (% on cost)<input id="oh" type="number" min="0" step="0.5" inputmode="decimal"></label>
+      <label class="field">Target margin (% of price)<input id="mg" type="number" min="0" max="95" step="0.5" inputmode="decimal"></label>
+      <label class="field">Discount<input id="q-disc" type="number" min="0" step="any" inputmode="decimal"></label>
+      <label class="field">Discount is<select id="q-discType"><option value="pct">% off the price</option><option value="amt">$ off the price</option></select></label>
+      <label class="field">Sales tax (%)<input id="q-tax" type="number" min="0" max="30" step="0.001" inputmode="decimal"></label>
+      <label class="field">Tax applies to<select id="q-taxOn"><option value="all">Whole job</option><option value="materials">Materials only</option></select></label>
+    </div>
+    <div id="tiles"></div>
+    <div class="row" style="margin-top:12px">
+      <button type="button" class="btn" id="copy">Copy internal cost summary</button>
+      <button type="button" class="btn" id="reset">New job</button>
+      <span id="cmsg" class="msg" role="status" aria-live="polite"></span>
+    </div>
+  </section>
+  <section class="panel" aria-labelledby="h-prop" id="sec-prop">
+    <h2 id="h-prop">3. Customer proposal</h2>
+    <p class="hint" style="margin:0 0 8px">What the customer sees: prices by section (or by line), any discount, sales tax and the total. Your costs, overhead and margin are never shown.</p>
+    <div id="prop-warn" style="display:grid;gap:8px;margin-bottom:10px" aria-live="polite"></div>
+    <div class="grid">
+      <label class="field">Your business name<input id="q-biz" type="text" maxlength="80"></label>
+      <label class="field">Your phone / email<input id="q-contact" type="text" maxlength="120"></label>
+      <label class="field">Site address<input id="q-addr" type="text" maxlength="160"></label>
+      <label class="field">Quote number (optional)<input id="q-qno" type="text" maxlength="30"></label>
+      <label class="field">Valid for (days)<input id="q-valid" type="number" min="0" step="1" inputmode="numeric"></label>
+      <label class="field">Deposit to schedule (% of total, optional)<input id="q-deposit" type="number" min="0" max="100" step="any" inputmode="decimal"></label>
+      <label class="field">Show prices<select id="q-show"><option value="groups">By section</option><option value="lines">Every line</option></select></label>
+    </div>
+    <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(260px,1fr));margin-top:10px">
+      <label class="field">Scope of work (leave blank to use the suggested wording)<textarea id="q-scope" class="plain" maxlength="1500"></textarea></label>
+      <label class="field">Notes and exclusions (optional)<textarea id="q-notes" class="plain" maxlength="1500" placeholder="Anything not included, payment terms, warranty"></textarea></label>
+    </div>
+    <div class="row" style="margin-top:10px"><button type="button" class="primary" id="print">Print or save as PDF</button><button type="button" class="btn" id="copy-prop">Copy proposal text</button><span id="pmsg" class="msg" role="status" aria-live="polite"></span></div>
+    <article id="proposal" class="paper" aria-label="Customer proposal preview"></article>
+  </section>
 
   <section class="panel" aria-labelledby="h-chk">
-    <h2 id="h-chk">1. Check an estimate you already have</h2>
+    <h2 id="h-chk">4. Already priced it in your spreadsheet? Check it</h2>
+    <p class="hint" style="margin:0 0 8px">Paste an estimate you built elsewhere and QuoteCraft shows which costs are missing (disposal, equipment, a second skid steer day) and what they do to your profit, before the quote goes out.</p>
     <div class="row" style="margin-bottom:10px"><span class="muted" style="font-size:14px">Job type</span>
       <div class="seg" role="group" aria-label="Job type for the check"><button type="button" id="ck-patio" aria-pressed="true">Patio</button><button type="button" id="ck-wall" aria-pressed="false">Retaining wall</button></div></div>
     <label class="field" for="ck-text">Select the cost rows in your spreadsheet, copy, and paste here. Any layout works: each row needs a description and a dollar amount.<textarea id="ck-text" spellcheck="false" placeholder="Paste your estimate rows here"></textarea></label>
@@ -84,38 +156,8 @@ h3{margin:0 0 8px;font-size:15px}
     </div>
   </section>
 
-  <section class="panel" aria-labelledby="h-rates">
-    <h2 id="h-rates">2. Your rates (saved, used every time)</h2>
-    <p class="hint" style="margin:0 0 8px">Enter these once. They price anything missing from a pasted estimate, and they fill in the job builder below so disposal and equipment are never left blank.</p>
-    <div class="grid" id="rate-grid"></div>
-  </section>
-
-  <section class="panel" aria-labelledby="h-job">
-    <h2 id="h-job">3. Or price a job here</h2>
-    <div class="row" style="margin-bottom:10px"><span class="muted" style="font-size:14px">Job type</span>
-      <div class="seg" role="group" aria-label="Job type for the builder"><button type="button" id="jb-patio" aria-pressed="true">Patio</button><button type="button" id="jb-wall" aria-pressed="false">Retaining wall</button></div></div>
-    <div class="grid" id="job-grid"></div>
-    <details style="margin-top:10px"><summary class="muted" style="cursor:pointer;font-size:14px">Conversion assumptions (change if yours differ)</summary>
-      <div class="grid" id="asm-grid" style="margin-top:8px"></div></details>
-    <div id="status" role="status" aria-live="polite" style="margin-top:12px"></div>
-    <div id="warns" aria-live="polite" style="margin-top:8px"></div>
-    <p class="hint" style="margin:10px 0 8px">Quantities fill in from the job; rates fill in from your rates. Type over either to change it. Tick N/A only if a cost really doesn't apply.</p>
-    <div class="scroll"><table>
-      <thead><tr><th scope="col">Cost</th><th class="num" scope="col">Qty</th><th scope="col">Unit</th><th class="num" scope="col">$ per unit</th><th class="num" scope="col">Total</th><th scope="col">N/A</th></tr></thead>
-      <tbody id="lines"></tbody></table></div>
-    <div class="grid" style="margin:12px 0">
-      <label class="field">Overhead (% on cost)<input id="oh" type="number" min="0" step="0.5" inputmode="decimal"></label>
-      <label class="field">Target margin (% of price)<input id="mg" type="number" min="0" max="95" step="0.5" inputmode="decimal"></label>
-    </div>
-    <div id="tiles"></div>
-    <div class="row" style="margin-top:12px">
-      <button type="button" class="primary" id="copy">Copy cost summary</button>
-      <button type="button" class="btn" id="reset">New job</button>
-      <span id="cmsg" class="msg" role="status" aria-live="polite"></span>
-    </div>
-  </section>
 </main>
-<footer>Cortex by Pitch, Pray, Ship. Typesafe.</footer>
+<footer>QuoteCraft by Pitch, Pray, Ship. Typesafe.</footer>
 <script>
 "use strict";
 (()=>{
@@ -124,8 +166,8 @@ const el=(t,a={},...k)=>{const e=document.createElement(t);for(const[x,y]of Obje
 const usd=x=>new Intl.NumberFormat("en-US",{style:"currency",currency:"USD",maximumFractionDigits:0}).format(Math.round(x));
 const usd2=x=>new Intl.NumberFormat("en-US",{style:"currency",currency:"USD"}).format(x);
 const nf=new Intl.NumberFormat("en-US",{maximumFractionDigits:2});
-const RATES=[["labour_hr","Crew labour (loaded)","$ / hour"],["skid_day","Skid steer","$ / day"],["compactor_day","Plate compactor","$ / day"],["saw_day","Saw and blades","$ / day"],
- ["trailer_trip","Trailering equipment to site and back","$ / round trip"],["haul_load","Hauling spoil away (truck + driver)","$ / load"],["dump_load","Dump / tipping fee","$ / load"],["delivery_load","Material delivery","$ / load"],
+const RATES=[["labour_hr","Crew labor (what an hour of crew time costs you)","$ / hour"],["skid_day","Skid steer","$ / day"],["compactor_day","Plate compactor","$ / day"],["saw_day","Saw and blades","$ / day"],
+ ["trailer_trip","Trailering equipment to site and back","$ / round trip"],["haul_load","Hauling dirt away (truck + driver)","$ / load"],["dump_load","Dump / tipping fee","$ / load"],["delivery_load","Material delivery","$ / load"],
  ["pavers_sqft","Pavers","$ / sq ft"],["base_ton","Base gravel","$ / ton"],["sand_ton","Bedding sand","$ / ton"],["edge_lf","Edge restraint","$ / lin ft"],
  ["wallblock_sqft","Wall block","$ / face sq ft"],["cap_lf","Wall caps","$ / lin ft"],["drainrock_ton","Drain rock","$ / ton"],["drainpipe_lf","Drain pipe","$ / lin ft"]];
 const blank=()=>({rates:{},asm:{tpcy:1.4,comp:15,loadCy:10},ck:{type:"patio",text:"",days:"",area:"",depth:"",len:"",height:"",quote:""},
@@ -135,50 +177,83 @@ const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch{}};
 const R=k=>Number(S.rates[k])||0;
 
 // ================= 1. estimate check =================
-const CATS=[
- ["summary",/\b(?:sub-?total|total|tax|mark-?up|overhead|profit|margin|contingency|price|quote|bid|contract)\b/i],
- ["disposal",/dump|dispos|haul[\s-]?(?:off|away|out)|spoil|tipping|debris|waste|removal|\bremove|\bdemo\b|tear[\s-]?out/i],
- ["trailer",/trailer|mobili[sz]|move[\s-]?in|(?:skid|bobcat|excavator|machine|equipment|loader)[^,;]{0,15}(?:deliver|haul|transport|drop)|(?:deliver|haul|transport)\w*\s+(?:of\s+)?(?:the\s+)?(?:skid|bobcat|excavator|machine|equipment)/i],
- ["delivery",/deliver|freight|trucking/i],
- ["poly",/polymeric|poly\s?sand|joint\s?sand/i],
- ["drainrock",/drain(?:age)?\s?(?:rock|gravel|aggregate|stone)|clean\s?rock|washed\s?(?:rock|gravel|stone)|#?\b57\b/i],
- ["drainpipe",/drain\s?(?:pipe|tile|line)|perf(?:orated)?|corrugated|\bsock\b/i],
- ["geogrid",/geo-?grid|\bgrid\b/i],
- ["fabric",/fabric|geotextile|filter\s?cloth/i],
- ["caps",/\bcaps?\b|coping/i],
- ["wallblock",/wall\s?block|retaining|\bblocks?\b|allan|versa-?lok|keystone|boulders?/i],
- ["pavers",/pavers?|flagstone|\bslabs?\b|brick|travertine|porcelain|bluestone|natural\s?stone/i],
- ["sand",/bedding|\bsand\b|screenings|stone\s?dust/i],
- ["base",/road\s?base|\bbase\b|crushed|gravel|aggregate|3\/4|class\s?ii|\babc\b/i],
- ["edge",/edg(?:e|ing)|restraint|spikes/i],
- ["skid",/skid|bobcat|track\s?loader|\bloader|mini[\s-]?ex|excavat|\bdig\b|dingo|toro/i],
- ["compactor",/compact|\bplate\b|tamper|jumping\s?jack|rammer/i],
- ["saw",/\bsaws?\b|blades?|cutting/i],
- ["labour",/labou?r|crew|man[\s-]?hours?|\bhours?\b|\bhrs\b|install|\bguys\b|\bmen\b/i],
- ["permit",/permit|locate|\b811\b|engineer|inspection/i],
- ["cleanup",/clean[\s-]?up|protection|restor|\bseed\b|sod\s?repair|final\s?grade/i]];
-const LABEL={pavers:"Pavers / surface",base:"Base gravel",sand:"Bedding sand",edge:"Edge restraint",poly:"Polymeric / joint sand",wallblock:"Wall block",caps:"Wall caps",
- drainrock:"Drain rock",drainpipe:"Drain pipe",geogrid:"Geogrid",fabric:"Filter fabric",labour:"Crew labour",skid:"Skid steer / digging machine",compactor:"Plate compactor",saw:"Saw and blades",
- trailer:"Trailering equipment to site",disposal:"Disposal: haul-off and dump fees",delivery:"Material delivery",permit:"Permits / 811 locates / engineering",cleanup:"Cleanup and site protection",other:"Other",summary:"Total / markup (not a cost)"};
-function needs(type,h){
- if(type==="wall")return{must:["wallblock","caps","base","drainrock","drainpipe","labour","skid","compactor","disposal","delivery","trailer",...(h>3?["geogrid"]:[]),...(h>4?["permit"]:[])],
-  often:[...(h>3?[]:["geogrid"]),...(h>4?[]:["permit"]),"fabric","saw","cleanup"]};
- return{must:["pavers","base","sand","labour","skid","compactor","disposal","delivery","trailer"],often:["edge","poly","saw","permit","cleanup"]}}
+// A row can satisfy several cost categories ("Equipment (skid, compactor, saw)", "Road base & sand").
+const MAT=["pavers","wallblock","caps","base","sand","edge","poly","drainrock","drainpipe","geogrid","fabric"];
+const RX={
+ quote:/\b(?:price|quote|bid|contract|customer|sell(?:ing)?|charge)\b/i,
+ total:/\b(?:grand\s+)?total\b/i,
+ tax:/\btax\b/i,
+ markup:/\b(?:mark-?up|overhead|profit|margin|contingency)\b/i,
+ subtotal:/\bsub-?total\b/i,
+ disposal:/dump|dispos|landfill|tipping|dumpster|roll[\s-]?off|haul[\s-]?(?:off|away|out)|haul\w*\s+(?:\w+\s+)?(?:dirt|spoil|debris|soil|concrete|rubble|waste|sod|loads?)|\bspoil\b|dirt\s+haul|debris\s+(?:haul|removal)/i,
+ tearout:/tear[\s-]?out|\bdemo(?:lition|lish)?\b|\bremov(?:e|al)\b|rip[\s-]?out|break\s?(?:up|out)|excavat|\bdig(?:ging)?\b/i,
+ trailer:/trailer|mobili[sz]|move[\s-]?in|(?:skid|bobcat|excavator|machine|equipment|loader)[^,;]{0,15}(?:deliver|haul|transport|drop)|(?:deliver|haul|transport)\w*\s+(?:of\s+)?(?:the\s+)?(?:skid|bobcat|excavator|machine|equipment)/i,
+ delivery:/deliver|freight|trucking/i,
+ labour:/labou?r|\bcrew\b|man[\s-]?hours?|\binstall|\bguys\b|\bmen\b|\bworkers?\b|\bhelpers?\b/i,
+ equipGeneric:/\bequip(?:ment)?\b|\brentals?\b|\bmachine(?:ry)?\b/i,
+ lumpMat:/^\s*(?:all\s+)?materials?\b(?!\s*deliver)/i,
+ poly:/polymeric|poly\s?sand|joint\s?sand/i,
+ drainrock:/drain(?:age)?\s?(?:rock|gravel|aggregate|stone)|clean\s?rock|washed\s?(?:rock|gravel|stone)|#\s?57\b|\b57\s?stone/i,
+ drainpipe:/drain\s?(?:pipe|tile|line)|\bperf(?:orated)?\b|corrugated|\bsock\b/i,
+ geogrid:/geo-?grid|\bgrid\b/i,
+ fabric:/fabric|geotextile|filter\s?cloth/i,
+ caps:/\bcaps?\b|coping/i,
+ wallblock:/wall\s?blocks?|retaining\s+(?:wall\s+)?blocks?|\bblocks?\b|allan|versa-?lok|keystone|boulders?/i,
+ pavers:/pavers?|flagstone|\bslabs?\b|brick|travertine|porcelain|bluestone|natural\s?stone/i,
+ sand:/bedding|\bsand\b|screenings|stone\s?dust/i,
+ base:/road\s?base|\bbase\b|crushed|gravel|aggregate|3\/4|class\s?ii|\babc\b/i,
+ edge:/edg(?:e|ing)|restraint|spikes/i,
+ skid:/skid|bobcat|track\s?loader|\bloader\b|mini[\s-]?ex|excavator|dingo|toro/i,
+ compactor:/compact|\bplate\b|tamper|jumping\s?jack|rammer/i,
+ saw:/\bsaws?\b|blades?|cutting/i,
+ permit:/permit|locate|\b811\b|engineer|inspection/i,
+ cleanup:/clean[\s-]?up|protection|restor|\bseed\b|sod\s?repair|final\s?grade/i};
+const LABEL={pavers:"Pavers / surface",base:"Base gravel",sand:"Bedding sand",edge:"Edge restraint",poly:"Joint sand (poly sand)",wallblock:"Wall block",caps:"Wall caps",
+ drainrock:"Drain rock",drainpipe:"Drain pipe",geogrid:"Geogrid",fabric:"Filter fabric",labour:"Crew labor",skid:"Skid steer / Bobcat",compactor:"Plate compactor",saw:"Saw and blades",
+ trailer:"Trailering equipment to site",disposal:"Disposal: haul-off and dump fees",delivery:"Material delivery",permit:"Permits / 811 locates / engineering",cleanup:"Cleanup",
+ tearout:"Tear-out / digging (work)",other:"Not recognised",summary:"Total, tax or markup (not a cost)"};
+function classify(desc){
+ const d=desc,cats=new Set(),notes=[];
+ if(RX.subtotal.test(d)||RX.total.test(d)||RX.tax.test(d)||RX.markup.test(d)||(RX.quote.test(d)&&!RX.labour.test(d)))return{cats:new Set(["summary"]),notes,kind:RX.tax.test(d)?"tax":RX.markup.test(d)?"markup":RX.quote.test(d)?"quote":RX.subtotal.test(d)?"subtotal":"total"};
+ for(const k of["disposal","trailer","delivery","poly","drainrock","drainpipe","geogrid","fabric","caps","wallblock","pavers","sand","base","edge","skid","compactor","saw","permit","cleanup"])if(RX[k].test(d))cats.add(k);
+ if(cats.has("trailer")){cats.delete("delivery");cats.delete("skid")}
+ if(cats.has("poly"))cats.delete("sand");
+ if(cats.has("drainrock"))cats.delete("base");
+ if(cats.has("disposal"))cats.delete("delivery");
+ if(RX.tearout.test(d))cats.add("tearout");
+ if(RX.labour.test(d)){cats.add("labour");for(const m of MAT)cats.delete(m)}           // "Install pavers", "Retaining wall labor": work, not material
+ if(RX.equipGeneric.test(d)&&!cats.has("skid")&&!cats.has("compactor")&&!cats.has("saw")&&!cats.has("trailer")){cats.add("skid");cats.add("compactor");notes.push("equipment not itemized")}
+ if(RX.lumpMat.test(d)&&![...cats].some(c=>MAT.includes(c))){for(const m of MAT)cats.add(m);notes.push("materials not itemized")}
+ if(cats.has("tearout")&&cats.size===1&&/excavat|\bdig/i.test(d)){cats.add("skid");notes.push("assumed to include the machine")}
+ return{cats,notes}}
+const UNIT_AFTER=/^\s*(?:sq\.?\s?ft|sf|sqft|lf|lin\.?\s?ft|ft|feet|in|inch(?:es)?|"|tons?|loads?|days?|hrs?|hours?|men|guys|people|yds?|cy|cu\.?\s?yds?|trips?|bags?|pallets?|pcs|ea|each|%|x\b)/i;
+const UNITCELL=/^(?:days?|hrs?|hours?|tons?|loads?|sq\.?\s?ft|sf|lf|lin\.?\s?ft|ea|each|yds?|cy|cu\.?\s?yds?|trips?|bags?|pallets?|ft)$/i;
 const money=s=>{const m=String(s).replace(/[$,\s]/g,"");return/^-?\d+(?:\.\d+)?$/.test(m)?Number(m):null};
-const UNIT=/^(?:days?|hrs?|hours?|tons?|loads?|sq\.?\s?ft|sf|lf|lin\.?\s?ft|ea|each|yds?|cy|cu\.?\s?yds?|trips?|bags?|pallets?|ft)$/i;
+function splitCSV(line){const out=[];let cur="",q=false;for(let i=0;i<line.length;i++){const c=line[i];if(q){if(c==='"'&&line[i+1]==='"'){cur+='"';i++}else if(c==='"')q=false;else cur+=c}else if(c==='"')q=true;else if(c===","){out.push(cur);cur=""}else cur+=c}out.push(cur);return out.map(x=>x.trim())}
+function daysFrom(line,unit,nums){
+ let m;
+ if(/^days?$/i.test(unit)&&nums.length>1)return nums[0].n;
+ if(m=line.match(/(\d+(?:\.\d+)?)\s*(?:men|guys|people|workers|crew)\s*(?:x|\*|for|@)\s*(\d+(?:\.\d+)?)\s*(?:hrs?|hours)/i))return Number(m[2])/8;
+ if(m=line.match(/(\d+(?:\.\d+)?)\s*days?\b/i))return Number(m[1]);
+ return null}
 function parseRows(text){
- const out=[];
+ const out=[],skipped=[];
  for(const raw of text.split(/\r?\n/)){const line=raw.trim();if(!line)continue;
-  let cells=line.includes("\t")?line.split("\t").map(c=>c.trim()):null,desc="",nums=[],unit="";
-  if(cells){for(const c of cells){if(!c)continue;const n=money(c);if(n!==null)nums.push({n,dollar:/\$/.test(c)});else if(UNIT.test(c))unit=c;else if(/[a-z]/i.test(c)&&!desc)desc=c;else if(/[a-z]/i.test(c))desc+=" "+c}}
-  else{const re=/\$?\s?\d[\d,]*(?:\.\d+)?/g;let m;while(m=re.exec(line)){const n=money(m[0]);if(n!==null)nums.push({n,dollar:/\$/.test(m[0]),i:m.index})}
-   desc=(nums.length?line.slice(0,nums[0].i):line).replace(/[-:|,]+\s*$/,"").trim()||line.replace(/\$?\s?\d[\d,]*(?:\.\d+)?/g,"").trim()}
-  if(!nums.length||!desc)continue;
+  let cells=null;
+  if(line.includes("\t"))cells=line.split("\t").map(c=>c.trim());
+  else if(!line.includes("$")&&(line.match(/,/g)||[]).length>=2)cells=splitCSV(line);
+  let desc="",nums=[],unit="";
+  if(cells){const words=[];for(const c of cells){if(!c)continue;const n=money(c);if(n!==null)nums.push({n,dollar:/\$/.test(c)});else if(UNITCELL.test(c))unit=c;else if(/[a-z]/i.test(c))words.push(c)}desc=words.join(" ")}
+  else{const re=/\$?\s?\d[\d,]*(?:\.\d+)?/g;let m;
+   while(m=re.exec(line)){const after=line.slice(m.index+m[0].length),dollar=/\$/.test(m[0]);if(!dollar&&UNIT_AFTER.test(after))continue;const n=money(m[0]);if(n!==null)nums.push({n,dollar,i:m.index})}
+   const firstNum=line.search(/\$?\s?\d/);desc=(firstNum>0?line.slice(0,firstNum):line).replace(/[-:|,@=]+\s*$/,"").trim();
+   if(!desc)desc=line.replace(/\$?\s?\d[\d,]*(?:\.\d+)?/g," ").replace(/\s+/g," ").trim()}
+  if(!desc){continue}
+  if(!nums.length){if(/[a-z]/i.test(line)&&/\d/.test(line))skipped.push(line);continue}   // e.g. "Hendricks - 450 sf patio": a heading, not a cost
   const amt=(nums.filter(x=>x.dollar).pop()||nums[nums.length-1]).n;
-  let days=null,m;if(/^days?$/i.test(unit)&&nums.length>1)days=nums[0].n;else if(m=line.match(/(\d+(?:\.\d+)?)\s*days?\b/i))days=Number(m[1]);
-  const cat=(CATS.find(c=>c[1].test(desc))||["other"])[0];
-  out.push({desc:desc.slice(0,80),amt,days,cat,line})}
- return out}
+  const c=classify(desc),days=daysFrom(line,unit,nums);
+  out.push({desc:desc.slice(0,80),amt,days,cats:c.cats,notes:c.notes,kind:c.kind,line})}
+ return{rows:out,skipped}}
 function estimate(cat,ctx){
  const d=ctx.days||1;
  switch(cat){
@@ -188,56 +263,68 @@ function estimate(cat,ctx){
   case"trailer":return R("trailer_trip")?{v:R("trailer_trip"),how:`1 round trip`}:null;
   case"delivery":return R("delivery_load")?{v:R("delivery_load"),how:`1 load`}:null;
   case"disposal":{const per=R("haul_load")+R("dump_load");if(!per)return null;const L=ctx.loads||1;return{v:per*L,how:`${ctx.loads?L:"at least 1"} load${L===1?"":"s"} x ${usd(per)}`}}
-  case"labour":return null;
   default:return null}}
-const CKF={patio:[["days","Days on site","n"],["area","Area (sq ft)","n"],["depth","Excavation depth (in)","n"],["quote","Quote price, if not in the paste ($)","n"]],
- wall:[["days","Days on site","n"],["len","Wall length (ft)","n"],["height","Wall height (ft)","n"],["quote","Quote price, if not in the paste ($)","n"]]};
+function needs(type,h){
+ if(type==="wall")return{must:["wallblock","caps","base","drainrock","drainpipe","labour","skid","compactor","disposal","delivery","trailer",...(h>3?["geogrid"]:[]),...(h>4?["permit"]:[])],often:[...(h>3?[]:["geogrid"]),"fabric",...(h>4?[]:["permit"])]};
+ return{must:["pavers","base","sand","labour","skid","compactor","disposal","delivery","trailer"],often:["edge","poly","permit"]}}
+const CKF={patio:[["days","Days on site","n"],["area","Area (sq ft)","n"],["depth","Dig depth (in)","n"],["quote","Your price to the customer ($)","n"]],
+ wall:[["days","Days on site","n"],["len","Wall length (ft)","n"],["height","Wall height (ft)","n"],["quote","Your price to the customer ($)","n"]]};
 function buildCk(){
  $("ck-patio").setAttribute("aria-pressed",String(S.ck.type==="patio"));$("ck-wall").setAttribute("aria-pressed",String(S.ck.type==="wall"));
- $("ck-grid").replaceChildren(...CKF[S.ck.type].map(([k,l])=>{const i=el("input",{type:"number",min:"0",step:"any",inputmode:"decimal",value:S.ck[k]??""});i.oninput=()=>{S.ck[k]=i.value;save();if(!$("ck-out").hidden)runCheck()};return el("label",{class:"field"},l+" (optional)",i)}))}
+ $("ck-grid").replaceChildren(...CKF[S.ck.type].map(([k,l])=>{const i=el("input",{type:"number",min:"0",step:"any",inputmode:"decimal",value:S.ck[k]??""});i.oninput=()=>{S.ck[k]=i.value;save();if(!$("ck-out").hidden)runCheck()};return el("label",{class:"field"},l+(k==="quote"?"":" (optional)"),i)}))}
 $("ck-text").value=S.ck.text;$("ck-text").oninput=e=>{S.ck.text=e.target.value;save()};
 $("ck-patio").onclick=()=>{S.ck.type="patio";save();buildCk();if(!$("ck-out").hidden)runCheck()};$("ck-wall").onclick=()=>{S.ck.type="wall";save();buildCk();if(!$("ck-out").hidden)runCheck()};
 function runCheck(){
- const rows=parseRows(S.ck.text),m=$("ck-msg");
+ const{rows,skipped}=parseRows(S.ck.text),m=$("ck-msg");
  if(!rows.length){$("ck-out").hidden=true;m.textContent="Nothing to check: paste rows that each have a description and a dollar amount.";return}
  m.textContent="";$("ck-out").hidden=false;
- const costs=rows.filter(r=>r.cat!=="summary"),have=new Set(costs.map(r=>r.cat));
- const labourDays=(costs.find(r=>r.cat==="labour"&&r.days)||{}).days,days=Number(S.ck.days)||labourDays||null;
+ const costs=rows.filter(r=>!r.cats.has("summary")),covers=c=>costs.filter(r=>r.cats.has(c));
+ const labourDays=(costs.find(r=>r.cats.has("labour")&&r.days)||{}).days,days=Number(S.ck.days)||labourDays||null;
  const h=Number(S.ck.height)||0;let cy=0;
  if(S.ck.type==="patio"&&Number(S.ck.area)>0&&Number(S.ck.depth)>0)cy=Number(S.ck.area)*Number(S.ck.depth)/12/27;
  if(S.ck.type==="wall"&&Number(S.ck.len)>0&&h>0)cy=Number(S.ck.len)*3*(h*0.5+0.5)/27;
  const ctx={days,loads:cy>0&&S.asm.loadCy>0?Math.ceil(cy/S.asm.loadCy):null};
- const nd=needs(S.ck.type,h),miss=[],soft=[];let estTotal=0,estUnknown=0;
- const body=[];
+ const nd=needs(S.ck.type,h),miss=[],soft=[],body=[];let estTotal=0,estUnknown=0;
+ const tear=covers("tearout");
  for(const[tier,list]of[["must",nd.must],["often",nd.often]])for(const c of list){
-  const found=costs.filter(r=>r.cat===c),ok=found.length>0,est=ok?null:estimate(c,ctx);
-  if(!ok){(tier==="must"?miss:soft).push(LABEL[c]);if(tier==="must"){if(est)estTotal+=est.v;else estUnknown++}}
-  body.push(el("tr",{class:ok?"":tier==="must"?"miss":""},el("td",{},LABEL[c]),
-   el("td",{},ok?found.map(r=>`${r.desc} (${usd2(r.amt)})`).join("; "):el("span",{class:"muted"},"Not found")),
-   el("td",{},el("span",{class:"chip "+(ok?"green":tier==="must"?"red":"amber")},ok?"Priced":tier==="must"?"Missing":"Often missed")),
+  const found=covers(c),ok=found.length>0,est=ok?null:estimate(c,ctx);
+  if(!ok){(tier==="must"?miss:soft).push(LABEL[c]);if(tier==="must"){if(est)estTotal+=est.v;else if(c!=="labour")estUnknown++}}
+  const why=!ok&&c==="disposal"&&tear.length?el("div",{class:"hint"},`You're paying for "${tear[0].desc}", but nothing to haul it away or dump it.`):"";
+  body.push(el("tr",{class:ok?"":tier==="must"?"miss":""},el("td",{},LABEL[c],why),
+   el("td",{},ok?found.map(r=>`${r.desc} (${usd2(r.amt)})${r.notes.length?" - "+r.notes.join(", "):""}`).join("; "):el("span",{class:"muted"},"Not found")),
+   el("td",{},el("span",{class:"chip "+(ok?"green":tier==="must"?"red":"amber")},ok?"Priced":tier==="must"?"Missing":"Worth a check")),
    el("td",{class:"num"},ok?"":est?el("span",{},usd(est.v),el("div",{class:"hint"},est.how)):el("span",{class:"hint"},c==="labour"?"needs hours":"add your rate below"))))}
  $("ck-body").replaceChildren(...body);
  const st=$("chk-status");
  if(miss.length){st.className="bad";st.textContent=`Missing from this estimate: ${miss.join(", ")}.`}else{st.className="ok";st.textContent="Nothing essential missing for a "+(S.ck.type==="wall"?"retaining wall":"patio")+" job."}
- // warnings
- const w=[];
- const skid=costs.filter(r=>r.cat==="skid"),skidDays=skid.reduce((a,r)=>a+(r.days||0),0);
- if(skid.length&&days&&skidDays&&skidDays<days){const extra=R("skid_day")*(days-skidDays);estTotal+=extra;w.push(`Skid steer is priced for ${nf.format(skidDays)} day${skidDays===1?"":"s"}, but the job runs ${nf.format(days)} days. Second day?${extra?` That's another ${usd(extra)} at your rate.`:""}`)}
- if(soft.length)w.push(`Often missed, check if they apply: ${soft.join(", ")}.`);
- const other=costs.filter(r=>r.cat==="other");if(other.length)w.push(`Not recognised (counted as cost, not checked): ${other.map(r=>r.desc).join(", ")}.`);
+ // the second day on the skid steer
+ const w=[],skid=covers("skid").filter(r=>!r.notes.includes("equipment not itemized")),rate=R("skid_day");
+ let skidDays=skid.reduce((a,r)=>a+(r.days||0),0);
+ if(skid.length&&!skidDays&&rate>0){const t=skid.reduce((a,r)=>a+r.amt,0),d=t/rate;if(d>=0.5&&Math.abs(d-Math.round(d))<0.15)skidDays=Math.round(d)}
+ if(skid.length&&days>1){
+  if(skidDays&&skidDays<days){const extra=rate*(days-skidDays);estTotal+=extra;w.push(`${skid[0].desc} is priced for ${nf.format(skidDays)} day${skidDays===1?"":"s"}, but the job runs ${nf.format(days)} days. Second day?${extra?` That's another ${usd(extra)} at your rate.`:""}`)}
+  else if(!skidDays)w.push(`"${skid[0].desc}" doesn't say how many days, and the job runs ${nf.format(days)} days. Is it priced for all of them?${rate?"":" (Add your skid steer day rate below and I'll work it out from the amount.)"}`)}
+ if(skid.length&&!days)w.push("Enter days on site to check the skid steer is priced for every day.");
+ if(soft.length)w.push(`Worth a check: ${soft.join(", ")}.`);
+ const other=costs.filter(r=>!r.cats.size);if(other.length)w.push(`Not recognised (counted as cost, not checked): ${other.map(r=>r.desc).join(", ")}.`);
+ if(skipped.length)w.push(`Skipped (no dollar amount): ${skipped.map(s=>s.slice(0,40)).join("; ")}.`);
  $("ck-warns").replaceChildren(...w.map(t=>el("div",{class:"warn"},t)));
- // profit impact
- const costSum=costs.reduce((a,r)=>a+r.amt,0),qRow=[...rows].reverse().find(r=>r.cat==="summary"&&/price|quote|bid|contract|\btotal\b/i.test(r.desc)&&!/sub-?total/i.test(r.desc));
- const quote=Number(S.ck.quote)||(qRow?qRow.amt:0),imp=$("ck-impact");
- if(quote>0&&quote>=costSum*0.5){const prof=quote-costSum,after=prof-estTotal,pct=x=>Math.round(x/quote*100)+"%";
-  const lines=[el("div",{},`Quote ${usd(quote)}${!Number(S.ck.quote)&&qRow?` (from your row “${qRow.desc}”)`:""}. Costs in the estimate: ${usd(costSum)}.`),
-   el("div",{},"As priced: ",el("strong",{},usd(prof))," profit (",pct(prof),").")];
-  if(estTotal>0)lines.push(el("div",{},"With the missing items at your rates: ",el("strong",{},usd(after))," (",pct(after),")",after<0?". This job loses money.":"."));
-  if(estUnknown)lines.push(el("div",{class:"hint"},`${estUnknown} missing item${estUnknown===1?"":"s"} not costed: add your rates in step 2.`));
-  if(!Number(S.ck.quote)&&qRow&&Math.abs(quote-costSum)<1)lines.push(el("div",{class:"hint"},"That row equals your cost total. Enter the quote price above to see profit."));
-  imp.className="impact"+(estTotal>0&&after<0?" loss":"");imp.replaceChildren(...lines)}
- else{imp.className="impact";imp.replaceChildren(el("div",{},`Costs in the estimate: ${usd(costSum)}.`+(estTotal?` Missing items at your rates add about ${usd(estTotal)}.`:"")),el("div",{class:"hint"},"Enter the quote price above to see what the missing items do to your profit."))}
- $("ck-rows").replaceChildren(...rows.map(r=>el("tr",{},el("td",{},r.desc),el("td",{class:"num"},usd2(r.amt)),el("td",{},LABEL[r.cat]+(r.days?` (${nf.format(r.days)} day${r.days===1?"":"s"})`:"")))));
+ // profit impact: only from an explicit price, or a total that is clearly more than costs + tax
+ const costSum=costs.reduce((a,r)=>a+r.amt,0),sum=k=>rows.filter(r=>r.kind===k).reduce((a,r)=>a+r.amt,0);
+ const qRow=[...rows].reverse().find(r=>r.kind==="quote"),tRow=[...rows].reverse().find(r=>r.kind==="total");
+ let quote=Number(S.ck.quote)||0,src="";
+ if(!quote&&qRow){quote=qRow.amt;src=`from your row “${qRow.desc}”`}
+ else if(!quote&&tRow){const net=tRow.amt-sum("tax");if(net>costSum*1.02){quote=net;src=`from your “${tRow.desc}” row${sum("tax")?", less tax":""}`}}
+ const imp=$("ck-impact");
+ if(quote>0){const prof=quote-costSum,after=prof-estTotal,pct=x=>Math.round(x/quote*100)+"%";
+  const L=[el("div",{},`Price ${usd(quote)}${src?` (${src})`:""}. Costs in the estimate: ${usd(costSum)}.`),el("div",{},"As priced: ",el("strong",{},usd(prof))," profit (",pct(prof),").")];
+  if(estTotal>0)L.push(el("div",{},"With what's missing, at your rates: ",el("strong",{},usd(after))," (",pct(after),")",after<0?". This job loses money.":"."));
+  if(estUnknown)L.push(el("div",{class:"hint"},`${estUnknown} missing item${estUnknown===1?"":"s"} not costed yet: add your rates below.`));
+  imp.className="impact"+(estTotal>0&&after<0?" loss":"");imp.replaceChildren(...L)}
+ else{imp.className="impact";imp.replaceChildren(el("div",{},`Costs in the estimate: ${usd(costSum)}.`+(estTotal?` What's missing adds about ${usd(estTotal)} at your rates.`:"")),
+  el("div",{class:"hint"},tRow?`Your “${tRow.desc}” row looks like costs${sum("tax")?" plus tax":""}, not your price. Enter your price to the customer above to see profit.`:"Enter your price to the customer above to see what the missing items do to your profit."))}
+ $("ck-rows").replaceChildren(...rows.map(r=>el("tr",{},el("td",{},r.desc),el("td",{class:"num"},usd2(r.amt)),
+  el("td",{},(r.cats.size?[...r.cats].map(c=>LABEL[c]).join(", "):LABEL.other)+(r.days?` (${nf.format(r.days)} day${r.days===1?"":"s"})`:"")+(r.notes.length?` - ${r.notes.join(", ")}`:"")))));
 }
 $("ck-go").onclick=runCheck;
 
@@ -256,7 +343,7 @@ const LINES={
   ["Materials","base","Base gravel","tons",()=>J("sqft")&&J("baseIn")?tons(J("sqft")*J("baseIn")/12/27)*(1+S.asm.comp/100):null,"base_ton","must"],
   ["Materials","sand","Bedding sand","tons",()=>J("sqft")&&J("bedIn")?tons(J("sqft")*J("bedIn")/12/27):null,"sand_ton","must"],
   ["Materials","edge","Edge restraint","lin ft",()=>J("perim")||null,"edge_lf","often"],
-  ["Materials","poly","Polymeric / joint sand","lump",null,null,"often"],
+  ["Materials","poly","Joint sand (poly sand)","lump",null,null,"often"],
   ["Materials","delivery","Material delivery","loads",()=>1,"delivery_load","must"]],
  wall:[["Materials","wallblock","Wall block","face sq ft",()=>J("len")&&J("height")?J("len")*J("height")*(1+J("waste")/100):null,"wallblock_sqft","must"],
   ["Materials","caps","Wall caps","lin ft",()=>J("len")||null,"cap_lf","must"],
@@ -266,12 +353,12 @@ const LINES={
   ["Materials","geogrid","Geogrid","lump",null,null,()=>J("height")>3?"must":"often"],
   ["Materials","fabric","Filter fabric","lump",null,null,"often"],
   ["Materials","delivery","Material delivery","loads",()=>1,"delivery_load","must"]]};
-const COMMON=[["Labour","labour","Crew labour","labour hrs",()=>J("crew")*J("hrs")*J("days")||null,"labour_hr","must"],
+const COMMON=[["Labor","labour","Crew labor","labor hrs",()=>J("crew")*J("hrs")*J("days")||null,"labour_hr","must"],
  ["Equipment","skid","Skid steer","days",()=>J("days")||null,"skid_day","must"],
  ["Equipment","compactor","Plate compactor","days",()=>J("days")||null,"compactor_day","must"],
  ["Equipment","saw","Saw and blades","days",()=>1,"saw_day","often"],
  ["Equipment","trailer","Trailering equipment to site and back","trips",()=>1,"trailer_trip","must"],
- ["Disposal","haul","Haul spoil away","loads",()=>spoilLoads(),"haul_load","must"],
+ ["Disposal","haul","Haul dirt away","loads",()=>spoilLoads(),"haul_load","must"],
  ["Disposal","dump","Dump / tipping fees","loads",()=>spoilLoads(),"dump_load","must"],
  ["Other","permit","Permits, 811 locates, engineering","lump",null,null,()=>S.jt==="wall"&&J("height")>4?"must":"often"],
  ["Other","clean","Cleanup and site protection","lump",null,null,"often"]];
