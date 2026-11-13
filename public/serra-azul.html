@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Repeat-Contact Retention | Cortex for Serra Azul Telecom</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f5f6f8;--surface:#fff;--ink:#1b2230;--muted:#5d6879;--line:#dde2ea;--accent:#2b4fd8;--accent-ink:#fff;
+ --red:#b3261e;--red-bg:#fde8e6;--amber:#8a5a00;--amber-bg:#fff1d6;--green:#1d7a46;--green-bg:#e0f4e8;
+ --font-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;--font-num:"IBM Plex Mono",ui-monospace,Menlo,monospace}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#12151c;--surface:#1a1f29;--ink:#e8ecf3;--muted:#9aa5b8;--line:#2b3342;--accent:#7f9bff;--accent-ink:#0b1020;
+ --red:#ff8a80;--red-bg:#3d1c1a;--amber:#f2c261;--amber-bg:#3a2d12;--green:#6fd09a;--green-bg:#16301f}}
+*{box-sizing:border-box}html,body{margin:0;max-width:100%;overflow-x:hidden}
+body{background:var(--bg);color:var(--ink);font:15px/1.5 var(--font-body)}
+.wrap{max-width:1100px;margin:0 auto;padding:20px 16px 32px;display:grid;gap:16px;min-width:0}
+.wrap>*{min-width:0}
+a{color:var(--accent)}h1{margin:0;font-size:26px;letter-spacing:-.01em;text-wrap:balance}
+h2{margin:0 0 10px;font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600}
+.back{font-size:13px}.sub,.muted{color:var(--muted)}.sub{margin:4px 0 0}
+.eyebrow{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600;margin-bottom:2px}
+.num{font-family:var(--font-num);font-variant-numeric:tabular-nums}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px}
+.panel p{margin:0 0 8px}
+[hidden]{display:none!important}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+label.field{display:grid;gap:4px;font-size:13px;color:var(--muted)}
+input,button,textarea,select{font:inherit}
+input[type=text],input[type=number],textarea,select{padding:7px 9px;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:8px;width:100%}
+textarea{font-family:var(--font-num);font-size:13px;min-height:110px;resize:vertical}
+.scroll{overflow-x:auto;max-width:100%}table{width:100%;border-collapse:collapse;min-width:820px}
+th,td{text-align:left;padding:7px 8px;border-top:1px solid var(--line);vertical-align:top}
+thead th{border-top:0;font-size:12px;color:var(--muted);font-weight:600}td.num,th.num{text-align:right}
+.st{display:inline-block;font-size:11px;font-weight:600;padding:1px 9px;border-radius:999px;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap}
+.st.red{background:var(--red-bg);color:var(--red)}.st.amber{background:var(--amber-bg);color:var(--amber)}.st.green{background:var(--green-bg);color:var(--green)}.st.grey{background:var(--bg);color:var(--muted);border:1px solid var(--line)}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px}
+.tile{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--line);border-radius:10px;padding:10px 14px}
+.tile.red{border-left-color:var(--red)}.tile.green{border-left-color:var(--green)}.tile.amber{border-left-color:var(--amber)}.tile.main{border-left-color:var(--accent)}
+.tile-label{color:var(--muted);font-size:13px}.tile-value{font:500 21px var(--font-num)}.hint{font-size:12px;color:var(--muted)}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+button.primary{padding:8px 14px;background:var(--accent);color:var(--accent-ink);border:0;border-radius:8px;font-weight:600;cursor:pointer}
+button.btn{font-size:13px;padding:5px 12px;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:999px;cursor:pointer}
+button.btn.on{border-color:var(--accent);color:var(--accent);font-weight:600}
+.msg{font-size:13px;color:var(--muted);margin:0;min-height:1.3em}.msg.warn{color:var(--red)}
+code{font-family:var(--font-num);font-size:12.5px;background:var(--bg);padding:1px 5px;border-radius:4px;border:1px solid var(--line)}
+details summary{cursor:pointer;color:var(--muted);font-size:14px}
+ul.plain{margin:6px 0 0;padding-left:18px;font-size:14px;display:grid;gap:3px}
+.acts{display:flex;gap:6px;flex-wrap:wrap;min-width:200px}
+.verdict{border:1px solid var(--line);border-left:6px solid var(--line);border-radius:10px;padding:12px 14px;background:var(--bg);display:grid;gap:6px;margin-top:12px}
+.verdict.green{border-left-color:var(--green)}.verdict.red{border-left-color:var(--red)}
+.v-head{font-weight:600;font-size:20px}.verdict.green .v-head{color:var(--green)}.verdict.red .v-head{color:var(--red)}
+.formula{font-family:var(--font-num);font-size:12.5px;background:var(--surface);border:1px dashed var(--line);border-radius:8px;padding:8px 10px;overflow-wrap:anywhere}
+.check{display:flex;gap:8px;align-items:center;font-size:14px}
+.sum{border:2px solid var(--ink);border-radius:10px;padding:14px;background:var(--surface);display:grid;gap:10px}
+.sum h3{margin:0;font-size:18px}.sum dl{margin:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:6px 18px}
+.sum dl div{display:flex;justify-content:space-between;gap:10px;border-bottom:1px solid var(--line);padding:3px 0}
+.sum dt{color:var(--muted);font-size:13px}.sum dd{margin:0;font:500 15px var(--font-num);text-align:right}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+footer{text-align:center;color:var(--muted);font-size:13px;padding:4px 16px 24px}
+@media print{
+ body{background:#fff;color:#000}.wrap>*:not(#sum-panel),footer,#sum-panel .noprint,#sum-panel h2{display:none!important}
+ .wrap{padding:0}#sum-panel{border:0;padding:0}.sum{border-color:#000;color:#000}.sum dt{color:#333}
+}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <a class="back" href="/">&larr; Back to Cortex</a>
+  <header>
+    <div class="eyebrow">Cortex for Serra Azul Telecom</div>
+    <h1>Repeat-contact retention</h1>
+    <p class="sub">Find postpaid customers who have contacted care more than once recently, decide who to call first, and check care-center capacity.</p>
+  </header>
+
+  <section class="panel" aria-labelledby="h-honest">
+    <h2 id="h-honest">What this does and does not do</h2>
+    <p style="font-size:14px">There is no CRM or contact-center integration. It works from a contact log you paste or upload. Everything stays in this browser; nothing is sent anywhere.</p>
+  </section>
+
+  <section class="panel" aria-labelledby="h-list">
+    <h2 id="h-list">1. Repeat-contact list</h2>
+    <form id="imp-form">
+      <label class="field" for="imp-in">Contact log, CSV or TSV with a header row<textarea id="imp-in" spellcheck="false" placeholder="Header row, then one contact per line. Columns can be in any order:&#10;customer_id, contact_date, channel, reason, plan_type, center, plan_value&#10;Dates as yyyy-mm-dd or dd/mm/yyyy. plan_type: postpaid or prepaid. plan_value is optional."></textarea></label>
+      <div class="row" style="margin-top:8px">
+        <button class="primary" type="submit">Import pasted log</button>
+        <label class="btn" style="cursor:pointer">Upload file<input id="imp-file" type="file" accept=".csv,.tsv,.txt,text/csv,text/plain" hidden></label>
+        <label class="row hint" for="win">Window, days <input id="win" type="text" inputmode="numeric" maxlength="3" style="width:64px" autocomplete="off"></label>
+        <span id="imp-msg" class="msg" role="status" aria-live="polite"></span>
+      </div>
+    </form>
+    <details style="margin-top:8px"><summary>Columns and rules</summary><ul class="plain muted">
+      <li>Needed columns: customer ID, contact date, plan type. Optional: channel, reason, center, monthly plan value. Common English and Portuguese header names are recognised.</li>
+      <li>A customer is flagged when the plan is postpaid and they have 2 or more contacts in the window. The window counts back from the latest date in the file, so with 30 days it covers the latest date and the 29 days before it. Prepaid and unlabelled plans are not flagged.</li>
+      <li>Order: more contacts first, then the same reason repeated (an unresolved issue), then a mention of cancelling or a competitor in the reason (<code>cancelar</code>, <code>cancelamento</code>, <code>portabilidade</code>, <code>cancel</code>, <code>port out</code>, <code>switch</code>, <code>concorrente</code>), then plan value.</li>
+    </ul></details>
+    <div id="list-empty" class="muted" style="margin-top:12px">No contact log imported yet.</div>
+    <div id="list-wrap" hidden style="margin-top:12px">
+      <p id="list-note" class="hint"></p>
+      <div class="scroll"><table><thead><tr><th scope="col">#</th><th scope="col">Customer</th><th scope="col">Center</th><th class="num" scope="col">Contacts</th><th class="num" scope="col">Plan value</th><th scope="col">Why flagged</th><th scope="col">Next step</th><th scope="col">Outcome</th></tr></thead><tbody id="list-body"></tbody></table></div>
+    </div>
+  </section>
+
+  <section aria-labelledby="h-tiles">
+    <h2 id="h-tiles" style="margin-left:2px">2. Numbers</h2>
+    <div class="tiles" id="tiles"></div>
+    <div class="hint" style="margin:10px 0 6px">Flagged per center</div>
+    <div class="tiles" id="center-tiles"></div>
+  </section>
+
+  <section class="panel" aria-labelledby="h-cap">
+    <h2 id="h-cap">3. Capacity check</h2>
+    <p class="muted" style="font-size:14px">Enter your own numbers. Nothing is pre-filled and nothing is assumed.</p>
+    <div class="grid">
+      <label class="field">Expected contacts per day<input id="c-cpd" type="text" inputmode="decimal" maxlength="9" autocomplete="off"></label>
+      <label class="field">Average handle time, minutes<input id="c-aht" type="text" inputmode="decimal" maxlength="6" autocomplete="off"></label>
+      <label class="field">Hours per agent shift<input id="c-shift" type="text" inputmode="decimal" maxlength="5" autocomplete="off"></label>
+      <label class="field">Shrinkage, %<input id="c-shr" type="text" inputmode="decimal" maxlength="5" autocomplete="off"></label>
+      <label class="field">Agents available, Recife<input id="c-rec" type="text" inputmode="numeric" maxlength="6" autocomplete="off"></label>
+      <label class="field">Agents available, Fortaleza<input id="c-for" type="text" inputmode="numeric" maxlength="6" autocomplete="off"></label>
+    </div>
+    <label class="check" style="margin-top:10px"><input type="checkbox" id="c-inc"> <span id="c-inc-t">Include flagged repeat contacts from section 1</span></label>
+    <div id="cap-out" aria-live="polite"></div>
+  </section>
+
+  <section class="panel" id="sum-panel" aria-labelledby="h-sum">
+    <h2 id="h-sum">4. One-slide summary</h2>
+    <div class="sum" id="sum-card"></div>
+    <div class="row noprint" style="margin-top:10px"><button class="primary" type="button" id="sum-copy">Copy as text</button><button class="btn" type="button" id="sum-print">Print this card</button><span id="sum-msg" class="msg" role="status" aria-live="polite"></span></div>
+  </section>
+
+  <section class="panel" aria-labelledby="h-log">
+    <div class="row" style="justify-content:space-between"><h2 id="h-log" style="margin:0">5. Activity log <span id="log-count" class="muted" style="text-transform:none;letter-spacing:0;font-weight:400"></span></h2>
+      <div class="row"><button type="button" class="btn" id="log-csv">Download CSV</button><button type="button" class="btn" id="clear-all">Clear all</button></div></div>
+    <p class="muted" style="font-size:13px;margin:8px 0">Every import and every call outcome, with the time. Kept in this browser only (key <code>serraazul.v1</code>). Download the CSV to keep it. "Clear all" erases the log, the imported contacts and the capacity entries.</p>
+    <p id="log-empty" class="muted">Nothing logged yet.</p>
+    <div class="scroll" id="log-wrap" hidden><table style="min-width:640px"><thead><tr><th scope="col">Time</th><th scope="col">Event</th><th scope="col">Customer</th><th scope="col">Detail</th></tr></thead><tbody id="log-body"></tbody></table></div>
+  </section>
+</main>
+<footer>Cortex by Pitch, Pray, Ship. Typesafe.</footer>
+<script>
+"use strict";
+// ==CORE==
+const SA=(()=>{
+const DAY=86400000;
+const norm=s=>String(s==null?"":s).normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().trim();
+const key=s=>norm(s).replace(/[^a-z0-9]/g,"");
+function parseDelimited(text){
+  const t=String(text||"").replace(/^﻿/,"");
+  const first=t.split(/\r?\n/).find(l=>l.trim())||"";
+  const cnt=c=>first.split(c).length-1;
+  const d=cnt("\t")>0?"\t":(cnt(";")>cnt(",")?";":",");
+  const rows=[];let row=[],f="",q=false;
+  for(let i=0;i<t.length;i++){const c=t[i];
+    if(q){if(c==='"'){if(t[i+1]==='"'){f+='"';i++}else q=false}else f+=c}
+    else if(c==='"'&&f==="")q=true;
+    else if(c===d){row.push(f);f=""}
+    else if(c==="\n"||c==="\r"){if(c==="\r"&&t[i+1]==="\n")i++;row.push(f);f="";if(row.some(x=>x.trim()))rows.push(row);row=[]}
+    else f+=c}
+  row.push(f);if(row.some(x=>x.trim()))rows.push(row);
+  return rows}
+const SYN={
+ id:["customerid","customer","cliente","clienteid","idcliente","msisdn","id","conta","account","accountid"],
+ date:["contactdate","date","data","datacontato","datadocontato","datetime","createdat","contactdatetime"],
+ channel:["channel","canal"],
+ reason:["reason","motivo","assunto","reasonforcontact","subject","category","categoria","contactreason"],
+ plan:["plantype","plan","tipoplano","tipodeplano","plano","segmento","segment","tipo"],
+ center:["center","centre","centro","site","callcenter","unidade","carecenter"],
+ value:["planvalue","monthlyvalue","valor","valormensal","mrr","value","monthlyplanvalue","monthlyplan"]};
+function mapColumns(h){const ks=h.map(key),m={};
+  for(const f of Object.keys(SYN)){let i=-1;for(const s of SYN[f]){i=ks.findIndex((k,j)=>k===s&&!Object.values(m).includes(j));if(i>=0)break}
+    if(i>=0)m[f]=i}
+  return m}
+function parseDate(s){const t=String(s==null?"":s).trim();let y,mo,d,m;
+  if((m=/^(\d{4})[-\/.](\d{1,2})[-\/.](\d{1,2})/.exec(t))){y=+m[1];mo=+m[2];d=+m[3]}
+  else if((m=/^(\d{1,2})[-\/.](\d{1,2})[-\/.](\d{2,4})/.exec(t))){d=+m[1];mo=+m[2];y=+m[3];if(y<100)y+=2000}
+  else return null;
+  if(mo<1||mo>12||d<1||d>31)return null;
+  const ms=Date.UTC(y,mo-1,d);const c=new Date(ms);if(c.getUTCMonth()!==mo-1)return null;return ms}
+function parseNum(s){let t=String(s==null?"":s).replace(/R\$|\s/g,"");if(!t)return null;
+  const c=t.lastIndexOf(","),p=t.lastIndexOf(".");
+  if(c>=0&&p>=0){t=c>p?t.replace(/\./g,"").replace(",","."):t.replace(/,/g,"")}
+  else if(c>=0){t=/,\d{1,2}$/.test(t)?t.replace(",","."):t.replace(/,/g,"")}
+  const n=Number(t);return Number.isFinite(n)&&n>=0?n:null}
+function planKind(p){const n=norm(p).replace(/[^a-z]/g,"");
+  if(/^(pre|prepaid)/.test(n))return "pre";if(/^(pos|postpaid)/.test(n))return "post";return "unknown"}
+function importLog(text){
+  const raw=parseDelimited(text);
+  if(raw.length<2)return{error:"Need a header row and at least one contact line."};
+  const m=mapColumns(raw[0]);
+  const miss=["id","date","plan"].filter(f=>m[f]===undefined);
+  if(miss.length)return{error:"Could not find column(s): "+miss.map(x=>({id:"customer ID",date:"contact date",plan:"plan type"})[x]).join(", ")+". Check the header row."};
+  const g=(r,f)=>m[f]===undefined?"":String(r[m[f]]==null?"":r[m[f]]).trim();
+  const rows=[];let skipped=0;
+  for(const r of raw.slice(1)){const id=g(r,"id").slice(0,60),at=parseDate(g(r,"date"));
+    if(!id||at===null){skipped++;continue}
+    rows.push({id,at,channel:g(r,"channel").slice(0,40),reason:g(r,"reason").slice(0,200),plan:g(r,"plan").slice(0,30),center:g(r,"center").slice(0,40),value:parseNum(g(r,"value"))})}
+  if(!rows.length)return{error:"No usable rows. Check the date format (yyyy-mm-dd or dd/mm/yyyy)."};
+  return{rows,skipped}}
+const CANCEL=/cancel|portabilidade|port ?-?out|switch|concorrente|competitor/;
+const BILL=/fatura|cobranca|bill|invoice|charge|boleto|pagamento|payment|reembolso|refund/;
+const hasCancel=r=>CANCEL.test(norm(r));
+function analyze(rows,win){
+  const w=Number.isFinite(win)&&win>=1?Math.floor(win):30;
+  if(!rows||!rows.length)return{flagged:[],total:0,post:0,latest:null,win:w,flaggedContacts:0,perCenter:{}};
+  let latest=-Infinity;for(const r of rows)if(r.at>latest)latest=r.at;
+  const from=latest-(w-1)*DAY;
+  const by=new Map();let post=new Set();
+  for(const r of rows){if(planKind(r.plan)!=="post")continue;post.add(r.id);
+    if(r.at<from||r.at>latest)continue;
+    if(!by.has(r.id))by.set(r.id,[]);by.get(r.id).push(r)}
+  const flagged=[];let flaggedContacts=0;
+  for(const [id,rs] of by){if(rs.length<2)continue;
+    const rc=new Map();for(const r of rs){const k=norm(r.reason).replace(/\s+/g," ");if(k)rc.set(k,(rc.get(k)||0)+1)}
+    let rep=null,repN=0;for(const [k,n] of rc)if(n>=2&&n>repN){rep=k;repN=n}
+    const cancelR=rs.find(r=>hasCancel(r.reason));
+    const value=rs.reduce((a,r)=>r.value!=null&&r.value>a?r.value:a,0);
+    const sorted=rs.slice().sort((a,b)=>b.at-a.at);
+    const center=(sorted.find(r=>r.center)||{}).center||"";
+    const repRaw=rep?(rs.find(r=>norm(r.reason).replace(/\s+/g," ")===rep).reason):"";
+    const why=[rs.length+" contacts in the last "+w+" days"];
+    if(rep)why.push("same reason "+repN+" times: \""+repRaw+"\"");
+    if(cancelR)why.push("mentions cancelling or a competitor: \""+cancelR.reason+"\"");
+    let next;
+    if(cancelR)next="Retention callback today";
+    else if(rep&&BILL.test(rep))next="Check billing";
+    else if(rep)next="Fix the repeat issue first";
+    else next="Retention callback today";
+    flagged.push({id,n:rs.length,rep:repN,cancel:!!cancelR,value,center,why:why.join("; "),next});
+    flaggedContacts+=rs.length}
+  flagged.sort((a,b)=>b.n-a.n||(b.rep>=2)-(a.rep>=2)||(b.rep-a.rep)||(+b.cancel)-(+a.cancel)||b.value-a.value||(a.id<b.id?-1:1));
+  const perCenter={};for(const f of flagged){const c=f.center||"(no center)";perCenter[c]=(perCenter[c]||0)+1}
+  return{flagged,total:new Set(rows.map(r=>r.id)).size,post:post.size,latest,win:w,flaggedContacts,perCenter}}
+const pnum=s=>{const t=String(s==null?"":s).trim().replace(",",".");if(!t)return null;const n=Number(t);return Number.isFinite(n)?n:null};
+function capacity(c,flagPerDay){
+  const cpd=pnum(c.cpd),aht=pnum(c.aht),shift=pnum(c.shift),shr=pnum(c.shr),rec=pnum(c.rec),fort=pnum(c.fort);
+  const miss=[];
+  if(cpd===null||cpd<0)miss.push("contacts per day");
+  if(aht===null||aht<=0)miss.push("handle time");
+  if(shift===null||shift<=0)miss.push("shift hours");
+  if(shr===null||shr<0||shr>=100)miss.push("shrinkage (0 to 99)");
+  if(miss.length)return{ok:false,miss};
+  const inc=c.inc&&flagPerDay!=null?flagPerDay:0;
+  const load=cpd+inc,hours=load*aht/60,prod=shift*(1-shr/100);
+  const exact=hours/prod,needed=Math.ceil(exact-1e-9);
+  const haveAny=rec!==null||fort!==null;const avail=haveAny?(rec||0)+(fort||0):null;
+  const gap=avail===null?null:avail-needed;
+  const f=x=>String(Math.round(x*100)/100);
+  const formula="agents needed = ceil( ("+f(cpd)+(inc?" + "+f(inc):"")+") x "+f(aht)+" / 60 / ("+f(shift)+" x (1 - "+f(shr)+" / 100)) ) = ceil( "+f(hours)+" / "+f(prod)+" ) = ceil( "+f(exact)+" ) = "+needed;
+  return{ok:true,load,hours,prod,exact,needed,avail,gap,inc,formula}}
+return{norm,parseDelimited,mapColumns,parseDate,parseNum,planKind,importLog,analyze,capacity,hasCancel}})();
+// ==END CORE==
+
+(()=>{
+const KEY="serraazul.v1",$=id=>document.getElementById(id);
+const el=(t,a={},...k)=>{const e=document.createElement(t);for(const[x,y]of Object.entries(a))if(y!==null&&y!==undefined)e.setAttribute(x,y);e.append(...k);return e};
+const blank=()=>({rows:[],win:"30",out:{},log:[],cap:{cpd:"",aht:"",shift:"",shr:"",rec:"",fort:"",inc:false}});
+let S=blank();
+try{const v=JSON.parse(localStorage.getItem(KEY));if(v&&Array.isArray(v.rows)&&Array.isArray(v.log)){S={...blank(),...v,cap:{...blank().cap,...(v.cap||{})},out:v.out&&typeof v.out==="object"?v.out:{}}}}catch{}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch{}};
+const fmtTime=iso=>{const d=new Date(iso);return isNaN(d)?String(iso||""):d.toLocaleString("en-US",{month:"short",day:"numeric",year:"numeric",hour:"numeric",minute:"2-digit",second:"2-digit"})};
+const fmtDay=ms=>ms==null?"":new Date(ms).toISOString().slice(0,10);
+const brl=x=>x?"R$ "+Number(x).toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2}):"";
+const OUT={saved:"Called, saved",noans:"Called, no answer",leaving:"Called, leaving",na:"Not needed"};
+const addLog=(kind,cust,detail)=>{S.log.unshift({at:new Date().toISOString(),kind,cust:cust||"",detail:detail||""});if(S.log.length>2000)S.log.length=2000};
+const winN=()=>{const n=Number(String(S.win).trim());return Number.isFinite(n)&&n>=1?Math.floor(n):30};
+let A=null;
+const centerNames=()=>Object.keys(A.perCenter);
+
+function tile(label,val,cls){return el("div",{class:"tile "+(cls||"")},el("div",{class:"tile-label"},label),el("div",{class:"tile-value"},String(val)))}
+const isToday=iso=>{const d=new Date(iso);return !isNaN(d)&&d.toDateString()===new Date().toDateString()};
+function stats(){
+  const ids=new Set(A.flagged.map(f=>f.id));let today=0,saved=0,leaving=0;
+  for(const id of ids){const o=S.out[id];if(!o)continue;
+    if(o.o!=="na"&&isToday(o.at))today++;
+    if(o.o==="saved")saved++;if(o.o==="leaving")leaving++}
+  return{today,saved,leaving}}
+function flagPerDay(){return A.flagged.length?A.flaggedContacts/A.win:null}
+
+function renderList(){
+  const has=S.rows.length>0;$("list-empty").hidden=has;$("list-wrap").hidden=!has;
+  const body=$("list-body");body.replaceChildren();
+  if(!has)return;
+  const MAX=300;
+  $("list-note").textContent=A.flagged.length?"Latest date in file: "+fmtDay(A.latest)+". Window: "+A.win+" days. "+A.post+" postpaid customers in the file, "+A.flagged.length+" flagged."+(A.flagged.length>MAX?" Showing the first "+MAX+".":""):"Latest date in file: "+fmtDay(A.latest)+". No postpaid customer has 2 or more contacts in the last "+A.win+" days.";
+  A.flagged.slice(0,MAX).forEach((f,i)=>{
+    const cur=S.out[f.id];
+    const acts=el("div",{class:"acts"});
+    for(const [k,lab] of Object.entries(OUT)){const b=el("button",{type:"button",class:"btn"+(cur&&cur.o===k?" on":"")},lab);
+      b.addEventListener("click",()=>{S.out[f.id]={o:k,at:new Date().toISOString()};addLog("outcome",f.id,lab);save();renderAll()});acts.append(b)}
+    const status=cur?el("div",{class:"hint"},"Last: "+OUT[cur.o]+", "+fmtTime(cur.at)):null;
+    const nextCls=f.next==="Check billing"?"amber":f.next==="Fix the repeat issue first"?"grey":"red";
+    body.append(el("tr",{},el("td",{class:"num"},String(i+1)),el("td",{class:"num"},f.id),el("td",{},f.center||"-"),el("td",{class:"num"},String(f.n)),el("td",{class:"num"},brl(f.value)||"-"),
+      el("td",{style:"max-width:300px;overflow-wrap:anywhere"},f.why),el("td",{},el("span",{class:"st "+nextCls},f.next)),el("td",{},acts,...(status?[status]:[]))))});
+}
+function renderTiles(){
+  const st=stats(),t=$("tiles");t.replaceChildren(
+    tile("Postpaid customers flagged",A.flagged.length,"red"),tile("Contacted today",st.today,"main"),tile("Saved",st.saved,"green"),tile("Leaving",st.leaving,"amber"));
+  const c=$("center-tiles");c.replaceChildren();
+  const names=centerNames();
+  if(!names.length)c.append(el("div",{class:"hint"},"None yet."));
+  for(const n of names)c.append(tile(n,A.perCenter[n]));
+}
+function readCap(){return{cpd:$("c-cpd").value,aht:$("c-aht").value,shift:$("c-shift").value,shr:$("c-shr").value,rec:$("c-rec").value,fort:$("c-for").value,inc:$("c-inc").checked}}
+function renderCap(){
+  const fpd=flagPerDay();
+  $("c-inc-t").textContent="Include flagged repeat contacts from section 1"+(fpd!==null?" ("+(Math.round(fpd*10)/10)+" per day)":" (none flagged yet)");
+  const out=$("cap-out");out.replaceChildren();
+  const r=SA.capacity(S.cap,fpd);
+  if(!r.ok){out.append(el("p",{class:"msg",style:"margin-top:10px"},"Enter "+r.miss.join(", ")+" to see agents needed."));return}
+  const short=r.gap!==null&&r.gap<0;
+  const v=el("div",{class:"verdict "+(r.gap===null?"":short?"red":"green")},
+    el("div",{class:"v-head num"},"Agents needed: "+r.needed),
+    el("div",{},r.avail===null?"Enter agents available per center to see the gap.":"Available: "+r.avail+". "+(short?"Short by "+(-r.gap)+" agents.":"Surplus of "+r.gap+" agents.")),
+    el("div",{class:"formula"},r.formula));
+  out.append(v)}
+function summaryLines(){
+  const st=stats(),r=SA.capacity(S.cap,flagPerDay());
+  const L=[["Contact log",S.rows.length?S.rows.length+" contacts, "+A.total+" customers, to "+fmtDay(A.latest):"not imported"],
+   ["Postpaid flagged ("+A.win+"-day window)",String(A.flagged.length)],
+   ["Contacted today",String(st.today)],["Saved",String(st.saved)],["Leaving",String(st.leaving)]];
+  for(const n of centerNames())L.push(["Flagged, "+n,String(A.perCenter[n])]);
+  if(r.ok){L.push(["Agents needed",String(r.needed)]);
+    L.push(["Agents available",r.avail===null?"not entered":String(r.avail)]);
+    L.push(["Gap",r.gap===null?"n/a":r.gap<0?"short "+(-r.gap):"surplus "+r.gap])}
+  else L.push(["Capacity","not entered"]);
+  return L}
+function renderSum(){
+  const c=$("sum-card");c.replaceChildren();
+  const dl=el("dl");for(const [k,v] of summaryLines())dl.append(el("div",{},el("dt",{},k),el("dd",{},v)));
+  c.append(el("h3",{},"Repeat-contact retention, Serra Azul Telecom"),dl,el("div",{class:"hint"},"Cortex by Pitch, Pray, Ship. Typesafe. Built from a pasted export; nothing sent."))}
+function renderLog(){
+  $("log-count").textContent=S.log.length?"("+S.log.length+")":"";
+  $("log-empty").hidden=S.log.length>0;$("log-wrap").hidden=!S.log.length;
+  const b=$("log-body");b.replaceChildren();
+  for(const e of S.log.slice(0,300))b.append(el("tr",{},el("td",{class:"num"},fmtTime(e.at)),el("td",{},e.kind),el("td",{class:"num"},e.cust||"-"),el("td",{style:"overflow-wrap:anywhere"},e.detail)))}
+function renderAll(){A=SA.analyze(S.rows,winN());renderList();renderTiles();renderCap();renderSum();renderLog()}
+
+function doImport(text,label){
+  const r=SA.importLog(text),m=$("imp-msg");
+  if(r.error){m.className="msg warn";m.textContent=r.error;return}
+  S.rows=r.rows.slice(0,50000);S.out={};
+  addLog("import","",label+": "+r.rows.length+" contacts"+(r.skipped?", "+r.skipped+" rows skipped (no ID or unreadable date)":""));
+  save();m.className="msg";m.textContent="Imported "+r.rows.length+" contacts"+(r.skipped?"; skipped "+r.skipped+" unreadable rows":"")+".";renderAll()}
+$("imp-form").addEventListener("submit",e=>{e.preventDefault();doImport($("imp-in").value,"Pasted log")});
+$("imp-file").addEventListener("change",e=>{const f=e.target.files&&e.target.files[0];if(!f)return;
+  if(f.size>20e6){$("imp-msg").className="msg warn";$("imp-msg").textContent="File is over 20 MB.";return}
+  const rd=new FileReader();rd.onload=()=>doImport(String(rd.result||""),"File "+f.name);rd.onerror=()=>{$("imp-msg").className="msg warn";$("imp-msg").textContent="Could not read that file."};rd.readAsText(f);e.target.value=""});
+$("win").value=S.win;
+$("win").addEventListener("input",()=>{S.win=$("win").value;save();renderAll()});
+const capIds={"c-cpd":"cpd","c-aht":"aht","c-shift":"shift","c-shr":"shr","c-rec":"rec","c-for":"fort"};
+for(const [id,k] of Object.entries(capIds)){$(id).value=S.cap[k]||"";$(id).addEventListener("input",()=>{S.cap[k]=$(id).value;save();renderCap();renderSum()})}
+$("c-inc").checked=!!S.cap.inc;$("c-inc").addEventListener("change",()=>{S.cap.inc=$("c-inc").checked;save();renderCap();renderSum()});
+
+$("sum-copy").addEventListener("click",async()=>{
+  const txt="Repeat-contact retention, Serra Azul Telecom\n"+summaryLines().map(([k,v])=>k+": "+v).join("\n");
+  const m=$("sum-msg");
+  try{await navigator.clipboard.writeText(txt);m.className="msg";m.textContent="Copied."}
+  catch{try{const ta=el("textarea",{});ta.value=txt;document.body.append(ta);ta.select();const ok=document.execCommand("copy");ta.remove();m.className=ok?"msg":"msg warn";m.textContent=ok?"Copied.":"Copy failed. Select the card text instead."}catch{m.className="msg warn";m.textContent="Copy failed. Select the card text instead."}}});
+$("sum-print").addEventListener("click",()=>{try{window.print()}catch{}});
+
+const csvCell=v=>{let s=String(v==null?"":v);if(/^[=+\-@\t\r]/.test(s))s="'"+s;return /[",\n\r]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s};
+$("log-csv").addEventListener("click",()=>{
+  const lines=[["time","event","customer","detail"].join(",")].concat(S.log.map(e=>[e.at,e.kind,e.cust,e.detail].map(csvCell).join(",")));
+  try{const u=URL.createObjectURL(new Blob([lines.join("\n")],{type:"text/csv"}));const a=el("a",{href:u,download:"serra-azul-activity-log.csv"});document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),2000)}catch{}});
+$("clear-all").addEventListener("click",()=>{
+  if(!confirm("Erase the imported contacts, outcomes, capacity entries and activity log from this browser?"))return;
+  S=blank();try{localStorage.removeItem(KEY)}catch{}
+  $("imp-in").value="";$("imp-msg").textContent="";$("win").value=S.win;
+  for(const [id,k] of Object.entries(capIds))$(id).value="";$("c-inc").checked=false;renderAll()});
+renderAll();
+})();
+</script>
+</body>
+</html>
