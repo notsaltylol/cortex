@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src data:; connect-src 'self'; form-action 'none'; base-uri 'none'">
+<title>Security &amp; Data Handling | Cortex</title>
+<style>
+:root{--bg:#f5f6f8;--surface:#fff;--ink:#1b2230;--muted:#5d6879;--line:#dde2ea;--accent:#2b4fd8;--accent-ink:#fff;
+ --red:#b3261e;--red-bg:#fde8e6;--amber:#8a5a00;--amber-bg:#fff1d6;--green:#1d7a46;--green-bg:#e0f4e8;
+ --font-body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;--font-num:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#12151c;--surface:#1a1f29;--ink:#e8ecf3;--muted:#9aa5b8;--line:#2b3342;--accent:#7f9bff;--accent-ink:#0b1020;
+ --red:#ff8a80;--red-bg:#3d1c1a;--amber:#f2c261;--amber-bg:#3a2d12;--green:#6fd09a;--green-bg:#16301f}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#12151c;--surface:#1a1f29;--ink:#e8ecf3;--muted:#9aa5b8;--line:#2b3342;--accent:#7f9bff;--accent-ink:#0b1020;
+ --red:#ff8a80;--red-bg:#3d1c1a;--amber:#f2c261;--amber-bg:#3a2d12;--green:#6fd09a;--green-bg:#16301f}
+*{box-sizing:border-box}html,body{margin:0;overflow-x:hidden}
+body{background:var(--bg);color:var(--ink);font:15px/1.5 var(--font-body)}
+.wrap{max-width:1100px;margin:0 auto;padding:20px 16px 32px;display:grid;gap:16px;min-width:0}
+.wrap>*{min-width:0}
+a{color:var(--accent)}h1{margin:0;font-size:26px;letter-spacing:-.01em}
+h2{margin:0 0 10px;font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600}
+.back{font-size:13px}.sub,.muted{color:var(--muted)}.sub{margin:4px 0 0}
+.eyebrow{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600;margin-bottom:2px}
+.num{font-family:var(--font-num);font-variant-numeric:tabular-nums}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px;min-width:0}
+.panel p{margin:0 0 8px}
+[hidden]{display:none!important}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+label.field{display:grid;gap:4px;font-size:13px;color:var(--muted)}
+input,button,textarea,select{font:inherit}
+input[type=text],textarea,select{padding:7px 9px;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:8px;width:100%;min-width:0}
+textarea{font-size:15px;min-height:96px;resize:vertical}
+.scroll{overflow-x:auto;max-width:100%}table{width:100%;border-collapse:collapse}
+#log-table{min-width:760px}#perm-table{min-width:300px}
+th,td{text-align:left;padding:7px 8px;border-top:1px solid var(--line);vertical-align:top;font-size:14px}
+thead th{border-top:0;font-size:12px;color:var(--muted);font-weight:600}
+.st{display:inline-block;font-size:11px;font-weight:600;padding:1px 9px;border-radius:999px;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap}
+.st.red{background:var(--red-bg);color:var(--red)}.st.amber{background:var(--amber-bg);color:var(--amber)}.st.green{background:var(--green-bg);color:var(--green)}.st.grey{background:var(--bg);color:var(--muted);border:1px solid var(--line)}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+button.primary{padding:8px 14px;background:var(--accent);color:var(--accent-ink);border:0;border-radius:8px;font-weight:600;cursor:pointer}
+button.btn{font-size:13px;padding:5px 12px;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:999px;cursor:pointer}
+button[aria-disabled="true"]{opacity:.45;cursor:not-allowed}
+button.btn.on{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.msg{font-size:13px;color:var(--muted);margin:0;min-height:1.3em}.msg.warn{color:var(--red)}
+.banner{border:1px solid var(--line);border-left:5px solid var(--amber);background:var(--amber-bg);color:var(--ink);border-radius:8px;padding:9px 12px;font-size:14px}
+.note{font-size:13px;color:var(--muted)}
+code{font-family:var(--font-num);font-size:12.5px;background:var(--bg);padding:1px 5px;border-radius:4px;border:1px solid var(--line)}
+ul.plain{margin:6px 0 0;padding-left:18px;font-size:14px;display:grid;gap:3px}
+.card{border:1px solid var(--line);border-left:5px solid var(--line);border-radius:10px;padding:12px;background:var(--bg);display:grid;gap:6px;margin-top:10px;min-width:0}
+.card.amber{border-left-color:var(--amber)}.card.green{border-left-color:var(--green)}.card.red{border-left-color:var(--red)}
+.reqtext{white-space:pre-wrap;word-break:break-word;font-size:14px;background:var(--surface);border:1px dashed var(--line);border-radius:8px;padding:8px 10px}
+.edit{display:grid;gap:8px;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px}
+.cell{word-break:break-word}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+footer{text-align:center;color:var(--muted);font-size:13px;padding:4px 16px 24px}
+.flag{border:2px solid var(--amber);background:var(--amber-bg);border-radius:8px;padding:10px 12px;font-weight:600}
+h2.s{margin:0 0 8px}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <a class="back" href="/">&larr; Back to Cortex</a>
+  <header>
+    <div class="eyebrow">Cortex</div>
+    <h1>Security &amp; data handling</h1>
+    <p class="sub">As of 12 November 2026.</p>
+  </header>
+  <section class="panel"><h2>Hosting and transport</h2><ul class="plain"><li>Cortex pages and APIs run on Cloudflare Workers.</li><li>Traffic is served over HTTPS (TLS). Plain-HTTP requests are redirected to HTTPS. HSTS is sent.</li></ul></section>
+  <section class="panel"><h2>What is stored, and where</h2><ul class="plain"><li>Each Cortex page stores its working data in the viewer's own browser (localStorage) on that device.</li><li>That storage is not separately encrypted by Cortex. It is protected by the device and browser.</li><li>Cortex's servers do not store request text for these workflows and do not write it to application logs.</li><li>No database holds St. Catherine's data.</li></ul></section>
+  <section class="panel"><h2>Third parties that receive data</h2><ul class="plain"><li>Cloudflare, as host.</li><li>TypeSafe, an AI classification API. It receives request text that passed the local identifier check, for classification only.</li><li>No other third parties for this workflow.</li></ul></section>
+  <section class="panel"><h2>Secrets</h2><ul class="plain"><li>API keys are held as Cloudflare Worker secrets, not in page code.</li></ul></section>
+  <section class="panel"><h2>HIPAA and BAA</h2><ul class="plain"><li>No Business Associate Agreement is in place with St. Catherine's.</li><li>No BAA is in place between Pitch, Pray, Ship and Cloudflare or TypeSafe for this service.</li><li>Therefore Cortex must not receive PHI.</li><li>The product enforces this with a two-stage identifier gate: browser and server. When identifiers are detected, the text is not sent onward, stored, shown or logged.</li><li>No automated check catches every identifier, so staff should still not enter patient information.</li></ul><p class="flag" style="margin-top:10px">[Owner to confirm: whether Pitch, Pray, Ship will sign a BAA for production use.]</p></section>
+  <section class="panel"><h2>How to verify</h2><ul class="plain"><li>Use the browser DevTools Network tab to see what is sent.</li><li>Run the "Prove it" self-test on the <a href="/st-catherines.html">St. Catherine's page</a>.</li></ul></section>
+  <section class="panel"><h2>Contact</h2><p>Contact your Pitch, Pray, Ship representative.</p></section>
+</main>
+<footer>Cortex by Pitch, Pray, Ship. Typesafe.</footer>
+</body>
+</html>

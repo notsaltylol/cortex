@@ -84,11 +84,8 @@ footer{text-align:center;color:var(--muted);font-size:13px;padding:4px 16px 24px
     <div class="row" style="margin-top:10px"><button class="primary" type="button" id="req-go">Submit request</button></div>
     <p class="msg" id="req-msg" aria-live="polite"></p>
     <div id="phi-box" hidden class="card red">
-      <strong>Submission blocked: possible patient information found. Nothing was sent.</strong>
+      <strong>Blocked: possible patient identifiers. Nothing was sent or saved, and the text was cleared.</strong>
       <ul class="plain" id="phi-list"></ul>
-      <div class="note">Masked preview:</div>
-      <div class="reqtext" id="phi-masked"></div>
-      <div class="row"><button class="btn" type="button" id="phi-use">Use redacted text</button></div>
     </div>
   </section>
 
@@ -121,18 +118,26 @@ footer{text-align:center;color:var(--muted);font-size:13px;padding:4px 16px 24px
   <section class="panel" aria-labelledby="h-how">
     <h2 id="h-how">How this page handles your text</h2>
     <ul class="plain">
-      <li>The PHI check runs in your browser, before anything is sent.</li>
-      <li>Only request text that passed the check is sent, as one POST to <code>/api/stc-request</code> on this site.</li>
-      <li>Requests and the activity log are stored only in this browser, under <code>stcatherines.requests.v1</code>.</li>
-      <li>You can verify this in your browser's DevTools Network tab.</li>
+      <li>The text is checked in the browser first, and blocked and cleared if identifiers are found.</li>
+      <li>Text that passes is sent once to <code>/api/stc-request</code> on this site. It is checked again there and classified by TypeSafe, a third-party AI service.</li>
+      <li>Request text is shown and stored only after both checks pass.</li>
+      <li>The log never contains request text, only actions, IDs, categories and counts.</li>
+      <li><a href="/security">Security and data handling</a></li>
     </ul>
+  </section>
+<section class="panel" aria-labelledby="h-test">
+    <h2 id="h-test">Prove it</h2>
+    <p class="note">Runs in this page with no network. It uses clearly labelled synthetic test samples (not real patients), passes them through every text gate, then checks that none of them appear in the page state, the activity log or localStorage. The samples are discarded afterwards.</p>
+    <div class="row"><button class="btn" type="button" id="selftest-go">Run self-test</button></div>
+    <ul class="plain" id="selftest-out"></ul>
   </section>
 </main>
 <footer>Cortex by Pitch, Pray, Ship. Typesafe.</footer>
 <script>
 (function(){
 "use strict";
-var KEY="stcatherines.requests.v1";
+var KEY="stcatherines.requests.v2",OLDKEY="stcatherines.requests.v1";
+var WITHHELD="[withheld: possible patient identifiers]";
 var TYPES=["facilities","it_access","it_incident","supplies","scheduling","privacy_security","other"];
 var TYPE_LABEL={facilities:"Facilities",it_access:"IT access",it_incident:"IT incident",supplies:"Supplies",scheduling:"Scheduling",privacy_security:"Privacy / security",other:"Other"};
 var DEFAULT_ROUTES={
@@ -161,14 +166,18 @@ function clear(n){while(n.firstChild)n.removeChild(n.firstChild)}
 
 function blank(){return {requests:[],log:[],routes:JSON.parse(JSON.stringify(DEFAULT_ROUTES)),seq:0,role:"Requester",names:{Requester:"",Approver:"",Auditor:""}}}
 var S=blank();
-function load(){try{var raw=localStorage.getItem(KEY);if(raw){var d=JSON.parse(raw);if(d&&Array.isArray(d.requests)&&Array.isArray(d.log)){S=d;S.routes=S.routes||JSON.parse(JSON.stringify(DEFAULT_ROUTES));S.names=S.names||{Requester:"",Approver:"",Auditor:""};if(ROLES.indexOf(S.role)<0)S.role="Requester";}}}catch(e){}}
-function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function load(){var purged=false;
+  try{if(localStorage.getItem(OLDKEY)!==null)purged=true;localStorage.removeItem(OLDKEY)}catch(e){}
+  try{var raw=localStorage.getItem(KEY);if(raw){var d=JSON.parse(raw);if(d&&Array.isArray(d.requests)&&Array.isArray(d.log)){S=d;S.routes=S.routes||JSON.parse(JSON.stringify(DEFAULT_ROUTES));S.names=S.names||{Requester:"",Approver:"",Auditor:""};if(ROLES.indexOf(S.role)<0)S.role="Requester";}}}catch(e){}
+  S.requests.forEach(function(r){if(r.status==="Classifying"){r.text="";r.dept="";r.status="Blocked: check interrupted";r.withheld=true;log("check interrupted",r.id,"Page closed before the server check finished; text withheld")}});
+  if(purged)log("Deleted data from the previous review build in this browser","","")}
+function save(){scrub(S);try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
 
 function stamp(){var d=new Date();var p=function(x){return String(x).padStart(2,"0")};var tz="";
   try{tz=new Intl.DateTimeFormat(undefined,{timeZoneName:"short"}).formatToParts(d).filter(function(x){return x.type==="timeZoneName"})[0].value}catch(e){var o=-d.getTimezoneOffset();tz="UTC"+(o>=0?"+":"-")+p(Math.floor(Math.abs(o)/60))+":"+p(Math.abs(o)%60)}
   return d.getFullYear()+"-"+p(d.getMonth()+1)+"-"+p(d.getDate())+" "+p(d.getHours())+":"+p(d.getMinutes())+":"+p(d.getSeconds())+" "+tz}
 function who(){return (S.names[S.role]||"").trim()||"(unnamed)"}
-function log(action,reqId,detail){S.log.push({t:stamp(),role:S.role,name:who(),action:action,req:reqId||"",detail:detail||""});save()}
+function log(action,reqId,detail){S.log.push(scrub({t:stamp(),role:S.role,name:who(),action:action,req:reqId||"",detail:detail||""}));save()}
 function can(p){return PERMS[p].roles.indexOf(S.role)>=0}
 function guard(p,reqId){if(can(p))return true;log("blocked attempt",reqId,S.role+" tried: "+PERMS[p].label);render();flash("Not permitted for the "+S.role+" role. The attempt was logged.",true);return false}
 function flash(t,warn){var m=$("req-msg");m.textContent=t;m.className="msg"+(warn?" warn":"")}
@@ -181,53 +190,75 @@ var RULES=[
   {cat:"Email address",re:/\b[\w.+-]+@[\w-]+(?:\.[\w-]+)+\b/g},
   {cat:"Record / member / account ID",re:/\b(?:MRN|Member\s*ID|Acct|Account)\s*(?:#|No\.?|Number)?\s*[:#]?\s*[A-Z0-9][A-Z0-9-]{3,}\b/gi},
   {cat:"Specific date",re:new RegExp("\\b\\d{1,2}[/-]\\d{1,2}[/-]\\d{2,4}\\b|\\b\\d{4}-\\d{2}-\\d{2}\\b|\\b"+MONTHS+"\\.?\\s+\\d{1,2}(?:st|nd|rd|th)?\\b|\\b\\d{1,2}(?:st|nd|rd|th)?\\s+(?:of\\s+)?"+MONTHS+"\\b|\\b(?:DOB|D\\.O\\.B\\.|date of birth|born|admit(?:ted)?|admission|discharged?)\\s*(?:on|date)?\\s*[:\\-]?\\s*\\d{1,2}[/.-]\\d{1,2}\\b","gi")},
+  {cat:"Date (month/day)",re:/(?<![\d\/])(?:0?[1-9]|1[0-2])\/(?:0?[1-9]|[12]\d|3[01])(?![\d\/])/g},
   {cat:"Street address",re:/\b\d{1,5}\s+(?:[A-Z][a-z]+\s+){1,3}(?:Street|St|Avenue|Ave|Road|Rd|Boulevard|Blvd|Lane|Ln|Drive|Dr|Way|Court|Ct|Place|Pl|Terrace|Ter|Parkway|Pkwy)\b\.?/g},
   {cat:"ZIP code",re:/\b\d{5}(?:-\d{4})?\b/g},
   {cat:"Patient name",re:/(?:\bPatient\s*:|\bPt\b\.?:?|\bMrs?\.|\bMs\.)\s*[A-Z][a-z]+/g},
+  {cat:"Name with title",re:/\b(?:Mr|Mrs|Ms)\.?\s+[A-Z][a-z]+/g},
+  {cat:"Name after patient cue",re:/\b(?:[Pp][Aa][Tt][Ii][Ee][Nn][Tt]|[Pp][Tt]|[Rr][Ee][Ss][Ii][Dd][Ee][Nn][Tt]|[Ff][Aa][Mm][Ii][Ll][Yy]\s+[Oo][Ff])\s+[A-Z][a-z]+(?:\s+[A-Z][a-z]+)?/g},
+  {cat:"Long digit run",re:/\d{6,}/g},
+  {cat:"Alphanumeric ID",re:/\b[A-Za-z]\d{6,}\b/g},
   {cat:"Age over 89",re:/\b(?:9\d|1[0-4]\d)\s*-?\s*(?:y\/?o|yo|yrs?(?:[-\s]old)?|years?(?:[-\s]old)?)\b|\bage[d:]?\s*(?:9\d|1[0-4]\d)\b/gi}
 ];
-function phiCheck(text){var found={},masked=text,total=0;
-  RULES.forEach(function(r){var m=text.match(r.re);if(m&&m.length){found[r.cat]=m.length;total+=m.length;masked=masked.replace(r.re,function(){return "["+r.cat.toUpperCase()+" REMOVED]"})}});
-  return {ok:total===0,found:found,masked:masked}}
+function phiCheck(text){var found={},total=0;text=String(text==null?"":text);
+  RULES.forEach(function(r){var m=text.match(r.re);if(m&&m.length){found[r.cat]=m.length;total+=m.length}});
+  return {ok:total===0,found:found,total:total}}
+function catList(found){return Object.keys(found).map(function(k){return k+" ("+found[k]+")"})}
+var STAMP=/\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2} \S+/g;
+function scrub(v){
+  if(typeof v==="string")return phiCheck(v.replace(STAMP,"").replace(/^self-test run: \d+\/\d+ passed$/,"")).ok?v:WITHHELD;
+  if(Array.isArray(v)){for(var i=0;i<v.length;i++)v[i]=scrub(v[i]);return v}
+  if(v&&typeof v==="object"){for(var k in v)v[k]=scrub(v[k]);return v}
+  return v}
+/* Gate for any free-text field. Returns true if BLOCKED (field cleared, categories-only log). */
+function blockField(name,val,reqId,input,silent){
+  var c=phiCheck(val||"");if(c.ok)return false;
+  if(input)input.value="";
+  if(!silent)log("blocked: possible patient identifiers in "+name,reqId,"Categories: "+catList(c.found).join(", "));
+  return true}
 
 /* ---- classifier ---- */
 function classify(text){
   return fetch("/api/stc-request",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({text:text})})
     .then(function(r){if(!r.ok)throw new Error("HTTP "+r.status);return r.json()})
-    .then(function(d){if(!d||TYPES.indexOf(d.kind)<0||typeof d.confidence!=="number")throw new Error("bad response");return d})}
+    .then(function(d){if(d&&d.blocked===true)return d;if(!d||TYPES.indexOf(d.kind)<0||typeof d.confidence!=="number")throw new Error("bad response");return d})}
 function num(x){x=Number(x);return isFinite(x)?Math.max(0,Math.min(1,x)):0}
+function srvCats(c){return (Array.isArray(c)?c:[]).slice(0,8).map(function(x){return String(x).replace(/[^A-Za-z0-9 ()\/&-]/g,"").slice(0,40)}).filter(Boolean)}
 
-var pendingRedacted=null;
 function submit(){
   if(!guard("submit"))return Promise.resolve(null);
   if(!(S.names[S.role]||"").trim()){flash("Enter the Requester name first, so the activity log records who submitted.",true);return Promise.resolve(null)}
   var text=$("req-text").value.trim(),dept=$("req-dept").value.trim();
-  $("phi-box").hidden=true;pendingRedacted=null;
+  $("phi-box").hidden=true;
   if(!text){flash("Enter a request first.",true);return Promise.resolve(null)}
   var chk=phiCheck(text+"\n"+dept);
-  var id="REQ-"+String(S.seq+1).padStart(4,"0");
   if(!chk.ok){
-    var parts=Object.keys(chk.found).map(function(k){return k+" ("+chk.found[k]+")"});
+    var parts=catList(chk.found);
+    text=dept="";$("req-text").value="";$("req-dept").value="";
     log("PHI check blocked","","Not submitted. Found: "+parts.join(", "));
     var ul=$("phi-list");clear(ul);parts.forEach(function(p){ul.appendChild(el("li",{text:p}))});
-    $("phi-masked").textContent=phiCheck(text).masked+(dept?"\nDepartment/location: "+phiCheck(dept).masked:"");
-    pendingRedacted={text:phiCheck(text).masked,dept:phiCheck(dept).masked};
-    $("phi-box").hidden=false;flash("Blocked before sending. Nothing left this browser.",true);render();return Promise.resolve(null)}
-  S.seq++;
-  var req={id:id,text:text,dept:dept,created:stamp(),by:who(),status:"Classifying",kind:null,confidence:null,urgent:0,clinical:0,classErr:false,owner:"",next:"",decision:""};
+    $("phi-box").hidden=false;
+    flash("Blocked: possible patient identifiers ("+parts.join(", ")+"). Nothing was sent or saved, and the text was cleared. Re-enter the request without patient information.",true);
+    render();return Promise.resolve(null)}
+  S.seq++;var id="REQ-"+String(S.seq).padStart(4,"0");
+  var req={id:id,text:"",dept:"",created:stamp(),by:who(),status:"Classifying",kind:null,confidence:null,urgent:0,clinical:0,classErr:false,blocked:false,withheld:"",owner:"",next:"",decision:""};
   S.requests.unshift(req);
-  log("submitted",id,(dept?"Department/location: "+dept+". ":"")+text.length+" characters");
+  log("submitted",id,text.length+" characters");
   log("PHI check passed",id,"0 categories found");
-  $("req-text").value="";flash("Submitted "+id+". Classifying...");render();
+  $("req-text").value="";$("req-dept").value="";flash("Submitted "+id+". Checking…");render();
   return classify(text).then(function(d){
+    if(d.blocked===true){
+      var cs=srvCats(d.categories);req.text="";req.dept="";req.blocked=true;req.status="Blocked: possible patient identifiers";
+      log("server PHI check blocked",id,"Categories: "+(cs.join(", ")||"unspecified"));return}
+    req.text=text;req.dept=dept;
     req.kind=d.kind;req.confidence=num(d.confidence);req.urgent=num(d.urgent);req.clinical=num(d.clinical);
     if(req.kind==="privacy_security")req.urgent=1;
     var rt=S.routes[req.kind]||DEFAULT_ROUTES.other;req.owner=rt.owner;req.next=rt.next;
     req.status=req.clinical>=0.5?"Needs review":"Awaiting approval";
     log("classified",id,TYPE_LABEL[req.kind]+", confidence "+Math.round(req.confidence*100)+"%"+(req.urgent>=0.5?", Today":"")+(req.clinical>=0.5?", looks clinical":"")+"; recommended "+req.owner);
   }).catch(function(e){
-    req.classErr=true;req.status="Awaiting approval";
-    log("classified",id,"Classifier unavailable: manual classification required");
+    req.text="";req.dept="";req.classErr=true;req.withheld="Classifier unavailable; text withheld";req.status="Awaiting approval";
+    log("classified",id,"Classifier unavailable: manual classification required; text withheld");
   }).then(function(){flash("");render();return req})}
 
 function findReq(id){for(var i=0;i<S.requests.length;i++)if(S.requests[i].id===id)return S.requests[i];return null}
@@ -235,7 +266,11 @@ function decide(id,action,opts){
   if(!guard("decide",id))return false;
   if(!(S.names[S.role]||"").trim()){flash("Enter the Approver name first, so the activity log records who decided.",true);return false}
   var r=findReq(id);if(!r)return false;opts=opts||{};
+  if(r.blocked){flash(id+" is blocked and cannot be actioned.",true);return false}
   if(r.status==="Approved"||r.status==="Rejected"){flash(id+" is already "+r.status.toLowerCase()+".",true);return false}
+  var fs=opts.fields||{},gates=action==="reject"?[["reject reason","reason","note"]]:action==="approve"?[]:[["owner","owner","owner"],["next step","next","next"],["edit note","note","note"]],bad=false;
+  gates.forEach(function(g){if(blockField(g[0],opts[g[1]],id,fs[g[2]]))bad=true});
+  if(bad){flash("Refused: possible patient identifiers in a field. The field was cleared and nothing was saved.",true);render();return false}
   if(action==="approve"){
     if(!r.kind){flash("Choose a type with Edit before approving: the classifier did not return one.",true);return false}
     r.status="Approved";r.decision="Approved by "+who()+" at "+stamp()+": routed to "+r.owner;
@@ -261,21 +296,21 @@ function setRole(role){if(ROLES.indexOf(role)<0||role===S.role)return;var prev=S
 function act(label,perm,id,fn){var b=el("button",{class:"btn",type:"button",text:label});
   if(!can(perm)){b.setAttribute("aria-disabled","true");b.title="Not permitted for "+S.role}
   b.addEventListener("click",function(){if(!guard(perm,id))return;fn()});return b}
-function statusChip(r){var c=r.status==="Approved"?"green":r.status==="Rejected"?"red":r.status==="Needs review"?"amber":"grey";return el("span",{class:"st "+c,text:r.status})}
+function statusChip(r){var c=r.status==="Approved"?"green":r.status==="Rejected"||r.blocked?"red":r.status==="Needs review"?"amber":"grey";return el("span",{class:"st "+c,text:r.status==="Classifying"?"Checking…":r.status})}
 function typeSelect(cur){var s=el("select");if(!cur)s.appendChild(el("option",{value:"",text:"Choose type"}));TYPES.forEach(function(t){var o=el("option",{value:t,text:TYPE_LABEL[t]});if(t===cur)o.selected=true;s.appendChild(o)});return s}
 
 function renderReq(r){
-  var cls=r.status==="Approved"?"green":r.status==="Rejected"?"red":"amber";
+  var cls=r.status==="Approved"?"green":r.status==="Rejected"||r.blocked?"red":"amber";
   var head=el("div",{class:"row"},[el("strong",{class:"num",text:r.id}),statusChip(r),
     r.kind?el("span",{class:"st grey",text:TYPE_LABEL[r.kind]}):null,
     r.confidence!=null?el("span",{class:"note",text:"confidence "+Math.round(r.confidence*100)+"%"}):null,
     r.urgent>=0.5?el("span",{class:"st red",text:"Today"}):null]);
+  var body=r.status==="Classifying"?el("div",{class:"note",text:"Checking…"}):r.blocked?el("div",{class:"reqtext",text:"Text withheld: possible patient identifiers"}):r.withheld?el("div",{class:"reqtext",text:r.withheld}):el("div",{class:"reqtext",text:r.text});
   var card=el("div",{class:"card "+cls},[head,
-    el("div",{class:"note",text:"Submitted "+r.created+" by "+r.by+(r.dept?" · "+r.dept:"")}),
-    el("div",{class:"reqtext",text:r.text})]);
+    el("div",{class:"note",text:"Submitted "+r.created+" by "+r.by+(r.dept?" · "+r.dept:"")}),body]);
+  if(r.status==="Classifying"||r.blocked)return card;
   if(r.classErr&&!r.kind)card.appendChild(el("div",{class:"msg warn",text:"Classifier unavailable: classify manually"}));
   if(r.clinical>=0.5)card.appendChild(el("div",{class:"msg warn",text:"Looks clinical: this workflow is for non-clinical operations"}));
-  if(r.status==="Classifying"){card.appendChild(el("div",{class:"note",text:"Classifying..."}));return card}
   card.appendChild(el("div",{},[el("span",{class:"note",text:"Recommended owner: "}),document.createTextNode(r.owner||"(none until classified)")]));
   card.appendChild(el("div",{},[el("span",{class:"note",text:"Next step: "}),document.createTextNode(r.next||"(none until classified)")]));
   if(r.decision){card.appendChild(el("div",{},[el("strong",{text:r.decision})]));
@@ -293,7 +328,7 @@ function renderReq(r){
     if(mode==="edit"){fields.next=el("input",{type:"text",maxlength:"200"});fields.next.value=r.next;panel.appendChild(el("label",{class:"field"},["Next step",fields.next]))}
     fields.note=el("input",{type:"text",maxlength:"200"});panel.appendChild(el("label",{class:"field"},[mode==="reject"?"Reason (required)":"Note",fields.note]));
     var ok=act(mode==="reject"?"Confirm reject":"Save "+mode,"decide",r.id,function(){
-      decide(r.id,mode,{kind:fields.kind&&fields.kind.value||undefined,owner:fields.owner&&fields.owner.value,next:fields.next&&fields.next.value,note:fields.note.value,reason:fields.note.value})});
+      decide(r.id,mode,{kind:fields.kind&&fields.kind.value||undefined,owner:fields.owner&&fields.owner.value,next:fields.next&&fields.next.value,note:fields.note.value,reason:fields.note.value,fields:fields})});
     panel.appendChild(el("div",{class:"row"},[ok,el("button",{class:"btn",type:"button",text:"Cancel"})]));
     panel.lastChild.lastChild.addEventListener("click",function(){panel.hidden=true})}
   card.appendChild(row);card.appendChild(panel);return card}
@@ -317,15 +352,33 @@ function csv(){var esc=function(v){v=String(v==null?"":v);if(/^[=+\-@\t\r]/.test
   var lines=[["time","role","name","action","request_id","detail"].join(",")].concat(filtered().map(function(x){return [x.t,x.role,x.name,x.action,x.req,x.detail].map(esc).join(",")}));
   return lines.join("\r\n")}
 
+/* ---- self-test (synthetic fixtures, no network) ---- */
+function selfTest(){
+  var samples=[["Name with Mr","Mr Hargrove"],["8-digit number","48213907"],["Date of birth","DOB 04/12/1961"],["SSN","123-45-6789"],["Patient cue","patient Jane Doe"]];
+  var fields=["edit note","reject reason","owner","next step","routing table","role name"];
+  var res=samples.map(function(s){var ok=!phiCheck(s[1]).ok;fields.forEach(function(f){if(!blockField(f,s[1],"","",true))ok=false});return {label:s[0],ok:ok}});
+  var hay=JSON.stringify(S)+"\n"+S.log.map(function(x){return [x.t,x.role,x.name,x.action,x.req,x.detail].join("|")}).join("\n");
+  try{for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);hay+="\n"+k+"="+localStorage.getItem(k)}}catch(e){}
+  samples.forEach(function(s,i){if(hay.indexOf(s[1])>=0)res[i].ok=false});
+  samples=null;hay=null;
+  var n=res.filter(function(r){return r.ok}).length;
+  var ul=$("selftest-out");clear(ul);
+  res.forEach(function(r,i){ul.appendChild(el("li",{text:"Sample "+(i+1)+" ("+r.label+", synthetic): "+(r.ok?"PASS":"FAIL")}))});
+  ul.appendChild(el("li",{text:"Result: "+n+"/"+res.length+" passed"}));
+  log("self-test run: "+n+"/"+res.length+" passed","","");render();return n===res.length}
+
 function wire(){
   $("req-go").addEventListener("click",submit);
   $("req-text").addEventListener("keydown",function(e){if(e.key==="Enter"&&(e.metaKey||e.ctrlKey)){e.preventDefault();submit()}});
-  $("phi-use").addEventListener("click",function(){if(!pendingRedacted)return;$("req-text").value=pendingRedacted.text;$("req-dept").value=pendingRedacted.dept;$("phi-box").hidden=true;flash("Redacted text placed in the form. Review it, then submit.")});
+  $("selftest-go").addEventListener("click",selfTest);
   ROLES.forEach(function(ro){var i=$("name-"+ro.toLowerCase());i.addEventListener("change",function(){
     if(ro!==S.role){i.value=S.names[ro]||"";log("blocked attempt","",S.role+" tried to change the "+ro+" name");render();flash("You can only set the name for the active role.",true);return}
+    if(blockField(ro+" name",i.value,"",i)){S.names[ro]="";render();flash("Refused: possible patient identifiers in the name. The field was cleared.",true);return}
     S.names[ro]=i.value.trim().slice(0,60);save()})});
-  $("route-save").addEventListener("click",function(){if(!guard("routing"))return;var ch=[];
-    Array.prototype.forEach.call($("route-body").querySelectorAll("input"),function(i){var t=i.getAttribute("data-t"),f=i.getAttribute("data-f"),v=i.value.trim();if(v&&v!==S.routes[t][f]){ch.push(TYPE_LABEL[t]+" "+f+": "+S.routes[t][f]+" → "+v);S.routes[t][f]=v}});
+  $("route-save").addEventListener("click",function(){if(!guard("routing"))return;var ch=[],bad=false,ins=Array.prototype.slice.call($("route-body").querySelectorAll("input"));
+    ins.forEach(function(i){if(blockField("routing table "+i.getAttribute("data-t")+" "+i.getAttribute("data-f"),i.value,"",i))bad=true});
+    if(bad){render();flash("Refused: possible patient identifiers in the routing table. The field was cleared and nothing was saved.",true);return}
+    ins.forEach(function(i){var t=i.getAttribute("data-t"),f=i.getAttribute("data-f"),v=i.value.trim();if(v&&v!==S.routes[t][f]){ch.push(TYPE_LABEL[t]+" "+f+": "+S.routes[t][f]+" → "+v);S.routes[t][f]=v}});
     if(ch.length)log("routing edited","",ch.join("; "));render()});
   $("log-filter").addEventListener("change",render);
   $("log-csv").addEventListener("click",function(){if(!guard("export"))return;var f=$("log-filter").value;log("log exported",f,"CSV"+(f?" filtered to "+f:""));
@@ -335,7 +388,7 @@ function wire(){
     var keep={role:S.role,names:S.names,routes:S.routes,seq:S.seq,last:S.log[S.log.length-1]};S=blank();S.role=keep.role;S.names=keep.names;S.routes=keep.routes;S.seq=keep.seq;S.log=[keep.last];render()});
 }
 load();wire();render();
-window.__stc={submit:submit,decide:decide,setRole:setRole,phiCheck:phiCheck,state:function(){return S},csv:csv};
+window.__stc={submit:submit,decide:decide,setRole:setRole,phiCheck:phiCheck,blockField:blockField,selfTest:selfTest,state:function(){return S},csv:csv};
 })();
 </script>
 </body>
