@@ -1,11 +1,26 @@
 import { handlePlaid } from "./plaid.js";
 import { handleTicketRisk } from "./ticketrisk.js";
+import { handleKeelsonEmail } from "./keelson.js";
 import { choice, noul, TypeSafeClient } from "@typesafe-ai/sdk";
 
 const json = (body, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json" } });
 
 export default {
+  async fetch(request, env) {
+    const u = new URL(request.url);
+    if (u.protocol === "http:" && u.hostname !== "localhost" && u.hostname !== "127.0.0.1") {
+      u.protocol = "https:";
+      return Response.redirect(u.toString(), 301);
+    }
+    const res = await route(request, env);
+    const out = new Response(res.body, res);
+    out.headers.set("Strict-Transport-Security", "max-age=31536000");
+    return out;
+  },
+};
+
+const app = {
   async fetch(request, env) {
     const url = new URL(request.url);
     if (url.pathname.startsWith("/api/plaid/")) return handlePlaid(request, env, url.pathname);
@@ -15,6 +30,7 @@ export default {
     if (url.pathname === "/api/elimu-intake") return elimuIntake(request, env);
     if (url.pathname === "/api/ticket-risk") return handleTicketRisk(request, env);
     if (url.pathname === "/api/stc-request") return stcRequest(request, env);
+    if (url.pathname === "/api/keelson-email") return handleKeelsonEmail(request, env);
     if (url.pathname !== "/api/categorize") return env.ASSETS.fetch(request);
     if (request.method !== "POST") return json({ error: "POST only" }, 405);
     if (!env.TYPESAFE_API_KEY) return json({ error: "TYPESAFE_API_KEY not configured" }, 503);
@@ -55,6 +71,8 @@ export default {
     }
   },
 };
+
+function route(request, env) { return app.fetch(request, env); }
 
 const LEVELS = {
   green: "Healthy: engaged usage, few or no problems, renewal very likely.",
@@ -235,6 +253,18 @@ const STC_KINDS = {
   other: "None of the above.",
 };
 
+const STC_PHI_RULES = [
+  ["SSN", /\b\d{3}-\d{2}-\d{4}\b/],
+  ["Phone number", /(?:\(\d{3}\)\s?|\b\d{3}[-.\s])\d{3}[-.\s]\d{4}\b/],
+  ["Email address", /\b[\w.+-]+@[\w-]+(?:\.[\w-]+)+\b/],
+  ["Long number or ID", /\d{6,}|\b[A-Za-z]\d{6,}\b/],
+  ["Record / member / account ID", /\b(?:MRN|Member\s*ID|Acct|Account)\s*(?:#|No\.?|number)?\s*[:#]?\s*[A-Z0-9-]*\d[A-Z0-9-]{2,}|\b(?:DOB|D\.O\.B\.?|date of birth)\b/i],
+  ["Specific date", /\b(?:0?[1-9]|1[0-2])\/(?:0?[1-9]|[12]\d|3[01])(?:\/\d{2,4})?\b|\b\d{4}-\d{2}-\d{2}\b|\b(?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|June?|July?|Aug(?:ust)?|Sept?(?:ember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)\.?\s+\d{1,2}(?:st|nd|rd|th)?\b/i],
+  ["Street address", /\b\d{1,5}\s+(?:[A-Z][a-z]+\s+){1,3}(?:Street|St|Avenue|Ave|Road|Rd|Boulevard|Blvd|Lane|Ln|Drive|Dr|Way|Court|Ct|Place|Pl)\b/],
+  ["ZIP code", /\b\d{5}(?:-\d{4})?\b/],
+  ["Patient name", /\b(?:Mrs?|Ms)\.?\s+[A-Z][a-z]+|\b(?:[Pp]atient|[Pp]t|[Rr]esident|[Ff]amily of)\.?:?\s+[A-Z][a-z]+/],
+];
+
 async function stcRequest(request, env) {
   if (request.method !== "POST") return json({ error: "POST only" }, 405);
   if (!env.TYPESAFE_API_KEY) return json({ error: "TYPESAFE_API_KEY not configured" }, 503);
@@ -242,8 +272,18 @@ async function stcRequest(request, env) {
   try { body = await request.json(); } catch { return json({ error: "Invalid JSON" }, 400); }
   const text = typeof body?.text === "string" ? body.text.trim().slice(0, 1500) : "";
   if (!text) return json({ error: "text required" }, 400);
+  // Server-side identifier gate: never echo the text back, only categories.
+  const hits = STC_PHI_RULES.filter(([, re]) => re.test(text)).map(([cat]) => cat);
+  if (hits.length) return json({ blocked: true, categories: hits });
   try {
     const client = new TypeSafeClient({ apiKey: env.TYPESAFE_API_KEY });
+    const gate = await client.systemOne({
+      state: { request: text },
+      questions: {
+        identifies: noul("Does `request` contain information that could identify a specific patient or person receiving care, such as their name, date of birth, record or account number, address, phone number, or details unique to one patient? Staff names and room numbers alone do not count."),
+      },
+    });
+    if ((gate.answers.identifies?.noul ?? 1) >= 0.3) return json({ blocked: true, categories: ["Possible patient identifier (server AI check)"] });
     const { answers } = await client.systemOne({
       state: { request: text },
       questions: {

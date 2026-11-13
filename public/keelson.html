@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Monday Forecast | Cortex for Keelson Fastening Systems</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f5f6f8;--surface:#fff;--ink:#1b2230;--muted:#5d6879;--line:#dde2ea;--accent:#2b4fd8;--accent-ink:#fff;
+ --red:#b3261e;--red-bg:#fde8e6;--amber:#8a5a00;--amber-bg:#fff1d6;--green:#1d7a46;--green-bg:#e0f4e8;
+ --font-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;--font-num:"IBM Plex Mono",ui-monospace,Menlo,monospace}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#12151c;--surface:#1a1f29;--ink:#e8ecf3;--muted:#9aa5b8;--line:#2b3342;--accent:#7f9bff;--accent-ink:#0b1020;
+ --red:#ff8a80;--red-bg:#3d1c1a;--amber:#f2c261;--amber-bg:#3a2d12;--green:#6fd09a;--green-bg:#16301f}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#12151c;--surface:#1a1f29;--ink:#e8ecf3;--muted:#9aa5b8;--line:#2b3342;--accent:#7f9bff;--accent-ink:#0b1020;
+ --red:#ff8a80;--red-bg:#3d1c1a;--amber:#f2c261;--amber-bg:#3a2d12;--green:#6fd09a;--green-bg:#16301f}
+*{box-sizing:border-box}html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:15px/1.5 var(--font-body)}
+.wrap{max-width:1120px;margin:0 auto;padding:20px 16px 32px;display:grid;grid-template-columns:minmax(0,1fr);gap:16px}
+.wrap>*,.split>*,.grid>*{min-width:0}
+a{color:var(--accent)}h1{margin:0;font-size:26px;letter-spacing:-.01em}
+h2{margin:0 0 10px;font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600}
+h2.sec{font-size:19px;text-transform:none;letter-spacing:0;color:var(--ink);margin:12px 0 0}
+h3{margin:0 0 8px;font-size:15px}
+.back{font-size:13px}.sub,.muted{color:var(--muted)}.sub{margin:4px 0 0}
+.eyebrow{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600;margin:0 0 2px}
+.num{font-family:var(--font-num);font-variant-numeric:tabular-nums}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px}
+[hidden]{display:none!important}
+label.field{display:grid;gap:4px;font-size:13px;color:var(--muted)}
+input,button,textarea,select{font:inherit}
+input[type=text],input[type=number],input[type=date],textarea,select{padding:7px 9px;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:8px;width:100%;max-width:100%}
+input[type=file]{font-size:13px;max-width:100%;color:var(--muted)}
+textarea{font-family:var(--font-num);font-size:13px;min-height:110px;resize:vertical}
+.scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}table{width:100%;border-collapse:collapse;min-width:640px}
+th,td{text-align:left;padding:7px 8px;border-top:1px solid var(--line);vertical-align:top}
+thead th{border-top:0;font-size:12px;color:var(--muted);font-weight:600}td.num,th.num{text-align:right}
+.st{display:inline-block;font-size:11px;font-weight:600;padding:1px 9px;border-radius:999px;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;margin:1px 4px 1px 0}
+.st.red{background:var(--red-bg);color:var(--red)}.st.amber{background:var(--amber-bg);color:var(--amber)}.st.green{background:var(--green-bg);color:var(--green)}
+.st.grey{background:var(--bg);color:var(--muted);border:1px solid var(--line)}.st.blue{background:var(--bg);color:var(--accent);border:1px solid var(--accent)}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:12px}
+.tile{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--line);border-radius:10px;padding:10px 14px}
+.tile.red{border-left-color:var(--red)}.tile.amber{border-left-color:var(--amber)}.tile.green{border-left-color:var(--green)}.tile.main{border-left-color:var(--accent)}
+.tile-label{color:var(--muted);font-size:13px}.tile-value{font:500 21px var(--font-num);word-break:break-word}.hint{font-size:12px;color:var(--muted)}
+.how{margin-top:6px}.how summary{font-size:12px}.how .calc{font-size:12.5px;margin:6px 0 0;color:var(--ink)}
+.calc ul{margin:4px 0 0;padding-left:18px}.calc li{font-family:var(--font-num);font-size:12px;word-break:break-word}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,180px),1fr));gap:10px}
+.split{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:12px}
+button.primary{padding:8px 14px;background:var(--accent);color:var(--accent-ink);border:0;border-radius:8px;font-weight:600;cursor:pointer}
+button.btn{font-size:13px;padding:5px 12px;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:999px;cursor:pointer}
+button.btn.ok{border-color:var(--green);color:var(--green)}button.btn.warn{border-color:var(--amber);color:var(--amber)}button.btn.risk{border-color:var(--red);color:var(--red)}
+button.btn[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+button.ghost{background:none;border:0;color:var(--muted);cursor:pointer;padding:2px 6px;border-radius:6px;font-size:13px}button.ghost:hover{color:var(--red)}
+button.danger{font-size:13px;padding:5px 12px;border:1px solid var(--red);background:none;color:var(--red);border-radius:999px;cursor:pointer}
+.msg{font-size:13px;color:var(--muted);margin:0;min-height:1.3em}.msg.warn{color:var(--red)}
+code{font-family:var(--font-num);font-size:12.5px;background:var(--bg);padding:1px 5px;border-radius:4px;border:1px solid var(--line)}
+details summary{cursor:pointer;color:var(--muted);font-size:14px}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+footer{text-align:center;color:var(--muted);font-size:13px;padding:4px 16px 24px}
+.plain{margin:0;font-size:14px}.plain+.plain{margin-top:4px}
+.jump{display:flex;gap:6px 14px;flex-wrap:wrap;font-size:14px}
+.gap{margin:0 0 6px;font-size:14px}.gap a{white-space:nowrap}
+.deal,.mail{border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--bg);display:grid;gap:6px}
+.deal+.deal,.mail+.mail{margin-top:8px}
+.deal-h{font-weight:600;word-break:break-word}.deal-m{font-size:13px;color:var(--muted)}
+.deal ul{margin:0;padding-left:18px;font-size:13.5px}
+.extra{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end}.extra label.field{flex:1 1 180px}
+.quote{font-family:var(--font-num);font-size:12.5px;color:var(--muted);white-space:pre-wrap;word-break:break-word;margin:0}
+.draft textarea{min-height:170px;background:var(--surface)}
+.kv{font-size:13px;word-break:break-word}.kv b{font-weight:600;color:var(--muted)}
+.group+.group{margin-top:14px}
+.sumcol{border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--bg)}
+.sumcol .tile{background:var(--surface)}.sumcol .tile+.tile{margin-top:8px}
+td.wrapc{word-break:break-word;min-width:120px}
+@media (max-width:600px){h1{font-size:22px}.tile-value{font-size:19px}}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <a class="back" href="/">&larr; Back to Cortex</a>
+  <header>
+    <p class="eyebrow">Cortex for Keelson Fastening Systems</p>
+    <h1 id="title">Monday forecast</h1>
+    <p class="sub" id="subtitle">OEM contracts and distributor reorders forecast side by side, a short weekly check-in on the OEM deals that need a look, and order-status email triage for the inside-sales desk.</p>
+  </header>
+
+  <section class="panel" aria-label="How this works">
+    <p class="plain"><strong>No integrations yet:</strong> there is no CRM, ERP or email integration yet. This works from exports and pasted emails, and nothing is sent automatically.</p>
+    <p class="plain"><strong>Where data lives:</strong> everything you load stays in this browser. Email text goes to TypeSafe only for classification.</p>
+    <div class="row" style="margin-top:8px" id="clear-row"><button type="button" class="danger" id="clear-all">Clear all</button><span id="clear-msg" class="msg" role="status" aria-live="polite"></span></div>
+  </section>
+
+  <!-- ===================== Rep check-in view (opened from a check-in link) ===================== -->
+  <section id="rep-view" class="panel" aria-labelledby="h-rep" hidden>
+    <h2 id="h-rep">Your Monday check-in</h2>
+    <p class="plain" id="rep-intro"></p>
+    <p class="hint" style="margin:6px 0 10px">This list came inside the link you were sent; it is not stored on any server. Your answers stay in this browser until you copy them.</p>
+    <p class="plain" id="rep-est" style="font-weight:600"></p>
+    <div id="rep-list" style="margin-top:10px"></div>
+    <details id="rep-more-wrap" style="margin-top:10px" hidden><summary id="rep-more-sum"></summary><div id="rep-more" style="margin-top:8px"></div></details>
+    <div class="row" style="margin-top:12px"><button type="button" class="primary" id="rep-copy">Copy my updates</button><span id="rep-msg" class="msg" role="status" aria-live="polite"></span></div>
+    <textarea id="rep-out" readonly spellcheck="false" aria-label="Your updates as text" style="margin-top:8px;min-height:120px"></textarea>
+    <p class="hint">Paste this into an email back to your sales manager, or into the CRM notes.</p>
+  </section>
+
+  <nav class="jump" aria-label="Sections" id="jump"><a href="#sec-a">A. Monday forecast</a><a href="#sec-b">B. Five-minute check-in</a><a href="#sec-c">C. Inbox triage</a><a href="#sec-log">Activity log</a></nav>
+
+  <!-- ===================== A. Monday forecast ===================== -->
+  <h2 class="sec" id="sec-a">A. Monday forecast</h2>
+
+  <section class="panel" aria-labelledby="h-period">
+    <h2 id="h-period">Forecast period</h2>
+    <div class="row">
+      <label class="field" for="p-start" style="flex:1 1 150px">From<input type="date" id="p-start"></label>
+      <label class="field" for="p-end" style="flex:1 1 150px">To<input type="date" id="p-end"></label>
+      <button type="button" class="btn" id="p-this">This quarter</button>
+      <button type="button" class="btn" id="p-next">Next quarter</button>
+    </div>
+    <p id="p-msg" class="msg" role="status" aria-live="polite"></p>
+  </section>
+
+  <section class="panel" aria-labelledby="h-oem">
+    <h2 id="h-oem">OEM contracts: load a CRM export</h2>
+    <form id="oem-form">
+      <label class="field" for="oem-in">Paste a CSV or tab-separated export, first row = column headers<textarea id="oem-in" spellcheck="false" placeholder="opportunity_id, account, opportunity, amount, stage, close_date, owner, last_updated, probability&#10;One deal per row. owner, last_updated and probability are optional."></textarea></label>
+      <div class="row" style="margin-top:6px"><label class="hint" for="oem-file">Or upload a file</label><input type="file" id="oem-file" accept=".csv,.tsv,.txt,text/csv,text/plain"></div>
+      <details style="margin-top:8px"><summary>Have last week's export? Paste it to compare now</summary>
+        <label class="field" for="oem-prior" style="margin-top:6px">Last week's export, same kind of columns<textarea id="oem-prior" spellcheck="false" placeholder="Same columns as above, exported last Monday"></textarea></label>
+        <div class="row" style="margin-top:6px"><label class="hint" for="oem-prior-file">Or upload a file</label><input type="file" id="oem-prior-file" accept=".csv,.tsv,.txt,text/csv,text/plain"></div>
+      </details>
+      <div class="row" style="margin-top:8px"><button class="primary" type="submit">Import OEM deals</button></div>
+      <p id="oem-msg" class="msg" role="status" aria-live="polite"></p>
+    </form>
+    <details><summary>Columns</summary><ul class="muted" style="font-size:14px;margin:8px 0 0">
+      <li><code>account</code> and/or <code>opportunity</code> (deal name): at least one is required</li>
+      <li><code>amount</code> or <code>value</code> in $, e.g. 250000, $250,000 or 250k (required)</li>
+      <li><code>stage</code> (required) and <code>close_date</code> as 2026-12-15 or 12/15/2026 (required)</li>
+      <li><code>owner</code>, <code>last_updated</code> (optional; used for the check-in list)</li>
+      <li><code>probability</code> as 60, 60% or 0.6 (optional; otherwise the stage table below is used)</li>
+      <li><code>opportunity_id</code> (optional; makes week-over-week matching exact)</li>
+    </ul>
+    <p class="hint" style="margin:6px 0 0">Each import is kept. The first import in a new week is compared with the last import from an earlier week, shown under "Changes since last Monday".</p></details>
+  </section>
+
+  <section class="panel" aria-labelledby="h-stages" id="stage-panel" hidden>
+    <h2 id="h-stages">Stages: what counts as commit, and probabilities</h2>
+    <p class="hint" style="margin:0 0 8px">Tick the stages you treat as commit. Probabilities start blank; they are used for best case only on deals with no probability in the export. Won and lost are set from the stage name; change them if that is wrong.</p>
+    <div class="scroll"><table style="min-width:520px"><thead><tr><th scope="col">Stage</th><th class="num" scope="col">Deals</th><th scope="col">Commit</th><th scope="col">Probability %</th><th scope="col">Open, won or lost</th></tr></thead><tbody id="stage-body"></tbody></table></div>
+    <div class="row" style="margin-top:10px">
+      <label class="field" for="big-deal" style="flex:0 1 220px">Big deal: $ amount or more (blank = 5 largest)<input type="number" id="big-deal" min="0" step="1000" inputmode="numeric"></label>
+    </div>
+  </section>
+
+  <section id="oem-tiles" class="tiles" aria-label="OEM forecast" hidden></section>
+
+  <section class="panel" aria-labelledby="h-move" id="move-panel" hidden>
+    <h2 id="h-move">OEM deals moving the number</h2>
+    <div id="gaps"></div>
+    <h3 style="margin-top:10px">Big deals in the period</h3>
+    <div class="scroll"><table><thead><tr><th scope="col">Deal</th><th scope="col">Owner</th><th scope="col">Stage</th><th scope="col">Close</th><th class="num" scope="col">Amount</th><th scope="col">Counts in</th><th scope="col">Check-in</th></tr></thead><tbody id="big-body"></tbody></table></div>
+    <p id="big-empty" class="muted" hidden>No deals close in this period.</p>
+    <h3 style="margin-top:14px">Close date already passed</h3>
+    <div class="scroll"><table><thead><tr><th scope="col">Deal</th><th scope="col">Owner</th><th scope="col">Stage</th><th scope="col">Close</th><th class="num" scope="col">Amount</th><th scope="col">Check-in</th></tr></thead><tbody id="past-body"></tbody></table></div>
+    <p id="past-empty" class="muted" hidden>No open deals have a close date in the past.</p>
+    <h3 style="margin-top:14px">Changes since last Monday</h3>
+    <div id="wow"></div>
+  </section>
+
+  <section class="panel" aria-labelledby="h-dist">
+    <h2 id="h-dist">Distributor reorders: load order history</h2>
+    <form id="dist-form">
+      <label class="field" for="dist-in">Paste a CSV or tab-separated export, first row = column headers<textarea id="dist-in" spellcheck="false" placeholder="distributor, order_date, amount, order_no, sku&#10;One order or order line per row. order_no and sku are optional."></textarea></label>
+      <div class="row" style="margin-top:6px"><label class="hint" for="dist-file">Or upload a file</label><input type="file" id="dist-file" accept=".csv,.tsv,.txt,text/csv,text/plain"></div>
+      <div class="row" style="margin-top:8px">
+        <button class="primary" type="submit">Import order history</button>
+        <label class="field" for="od-mult" style="flex:0 1 260px">Overdue when days since last order is more than × median interval<input type="number" id="od-mult" min="1" max="10" step="0.1"></label>
+      </div>
+      <p id="dist-msg" class="msg" role="status" aria-live="polite"></p>
+    </form>
+    <details><summary>Columns</summary><ul class="muted" style="font-size:14px;margin:8px 0 0">
+      <li><code>distributor</code> (or customer) name, <code>order_date</code>, <code>amount</code> in $ (all required)</li>
+      <li><code>order_no</code> (optional): lines with the same order number count as one order. Without it, lines from one distributor on the same date count as one order.</li>
+      <li><code>sku</code> or <code>line</code> (optional, not needed for the run-rate)</li>
+    </ul></details>
+  </section>
+
+  <section id="dist-tiles" class="tiles" aria-label="Distributor run-rate" hidden></section>
+
+  <section class="panel" aria-labelledby="h-dtab" id="dist-panel" hidden>
+    <h2 id="h-dtab">Distributors: expected this period</h2>
+    <div class="scroll"><table style="min-width:760px"><thead><tr><th scope="col">Distributor</th><th class="num" scope="col">Orders</th><th scope="col">Expected this period (math)</th><th scope="col">Last order</th><th scope="col">Reorder</th></tr></thead><tbody id="dist-body"></tbody></table></div>
+    <div id="thin-wrap" hidden style="margin-top:12px"><h3>Not enough history (fewer than 3 orders)</h3><p class="hint" style="margin:0 0 6px">Left out of the run-rate rather than guessed.</p><div class="scroll"><table style="min-width:480px"><thead><tr><th scope="col">Distributor</th><th class="num" scope="col">Orders</th><th class="num" scope="col">Total ordered</th><th scope="col">Last order</th></tr></thead><tbody id="thin-body"></tbody></table></div></div>
+  </section>
+
+  <section class="panel" aria-labelledby="h-sum" id="sum-panel" hidden>
+    <h2 id="h-sum">Monday summary: two channels side by side</h2>
+    <div class="split" id="sum-split"></div>
+    <div id="sum-combined" style="margin-top:12px"></div>
+    <div class="row" style="margin-top:12px"><button type="button" class="primary" id="sum-copy">Copy Monday summary</button><span id="sum-msg" class="msg" role="status" aria-live="polite"></span></div>
+    <details style="margin-top:8px"><summary>Preview the summary text</summary><textarea id="sum-out" readonly spellcheck="false" aria-label="Monday summary text" style="margin-top:6px;min-height:240px"></textarea></details>
+  </section>
+
+  <!-- ===================== B. Check-in ===================== -->
+  <h2 class="sec" id="sec-b">B. Five-minute rep check-in</h2>
+  <section class="panel" aria-labelledby="h-ci">
+    <h2 id="h-ci">OEM deals that need a look, by owner</h2>
+    <p id="ci-none" class="muted" style="margin:0">Import an OEM export above to build each owner's check-in list.</p>
+    <div id="ci-body" hidden>
+      <div class="row">
+        <label class="field" for="ci-owner" style="flex:1 1 200px">Owner<select id="ci-owner"></select></label>
+        <label class="field" for="ci-stale" style="flex:0 1 160px">No update in (days)<input type="number" id="ci-stale" min="1" max="365" step="1"></label>
+        <label class="field" for="ci-pct" style="flex:0 1 200px">Big change: amount moved by % or more<input type="number" id="ci-pct" min="1" max="1000" step="1"></label>
+      </div>
+      <p class="hint" style="margin:6px 0 0">A deal is listed if its close date has passed, it has no update in that many days (a check-in counts as an update), or its close date was pushed or its amount changed by that much since last week.</p>
+      <p class="plain" id="ci-est" style="font-weight:600;margin-top:10px"></p>
+      <div id="ci-list" style="margin-top:8px"></div>
+      <details id="ci-more-wrap" style="margin-top:10px" hidden><summary id="ci-more-sum"></summary><div id="ci-more" style="margin-top:8px"></div></details>
+      <div class="row" style="margin-top:12px">
+        <button type="button" class="primary" id="ci-copy">Copy my updates</button>
+        <button type="button" class="btn" id="ci-link">Copy check-in link for this owner</button>
+        <span id="ci-msg" class="msg" role="status" aria-live="polite"></span>
+      </div>
+      <p class="hint" style="margin:4px 0 0">The link carries this owner's list inside it (nothing is stored on a server), so the rep can open it on their own computer. Share it only with that rep. Their answers come back as text you paste below.</p>
+      <textarea id="ci-out" readonly spellcheck="false" aria-label="Updates as text" style="margin-top:8px;min-height:100px" hidden></textarea>
+      <details style="margin-top:10px"><summary>Paste updates a rep sent back</summary>
+        <label class="field" for="ci-paste" style="margin-top:6px">The text from their "Copy my updates" button<textarea id="ci-paste" spellcheck="false" placeholder="Lines ending in [ref:...] from a rep's copied updates"></textarea></label>
+        <div class="row" style="margin-top:6px"><button type="button" class="btn" id="ci-apply">Apply updates</button><span id="ci-apply-msg" class="msg" role="status" aria-live="polite"></span></div>
+      </details>
+    </div>
+  </section>
+
+  <!-- ===================== C. Inbox triage ===================== -->
+  <h2 class="sec" id="sec-c">C. Inside-sales inbox triage</h2>
+  <section class="panel" aria-labelledby="h-mail">
+    <h2 id="h-mail">Paste customer emails</h2>
+    <form id="mail-form">
+      <label class="field" for="mail-in">One or more emails. Put a line containing only --- between emails (or a blank line, if no email has blank lines inside it).<textarea id="mail-in" spellcheck="false" style="min-height:150px" placeholder="From: name &lt;address&gt; (optional)&#10;Subject and body of the email&#10;---&#10;Next email"></textarea></label>
+      <details style="margin-top:8px"><summary>Open-orders export (optional, lets Cortex draft status replies)</summary>
+        <label class="field" for="oo-in" style="margin-top:6px">CSV or tab-separated, first row = column headers<textarea id="oo-in" spellcheck="false" placeholder="po, order_no, customer, item, qty, promised_ship_date, status, tracking&#10;One order line per row. Needs po or order_no."></textarea></label>
+        <div class="row" style="margin-top:6px"><label class="hint" for="oo-file">Or upload a file</label><input type="file" id="oo-file" accept=".csv,.tsv,.txt,text/csv,text/plain"></div>
+        <p id="oo-msg" class="msg" role="status" aria-live="polite"></p>
+      </details>
+      <div class="row" style="margin-top:8px">
+        <button class="primary" type="submit">Triage emails</button>
+        <label class="row" style="gap:6px;font-size:13px;color:var(--muted)"><input type="checkbox" id="use-ts"> Also classify with TypeSafe (sends email text)</label>
+      </div>
+      <p id="mail-msg" class="msg" role="status" aria-live="polite"></p>
+    </form>
+  </section>
+  <section id="mail-tiles" class="tiles" aria-label="Inbox counts" hidden></section>
+  <section class="panel" aria-labelledby="h-mres" id="mail-panel" hidden>
+    <div class="row" style="justify-content:space-between;margin-bottom:8px"><h2 id="h-mres" style="margin:0">Triaged emails</h2><span id="mail-mode" class="st grey"></span></div>
+    <div id="mail-groups"></div>
+  </section>
+
+  <!-- ===================== Log ===================== -->
+  <section class="panel" aria-labelledby="h-log" id="sec-log">
+    <div class="row" style="justify-content:space-between;margin-bottom:8px"><h2 id="h-log" style="margin:0">Activity log</h2>
+      <button type="button" class="btn" id="log-csv">Download log as CSV</button></div>
+    <div class="scroll"><table style="min-width:520px"><thead><tr><th scope="col">Time</th><th scope="col">Action</th><th scope="col">Detail</th></tr></thead><tbody id="log-body"></tbody></table></div>
+    <p id="log-empty" class="muted">Nothing recorded yet.</p>
+  </section>
+</main>
+<footer>Cortex by Pitch, Pray, Ship. Typesafe.</footer>
+<script>
+"use strict";
+(()=>{
+const KEY="keelson.v1",$=id=>document.getElementById(id);
+const el=(t,a={},...k)=>{const e=document.createElement(t);for(const[x,y]of Object.entries(a))if(y!==null&&y!==undefined&&y!==false)e.setAttribute(x,y===true?"":String(y));e.append(...k.flat().filter(v=>v!==null&&v!==undefined&&v!==false&&v!=="").map(v=>typeof v==="number"?String(v):v));return e};
+const lc=s=>String(s??"").trim().toLowerCase();
+const plural=(n,w,p)=>`${n} ${n===1?w:(p||w+"s")}`;
+
+// ================= dates, money =================
+const pad=n=>String(n).padStart(2,"0");
+const isoOf=(y,m,d)=>`${y}-${pad(m)}-${pad(d)}`;
+let TODAY=null;
+const today=()=>{if(TODAY)return TODAY;const d=new Date();return isoOf(d.getFullYear(),d.getMonth()+1,d.getDate())};
+const dnum=s=>{const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(String(s||""));return m?Date.UTC(+m[1],+m[2]-1,+m[3])/864e5:null};
+const dayDiff=(a,b)=>{const x=dnum(a),y=dnum(b);return x==null||y==null?null:y-x};
+const fromDnum=n=>{const d=new Date(n*864e5);return isoOf(d.getUTCFullYear(),d.getUTCMonth()+1,d.getUTCDate())};
+const addDays=(s,n)=>{const x=dnum(s);return x==null?null:fromDnum(x+n)};
+const MON=["jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"],MONC=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const validDate=(y,mo,d)=>{if(!(mo>=1&&mo<=12&&d>=1&&d<=31&&y>=1900&&y<=2200))return null;const t=new Date(Date.UTC(y,mo-1,d));return t.getUTCMonth()===mo-1?isoOf(y,mo,d):null};
+function parseDate(v){const s=String(v??"").trim();if(!s)return null;let m;
+ if((m=s.match(/^(\d{4})[-\/.](\d{1,2})[-\/.](\d{1,2})(?:$|[T\s])/)))return validDate(+m[1],+m[2],+m[3]);
+ if((m=s.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{2}|\d{4})(?:$|\s)/))){let y=+m[3];if(y<100)y+=2000;return validDate(y,+m[1],+m[2])}
+ if((m=s.match(/^([A-Za-z]{3,9})\.?\s+(\d{1,2})(?:st|nd|rd|th)?,?\s+(\d{4})\b/))){const i=MON.indexOf(m[1].slice(0,3).toLowerCase());return i<0?null:validDate(+m[3],i+1,+m[2])}
+ if((m=s.match(/^(\d{1,2})[\s-]+([A-Za-z]{3,9})\.?[\s,-]+(\d{4})\b/))){const i=MON.indexOf(m[2].slice(0,3).toLowerCase());return i<0?null:validDate(+m[3],i+1,+m[1])}
+ return null}
+const fmtDate=s=>{const x=dnum(s);if(x==null)return"-";const[y,m,d]=s.split("-").map(Number);return`${MONC[m-1]} ${d}, ${y}`};
+const fmtTime=iso=>{try{return new Intl.DateTimeFormat(undefined,{year:"numeric",month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"}).format(new Date(iso))}catch{return String(iso)}};
+function parseMoney(v){let s=String(v??"").trim().toLowerCase();if(!s)return null;let neg=false;
+ if(/^\(.*\)$/.test(s)){neg=true;s=s.slice(1,-1)}
+ s=s.replace(/usd|\$|,|\s/g,"");if(s.startsWith("-")){neg=!neg;s=s.slice(1)}
+ const m=s.match(/^(\d+(?:\.\d+)?|\.\d+)([km])?$/);if(!m)return null;
+ const n=Number(m[1])*(m[2]==="k"?1e3:m[2]==="m"?1e6:1);return Number.isFinite(n)?(neg?-n:n):null}
+function parseProb(v){const raw=String(v??"").trim();if(!raw)return null;const pct=raw.endsWith("%");const n=Number(raw.replace(/%$/,"").trim());
+ if(!Number.isFinite(n)||n<0)return null;const p=pct?n/100:(n<=1?n:n/100);return p>1?null:p}
+const NF=new Intl.NumberFormat("en-US",{maximumFractionDigits:0});
+const usd=n=>n==null||!Number.isFinite(n)?"-":(n<0?"-$":"$")+NF.format(Math.round(Math.abs(n)));
+const signed=n=>n==null||!Number.isFinite(n)?"-":(n>0?"+":n<0?"-":"±")+"$"+NF.format(Math.round(Math.abs(n)));
+const pctS=p=>p==null||!Number.isFinite(p)?"-":(Math.round(p*1000)/10)+"%";
+const r1=n=>n==null||!Number.isFinite(n)?"-":String(Math.round(n*10)/10);
+const median=xs=>{if(!xs.length)return null;const s=[...xs].sort((a,b)=>a-b),m=s.length>>1;return s.length%2?s[m]:(s[m-1]+s[m])/2};
+const refOf=k=>{let h=0x811c9dc5;for(const c of String(k)){h^=c.codePointAt(0);h=Math.imul(h,0x01000193)>>>0}return h.toString(36)};
+
+// ================= tables =================
+function parseTable(text){text=String(text||"").replace(/^﻿/,"");const first=text.split(/\r?\n/,1)[0]||"",d=first.includes("\t")?"\t":(first.split(";").length>first.split(",").length?";":",");const out=[];let row=[],cur="",q=false;
+ for(let i=0;i<text.length;i++){const ch=text[i];
+  if(q){if(ch==='"'&&text[i+1]==='"'){cur+='"';i++}else if(ch==='"')q=false;else cur+=ch}
+  else if(ch==='"'&&cur.trim()==="")q=true;else if(ch===d){row.push(cur);cur=""}
+  else if(ch==="\n"||ch==="\r"){if(ch==="\r"&&text[i+1]==="\n")i++;row.push(cur);cur="";if(row.some(x=>x.trim()))out.push(row);row=[]}else cur+=ch}
+ row.push(cur);if(row.some(x=>x.trim()))out.push(row);return out}
+const normH=h=>String(h||"").toLowerCase().trim().replace(/%/g,"pct").replace(/#/g," no").replace(/[^a-z0-9]+/g,"_").replace(/^_+|_+$/g,"");
+function mapCols(h,alias){const idx={},used=new Set();
+ for(const[k,al]of Object.entries(alias))for(const a of al){const i=h.findIndex((x,j)=>!used.has(j)&&x===a);if(i>=0){idx[k]=i;used.add(i);break}}
+ for(const[k,al]of Object.entries(alias)){if(idx[k]!=null)continue;const i=h.findIndex((x,j)=>!used.has(j)&&x&&al.some(a=>a.length>=4&&x.startsWith(a+"_")));if(i>=0){idx[k]=i;used.add(i)}}
+ return idx}
+const MAX_ROWS=5000;
+
+// ================= OEM =================
+const OEM_ALIAS={
+ id:["opportunity_id","opp_id","deal_id","opportunity_number","opp_no","record_id","id"],
+ account:["account","account_name","customer","customer_name","company","oem","oem_account"],
+ opp:["opportunity","opportunity_name","opp","opp_name","deal","deal_name","program","project","name"],
+ amount:["amount","value","deal_value","contract_value","annual_value","acv","tcv","total","amount_usd","revenue"],
+ stage:["stage","sales_stage","deal_stage","opportunity_stage","pipeline_stage"],
+ close:["close_date","expected_close_date","expected_close","close","closing_date","target_close","target_close_date","est_close_date","close_dt"],
+ owner:["owner","opportunity_owner","deal_owner","account_owner","rep","sales_rep","salesperson","assigned_to"],
+ updated:["last_updated","last_modified","last_modified_date","last_update","updated","updated_at","last_activity","last_activity_date","modified","modified_date"],
+ prob:["probability","probability_pct","prob","win_probability","probability_percent","win_pct"]};
+function parseOEM(text){
+ const t=parseTable(text);if(t.length<2)return{error:"Paste a header row plus at least one deal."};
+ const h=t[0].map(normH),idx=mapCols(h,OEM_ALIAS),need=[];
+ if(idx.amount==null)need.push("amount or value");if(idx.stage==null)need.push("stage");if(idx.close==null)need.push("close date");if(idx.account==null&&idx.opp==null)need.push("account or opportunity");
+ if(need.length)return{error:`Missing column${need.length>1?"s":""}: ${need.join(", ")}. Found: ${h.filter(Boolean).join(", ")||"(none)"}.`};
+ const rows=[],keys=new Set();let skipped=0,badAmount=0,badClose=0;
+ for(let r=1;r<t.length&&rows.length<MAX_ROWS;r++){const g=k=>idx[k]==null?"":String(t[r][idx[k]]??"").trim();
+  const account=g("account").slice(0,120),opp=g("opp").slice(0,160);if(!account&&!opp){skipped++;continue}
+  const amount=parseMoney(g("amount"));if(amount==null){badAmount++;continue}
+  const id=g("id").slice(0,60),base=id?"id:"+id.toLowerCase():"n:"+(account+"|"+opp).toLowerCase();let key=base,n=1;while(keys.has(key))key=base+"#"+(++n);keys.add(key);
+  const close=parseDate(g("close"));if(!close&&g("close"))badClose++;
+  rows.push({key,ref:refOf(key),id,account,opp,amount,stage:g("stage").slice(0,60)||"(no stage)",close,owner:g("owner").slice(0,80),updated:parseDate(g("updated")),prob:idx.prob==null?null:parseProb(g("prob"))})}
+ return{rows,skipped,badAmount,badClose,has:{updated:idx.updated!=null,prob:idx.prob!=null,owner:idx.owner!=null,id:idx.id!=null}}}
+const autoClosed=s=>/\blost\b|\bdead\b|disqualif|no[\s_-]?decision|\bcancel/i.test(s)?"lost":/\bwon\b|\bbooked\b/i.test(s)?"won":"open";
+function scfg(stages,stage){const c=(stages&&stages[lc(stage)])||{};const p=c.prob==null||c.prob===""?null:Number(c.prob);
+ return{commit:!!c.commit,prob:Number.isFinite(p)&&p>=0&&p<=100?p:null,closed:c.closed==="won"||c.closed==="lost"||c.closed==="open"?c.closed:autoClosed(stage)}}
+// A check-in is current unless the CRM was updated after it.
+function currentCheckin(d,checkins){const c=checkins&&checkins[d.key];if(!c)return null;if(d.updated&&c.date&&c.date<d.updated)return null;return c}
+const dealName=d=>(d.account||"")+(d.account&&d.opp?" · ":"")+(d.opp||"");
+const ownerOf=d=>d.owner||"(no owner in export)";
+
+function forecast(rows,stages,period,checkins){
+ const o={committed:0,best:0,pipeline:0,inPeriod:[],commitDeals:[],noProb:[],noClose:[],atRiskOut:[],movedOut:[],movedIn:[],lost:0,fromExport:0,fromStage:0,won:0};
+ for(const d of rows||[]){const c=scfg(stages,d.stage);if(c.closed==="lost"){o.lost++;continue}
+  if(!Number.isFinite(d.amount))continue;
+  const ci=currentCheckin(d,checkins);let close=d.close;if(ci&&ci.status==="moving"&&dnum(ci.newDate)!=null)close=ci.newDate;
+  if(!close){o.noClose.push(d);continue}
+  const inP=close>=period.start&&close<=period.end,wasIn=!!d.close&&d.close>=period.start&&d.close<=period.end;
+  if(ci&&ci.status==="moving"){if(wasIn&&!inP)o.movedOut.push({d,ci});if(!wasIn&&inP)o.movedIn.push({d,ci})}
+  if(!inP)continue;
+  const won=c.closed==="won",p=won?1:d.prob!=null?d.prob:c.prob!=null?c.prob/100:null,src=won?"won":d.prob!=null?"export":c.prob!=null?"stage":null;
+  const atRisk=!!ci&&ci.status==="risk",isCommit=c.commit||won,counted=isCommit&&!atRisk;
+  if(won)o.won++;else if(src==="export")o.fromExport++;else if(src==="stage")o.fromStage++;
+  if(isCommit&&atRisk)o.atRiskOut.push({d,ci});
+  o.pipeline+=d.amount;if(counted){o.committed+=d.amount;o.commitDeals.push(d)}
+  if(p!=null)o.best+=d.amount*p;else o.noProb.push(d);
+  o.inPeriod.push({d,close,p,src,commit:counted,ci,atRisk})}
+ return o}
+
+function diffSnap(prev,cur,bigPct){const pm=new Map((prev||[]).map(d=>[d.key,d])),cm=new Map((cur||[]).map(d=>[d.key,d]));
+ const r={pushed:[],pulled:[],amount:[],stage:[],added:[],removed:[]};
+ for(const d of cur||[]){const p=pm.get(d.key);if(!p){r.added.push(d);continue}
+  if(p.close&&d.close&&p.close!==d.close){const n=dayDiff(p.close,d.close);(n>0?r.pushed:r.pulled).push({d,p,days:n})}
+  if(Number.isFinite(p.amount)&&Number.isFinite(d.amount)&&p.amount!==d.amount){const pct=p.amount===0?Infinity:Math.abs(d.amount-p.amount)/Math.abs(p.amount)*100;if(pct>=bigPct)r.amount.push({d,p,pct})}
+  if(lc(p.stage)!==lc(d.stage))r.stage.push({d,p})}
+ for(const p of prev||[])if(!cm.has(p.key))r.removed.push(p);
+ return r}
+
+// Deals that need a look. Check-ins made before this import count as updates; ones made after it mark the deal done.
+function needsLook(rows,stages,checkins,dif,staleDays,td,importedAt){
+ const changed=new Map(),addC=(k,t)=>{if(!changed.has(k))changed.set(k,[]);changed.get(k).push(t)};
+ if(dif){for(const x of dif.pushed)addC(x.d.key,`Close date moved from ${fmtDate(x.p.close)} to ${fmtDate(x.d.close)} since last week`);
+  for(const x of dif.amount)addC(x.d.key,`Amount changed from ${usd(x.p.amount)} to ${usd(x.d.amount)} since last week`)}
+ const out=[];
+ for(const d of rows||[]){if(scfg(stages,d.stage).closed!=="open")continue;
+  const ci=currentCheckin(d,checkins),done=!!ci&&!!importedAt&&ci.at>=importedAt,prior=ci&&!done?ci:null;
+  const close=prior&&prior.status==="moving"&&dnum(prior.newDate)!=null?prior.newDate:d.close;
+  let touch=d.updated;if(prior&&prior.date&&(!touch||prior.date>touch))touch=prior.date;
+  const reasons=[];let rank=9;
+  if(close&&close<td){reasons.push(`Close date ${fmtDate(close)} has passed`);rank=0}
+  if(changed.has(d.key)){reasons.push(...changed.get(d.key));rank=Math.min(rank,1)}
+  const age=touch?dayDiff(touch,td):null;
+  if(age!=null&&age>=staleDays){reasons.push(`No update in ${age} days (last ${fmtDate(touch)})`);rank=Math.min(rank,2)}
+  if(reasons.length)out.push({d,ref:d.ref,account:d.account,opp:d.opp,amount:d.amount,stage:d.stage,close:d.close,owner:ownerOf(d),reasons,rank,ci,done,stale:age!=null&&age>=staleDays,past:!!close&&close<td,changed:changed.has(d.key)})}
+ out.sort((a,b)=>a.rank-b.rank||(b.amount||0)-(a.amount||0));
+ return out}
+
+// ================= distributors =================
+const DIST_ALIAS={
+ dist:["distributor","distributor_name","customer","customer_name","account","account_name","sold_to","bill_to","company"],
+ date:["order_date","date","ordered","order_dt","invoice_date","created","created_at","created_date"],
+ amount:["amount","order_amount","order_total","order_value","total","value","net_amount","extended_price","ext_price","line_amount","line_total","sales","revenue","amount_usd"],
+ order:["order_no","order_number","order","order_id","so","so_number","sales_order","invoice","invoice_no","invoice_number","po","po_number","po_no"],
+ sku:["sku","item","part","part_number","item_number","line","line_no"]};
+function parseDist(text){
+ const t=parseTable(text);if(t.length<2)return{error:"Paste a header row plus at least one order."};
+ const h=t[0].map(normH),idx=mapCols(h,DIST_ALIAS),need=[];
+ if(idx.dist==null)need.push("distributor");if(idx.date==null)need.push("order date");if(idx.amount==null)need.push("amount");
+ if(need.length)return{error:`Missing column${need.length>1?"s":""}: ${need.join(", ")}. Found: ${h.filter(Boolean).join(", ")||"(none)"}.`};
+ const rows=[];let skipped=0;
+ for(let r=1;r<t.length&&rows.length<MAX_ROWS*4;r++){const g=k=>idx[k]==null?"":String(t[r][idx[k]]??"").trim();
+  const dist=g("dist").slice(0,120),date=parseDate(g("date")),amount=parseMoney(g("amount"));
+  if(!dist||!date||amount==null){skipped++;continue}
+  rows.push({dist,date,amount,order:g("order").slice(0,60),sku:g("sku").slice(0,60)})}
+ return{rows,skipped,hasOrder:idx.order!=null}}
+function distForecast(rows,period,mult,td){
+ const by=new Map();
+ for(const r of rows||[]){if(!Number.isFinite(r.amount)||dnum(r.date)==null)continue;const k=lc(r.dist);if(!k)continue;
+  if(!by.has(k))by.set(k,{name:r.dist.trim(),orders:new Map()});const g=by.get(k),ok=r.order?"o:"+lc(r.order):"d:"+r.date;
+  if(!g.orders.has(ok))g.orders.set(ok,{date:r.date,amount:0});const o=g.orders.get(ok);o.amount+=r.amount;if(r.date<o.date)o.date=r.date}
+ const pdays=Math.max(1,(dayDiff(period.start,period.end)??0)+1),m=Number.isFinite(mult)&&mult>0?mult:1.5;
+ const items=[],thin=[];let total=0;
+ for(const g of by.values()){const os=[...g.orders.values()].sort((a,b)=>a.date<b.date?-1:a.date>b.date?1:0);
+  const n=os.length,sum=os.reduce((s,o)=>s+o.amount,0),last=os[n-1].date,since=dayDiff(last,td);
+  if(n<3){thin.push({name:g.name,n,total:sum,last,since});continue}
+  const gaps=[];for(let i=1;i<n;i++)gaps.push(dayDiff(os[i-1].date,os[i].date));
+  const med=median(gaps),interval=Math.max(1,med),avg=sum/n,k=pdays/interval,y=avg*k,limit=m*interval,overdue=since!=null&&since>limit;
+  total+=y;items.push({name:g.name,n,total:sum,avg,median:med,interval,k,y,last,since,overdue,limit,pdays})}
+ items.sort((a,b)=>(b.overdue-a.overdue)||b.y-a.y);thin.sort((a,b)=>b.total-a.total);
+ return{items,thin,total,pdays,mult:m}}
+const mathText=x=>`avg ${usd(x.avg)} every ~${r1(x.interval)} days → ~${r1(x.k)} orders → ${usd(x.y)}`;
+
+// ================= email triage =================
+const KIND_LABEL={status:"Order status / where is my order",expedite:"Expedite or date change request",order:"New order, reorder or quote request",quality:"Quality, shortage or damage issue",other:"Other"};
+const KIND_CHIP={status:"blue",expedite:"amber",order:"green",quality:"red",other:"grey"};
+const R_STATUS=/\b(?:where\s+(?:is|are)\b|where's|status\b|tracking\b|track\s+(?:it|this|the|our|my)\b|eta\b|e\.t\.a\.?|shipped\s+yet|has\s+(?:it|this|the\s+order)\s+shipped|when\s+(?:will|does|do|is)\s+(?:it|this|they|the\s+order|our\s+order|my\s+order)\b[^.?!]{0,30}\b(?:ship|arrive|deliver))/i;
+const R_EXP=/\b(?:expedit\w*|need(?:ed)?\s+(?:(?:it|them|these|this|the\s+(?:parts|order|balance))\s+)?by\b|need-by|pull(?:ed|ing)?[\s-]*in\b|rush\b|move\s+up\s+(?:the\s+)?(?:ship|delivery|due)|push(?:ed)?\s+(?:out|back)\b|reschedul\w*|change\s+(?:the\s+)?(?:ship|delivery|due|dock)\s+date|earlier\s+(?:ship|delivery)\s+date)/i;
+const R_NEW=/\b(?:quote\b|quotation|rfq\b|request\s+for\s+quot\w*|p\.?o\.?\s+(?:is\s+)?attached|attached\s+(?:is\s+)?(?:our\s+|a\s+|the\s+)?(?:p\.?o\b|purchase\s+order)|purchase\s+order\s+attached|new\s+order|re-?order\w*|place\s+an?\s+order|pricing\s+(?:for|on)\b)/i;
+const R_QUAL=/\b(?:damag\w*|shortage|short[\s-]?shipped|short\s+\d+|missing\s+(?:\w+\s+){0,2}(?:parts?|pieces?|pcs|items?|cartons?|boxes|qty|quantity|lines?)|wrong\s+(?:\w+\s+)?(?:parts?|items?|size|thread|finish|grade|material|qty|quantity)|defect\w*|non-?conform\w*|ncr\b|reject\w*|out\s+of\s+spec|stripped|cracked|corrod\w*|rust(?:ed|y)?\b|rma\b|quality\s+(?:issue|problem|concern)|bad\s+(?:parts|batch|lot))/i;
+const R_URG=/\b(?:line[\s-]?down|lines?\s+(?:is|are|went)\s+down|production\s+(?:is\s+)?(?:stopped|stop|halt\w*|down)|shut\s?down|shutting\s+down|urgent\w*|asap\b|a\.s\.a\.p|critical\b|unacceptable|frustrat\w*|angry|furious|escalat\w*|disappoint\w*|(?:by|before)\s+(?:end\s+of\s+(?:the\s+)?day|eod\b|today|tonight|this\s+afternoon)|need\w*\s+(?:\w+\s+){0,3}today)/i;
+function rulesKind(text){const t=String(text||""),hits=[];let kind="other";
+ const q=t.match(R_QUAL),e=t.match(R_EXP),n=t.match(R_NEW),s=t.match(R_STATUS),u=t.match(R_URG);
+ if(q){kind="quality";hits.push(q[0])}else if(e){kind="expedite";hits.push(e[0])}else if(n){kind="order";hits.push(n[0])}else if(s){kind="status";hits.push(s[0])}
+ return{kind,urgent:!!u,urgentHit:u?u[0]:"",hits}}
+function splitEmails(t){t=String(t||"").replace(/\r\n?/g,"\n").trim();if(!t)return[];
+ const parts=/^[ \t]*-{3,}[ \t]*$/m.test(t)?t.split(/^[ \t]*-{3,}[ \t]*$/m):t.split(/\n[ \t]*\n/);
+ return parts.map(s=>s.trim()).filter(Boolean)}
+const normPO=s=>String(s||"").toUpperCase().replace(/[^A-Z0-9]/g,"").replace(/^PO(?=\d)/,"");
+const PO_RE=/\b(?:p\.?\s?o\b\.?|purchase\s+order|sales\s+order|order|so(?=\s*#))(?:\s*(?:#|no\b\.?|num(?:ber)?\b\.?))?\s*[:#-]?\s*([A-Z0-9][A-Z0-9-]{2,24})/gi;
+const PART_RE=/\b(?:part|p\/n|pn|item|sku)\s*(?:#|no\b\.?|number)?\s*[:#]?\s*([A-Z0-9][A-Z0-9.\-\/]{2,30})/gi;
+const DATE_RE=/\b(?:\d{4}-\d{2}-\d{2}|\d{1,2}\/\d{1,2}(?:\/\d{2,4})?|(?:jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec)[a-z]*\.?\s+\d{1,2}(?:st|nd|rd|th)?(?:,?\s+\d{4})?|(?:monday|tuesday|wednesday|thursday|friday|saturday|sunday|tomorrow)\b)/gi;
+function extract(text,orders){const t=String(text||""),pos=[],parts=[],dates=[],seen=new Set();let m;
+ PO_RE.lastIndex=0;while((m=PO_RE.exec(t))){const v=m[1].replace(/-+$/,"");if(/\d/.test(v)&&!seen.has(normPO(v))){seen.add(normPO(v));pos.push(v)}}
+ if(orders&&orders.length){const tok=" "+t.toUpperCase().replace(/[^A-Z0-9]+/g," ")+" ";
+  for(const o of orders)for(const v of [o.po,o.order]){const n=normPO(v);if(n.length>=4&&/\d/.test(n)&&!seen.has(n)&&tok.includes(" "+n+" ")){seen.add(n);pos.push(v)}}}
+ PART_RE.lastIndex=0;while((m=PART_RE.exec(t))){const v=m[1].replace(/[.\-\/]+$/,"");if(/\d/.test(v)&&!seen.has(normPO(v))&&!parts.includes(v))parts.push(v)}
+ DATE_RE.lastIndex=0;while((m=DATE_RE.exec(t))){if(!dates.includes(m[0]))dates.push(m[0])}
+ let sender="",first="",company="";const fm=t.match(/^\s*from:\s*(.+)$/im);
+ if(fm){sender=fm[1].trim().slice(0,120);const nm=sender.replace(/<[^>]*>/,"").replace(/["']/g,"").trim();if(nm&&!nm.includes("@"))first=nm.split(/[\s,]+/)[0];
+  const dm=sender.match(/@([a-z0-9.-]+)/i);if(dm){const parts2=dm[1].toLowerCase().split(".");company=parts2.length>1?parts2[parts2.length-2]:parts2[0]}}
+ if(orders&&orders.length){const low=t.toLowerCase();for(const o of orders){const c=lc(o.customer);if(c.length>=3&&low.includes(c)){company=o.customer;break}}}
+ if(!first){const sm=t.match(/(?:^|\n)\s*(?:[Tt]hanks|[Tt]hank you|[Rr]egards|[Bb]est(?: regards)?|[Cc]heers)[,!.]?[ \t]*\n\s*([A-Z][a-z]+)\b/);if(sm)first=sm[1]}
+ return{pos:pos.slice(0,8),parts:parts.slice(0,8),dates:dates.slice(0,8),sender,first,company}}
+const OO_ALIAS={
+ po:["po","po_number","po_no","customer_po","cust_po","purchase_order","po_num","po_order","po_order_no","po_order_number"],
+ order:["order_no","order_number","order","order_id","so","so_number","so_no","sales_order","order_num"],
+ customer:["customer","customer_name","account","company","sold_to","ship_to","distributor"],
+ item:["item","part","part_number","part_no","sku","item_number","item_no","description","item_description","product"],
+ qty:["qty","quantity","qty_ordered","order_qty","open_qty"],
+ promised:["promised_ship_date","promised_date","promise_date","promised","promised_ship","scheduled_ship_date","ship_date","due_date"],
+ status:["status","order_status","line_status"],
+ tracking:["tracking","tracking_number","tracking_no","tracking_num","pro_number"]};
+function parseOpenOrders(text){const t=parseTable(text);if(t.length<2)return{error:"Paste a header row plus at least one order line."};
+ const h=t[0].map(normH),idx=mapCols(h,OO_ALIAS);
+ if(idx.po==null&&idx.order==null)return{error:"Need a po or order number column. Found: "+(h.filter(Boolean).join(", ")||"(none)")+"."};
+ const rows=[];let skipped=0;
+ for(let r=1;r<t.length&&rows.length<MAX_ROWS;r++){const g=k=>idx[k]==null?"":String(t[r][idx[k]]??"").trim();
+  const po=g("po").slice(0,40),order=g("order").slice(0,40);if(!po&&!order){skipped++;continue}
+  const pr=g("promised");rows.push({po,order,customer:g("customer").slice(0,120),item:g("item").slice(0,160),qty:g("qty").slice(0,20),promised:parseDate(pr),promisedRaw:pr.slice(0,30),status:g("status").slice(0,60),tracking:g("tracking").slice(0,80)})}
+ return{rows,skipped}}
+function matchOrders(pos,orders){if(!orders||!orders.length||!pos.length)return[];const want=new Set(pos.map(normPO).filter(Boolean));
+ return orders.filter(o=>want.has(normPO(o.po))||want.has(normPO(o.order)))}
+const SHIPPED=/ship|deliver|complete|invoic|closed|picked\s*up/i;
+const isLate=(o,td)=>!!o.promised&&o.promised<td&&!SHIPPED.test(o.status);
+function draftReply(x,lines){const ref=[...new Set(lines.map(o=>o.po?"PO "+o.po:"order "+o.order))].join(", ");
+ const L=lines.map(o=>{const bits=[`${o.item||"Item"}${o.qty?` (qty ${o.qty})`:""}: ${o.status||"status not listed"}`];
+  if(o.promised)bits.push(`promised ship date ${fmtDate(o.promised)}`);else if(o.promisedRaw)bits.push(`promised ship date ${o.promisedRaw}`);
+  if(o.tracking)bits.push(`tracking ${o.tracking}`);return"- "+bits.join(", ")+"."});
+ return[`Hi ${x.first||"there"},`,"",`Thanks for checking on ${ref}. Here is where it stands in our open-orders report:`,"",...L,"","Let me know if you need anything else on this order.","","Thanks,","Keelson Fastening Systems inside sales"].join("\n")}
+function triageItem(m,orders,td){
+ const r=rulesKind(m.text),x=extract(m.text,orders),ts=m.ts&&KIND_LABEL[m.ts.kind]?m.ts:null;
+ const kind=ts?ts.kind:r.kind,checkType=!!ts&&r.kind!=="other"&&r.kind!==ts.kind;
+ const tsUrgent=!!ts&&typeof ts.urgent==="number"&&ts.urgent>=0.5,urgent=tsUrgent||r.urgent;
+ const lines=kind==="status"?matchOrders(x.pos,orders):[];const late=lines.some(o=>isLate(o,td));
+ const draft=lines.length?draftReply(x,lines):null,answerable=!!draft&&!late&&!checkType;
+ const group=kind==="expedite"||kind==="quality"||urgent||checkType?"first":answerable?"answer":kind==="status"?"lookup":kind==="order"?"order":"other";
+ return{id:m.id,text:m.text,rules:r,ts,kind,checkType,urgent,tsUrgent,x,lines,late,draft,answerable,group}}
+const GROUPS=[["first","Urgent, expedite or quality: look first"],["answer","Can answer now from the open-orders file"],["lookup","Order status: needs a lookup"],["order","New orders, reorders and quotes"],["other","Other"]];
+async function tsClassify(items){const out=new Map();
+ for(let i=0;i<items.length;i+=30){const batch=items.slice(i,i+30).map(x=>({id:x.id,text:x.text.slice(0,2000)}));
+  const res=await fetch("/api/keelson-email",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({emails:batch})});
+  if(!res.ok)throw new Error("HTTP "+res.status);const j=await res.json();if(!j||!Array.isArray(j.results))throw new Error("bad response");
+  for(const x of j.results)if(x&&KIND_LABEL[x.kind])out.set(String(x.id),{kind:x.kind,confidence:typeof x.confidence==="number"?x.confidence:null,urgent:typeof x.urgent==="number"?x.urgent:null})}
+ return out}
+
+// ================= state =================
+const blank=()=>({v:1,period:null,stages:{},bigDeal:null,bigPct:20,staleDays:21,overdueMult:1.5,oem:null,prev:null,dist:null,checkins:{},repCI:{},ciOwner:"",mail:null,orders:null,useTs:true,log:[]});
+let S=blank();
+const isObj=v=>v&&typeof v==="object"&&!Array.isArray(v);
+function load(){try{const raw=localStorage.getItem(KEY);if(!raw)return;const v=JSON.parse(raw);if(!isObj(v)||v.v!==1)return;const b=blank();
+  S={...b,...v};for(const k of["stages","checkins","repCI"])if(!isObj(S[k]))S[k]=b[k];if(!Array.isArray(S.log))S.log=[];
+  for(const k of["oem","prev","dist","orders"])if(S[k]&&!Array.isArray(S[k].rows))S[k]=null;if(S.mail&&!Array.isArray(S.mail.items))S.mail=null;
+  S.staleDays=num(S.staleDays,21,1,365);S.bigPct=num(S.bigPct,20,1,1000);S.overdueMult=num(S.overdueMult,1.5,1,10);S.bigDeal=S.bigDeal==null?null:num(S.bigDeal,null,0,1e12);if(typeof S.ciOwner!=="string")S.ciOwner=""}catch{S=blank()}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));return true}catch{const m=$("clear-msg");if(m){m.className="msg warn";m.textContent="Couldn't save in this browser (storage full or blocked). This view still works until you close the tab."}return false}}
+function logAdd(action,detail){S.log.push({at:new Date().toISOString(),action,detail:String(detail||"").slice(0,300)});if(S.log.length>1000)S.log=S.log.slice(-1000);save();renderLog()}
+const num=(v,def,min,max)=>{const n=Number(v);return v!==""&&v!=null&&Number.isFinite(n)&&n>=min&&n<=max?n:def};
+function quarterOf(td,offset){const[y,m]=td.split("-").map(Number);let q=Math.floor((m-1)/3)+(offset||0);const yy=y+Math.floor(q/4);q=((q%4)+4)%4;
+ const sm=q*3+1,start=isoOf(yy,sm,1),end=addDays(sm+3>12?isoOf(yy+1,1,1):isoOf(yy,sm+3,1),-1);return{start,end}}
+const period=()=>S.period&&dnum(S.period.start)!=null&&dnum(S.period.end)!=null&&S.period.start<=S.period.end?S.period:quarterOf(today(),0);
+const weekOf=s=>{const x=dnum(s);if(x==null)return null;const wd=((x+4)%7+7)%7;return x-((wd+6)%7)};
+function ensureStages(rows){for(const d of rows){const k=lc(d.stage);if(!S.stages[k])S.stages[k]={name:d.stage,commit:false,prob:null,closed:autoClosed(d.stage)}}}
+function importOEM(text,priorText){
+ const p=parseOEM(text);if(p.error)return{error:p.error};if(!p.rows.length)return{error:`No deals with a readable amount found${p.badAmount?` (${p.badAmount} rows had an amount that couldn't be read)`:""}.`};
+ const snap={rows:p.rows,importedAt:new Date().toISOString(),day:today(),has:p.has,label:"your import from "+fmtDate(today())};let cmp="";
+ if(priorText&&priorText.trim()){const q=parseOEM(priorText);if(q.error)return{error:"Last week's export: "+q.error};if(!q.rows.length)return{error:"Last week's export has no deals with a readable amount."};
+  S.prev={rows:q.rows,importedAt:null,day:null,has:q.has,label:"the prior-week export you pasted"};ensureStages(q.rows);cmp=" Compared with the prior-week export you pasted."}
+ else if(S.oem&&S.oem.day&&weekOf(S.oem.day)!==weekOf(snap.day)){S.prev=S.oem;cmp=` Compared with ${S.oem.label}.`}
+ else if(S.prev)cmp=` Replaced this week's import; still compared with ${S.prev.label}.`;
+ S.oem=snap;ensureStages(p.rows);save();
+ logAdd("Forecast imported",`OEM: ${plural(p.rows.length,"deal")}${S.prev?", compared with "+S.prev.label:""}`);
+ const notes=[];if(p.skipped)notes.push(`${p.skipped} rows had no account or opportunity`);if(p.badAmount)notes.push(`${p.badAmount} rows had an amount that couldn't be read`);if(p.badClose)notes.push(`${p.badClose} close dates couldn't be read`);
+ return{ok:true,msg:`Loaded ${plural(p.rows.length,"OEM deal")}.${cmp}${notes.length?" Skipped or flagged: "+notes.join("; ")+".":""}${!p.has.updated?" No last-updated column, so 'no update in N days' can't be checked.":""}`}}
+function importDist(text){const p=parseDist(text);if(p.error)return{error:p.error};if(!p.rows.length)return{error:"No rows with a distributor, readable date and amount."};
+ S.dist={rows:p.rows,importedAt:new Date().toISOString(),hasOrder:p.hasOrder};save();
+ const names=new Set(p.rows.map(r=>lc(r.dist)));logAdd("Forecast imported",`Distributors: ${plural(p.rows.length,"order line")} from ${plural(names.size,"distributor")}`);
+ return{ok:true,msg:`Loaded ${plural(p.rows.length,"line")} from ${plural(names.size,"distributor")}.${p.skipped?` Skipped ${p.skipped} rows missing a distributor, readable date or amount.`:""}`}}
+function setCheckin(key,ci,source){if(ci){S.checkins[key]={...ci,at:ci.at||new Date().toISOString(),date:ci.date||today()}}else delete S.checkins[key];save()}
+
+// ================= computed =================
+function compute(){const per=period(),td=today(),rows=S.oem?S.oem.rows:[];
+ const fc=forecast(rows,S.stages,per,S.checkins),pf=S.prev?forecast(S.prev.rows,S.stages,per,null):null;
+ const dif=S.prev&&S.oem?diffSnap(S.prev.rows,rows,S.bigPct):null;
+ const look=needsLook(rows,S.stages,S.checkins,dif,S.staleDays,td,S.oem?S.oem.importedAt:null);
+ const df=S.dist?distForecast(S.dist.rows,per,S.overdueMult,td):null;
+ return{per,td,fc,pf,dif,look,df}}
+
+// ================= render helpers =================
+const chip=(c,t)=>el("span",{class:"st "+c},t);
+function how(...nodes){return el("details",{class:"how"},el("summary",{},"How this was calculated"),el("div",{class:"calc"},...nodes))}
+function tile(c,label,value,hint,howNode){return el("div",{class:"tile "+(c||"")},el("div",{class:"tile-label"},label),el("div",{class:"tile-value"},value),hint?el("div",{class:"hint"},hint):null,howNode||null)}
+function list(items,max){const shown=items.slice(0,max||12);return el("ul",{},...shown.map(t=>el("li",{},t)),items.length>shown.length?el("li",{},`… and ${items.length-shown.length} more`):null)}
+const ciShort=ci=>ci.status==="ontrack"?"on track":ci.status==="moving"?`moving to ${fmtDate(ci.newDate)}`:`at risk${ci.reason?": "+ci.reason:""}`;
+const ciChip=ci=>ci?chip(ci.status==="ontrack"?"green":ci.status==="moving"?"amber":"red",`Rep confirmed ${fmtDate(ci.date)}: ${ciShort(ci)}`):el("span",{class:"muted"},"-");
+const ciText=ci=>ci.status==="ontrack"?"Still on track":ci.status==="moving"?`Moving close date to ${ci.newDate}`:`At risk${ci.reason?": "+ci.reason:""}`;
+
+function renderPeriod(){const p=period();$("p-start").value=p.start;$("p-end").value=p.end;$("p-msg").textContent=`${fmtDate(p.start)} to ${fmtDate(p.end)} (${dayDiff(p.start,p.end)+1} days)${S.period?"":", the current quarter"}.`}
+function renderStages(){const has=!!S.oem;$("stage-panel").hidden=!has;if(!has)return;
+ const counts=new Map();for(const d of S.oem.rows){const k=lc(d.stage);counts.set(k,(counts.get(k)||0)+1)}
+ $("stage-body").replaceChildren(...[...counts.keys()].map(k=>{const c=S.stages[k]||(S.stages[k]={name:k,commit:false,prob:null,closed:autoClosed(k)}),id=refOf(k);
+  const cb=el("input",{type:"checkbox",id:"cm-"+id,"aria-label":"Counts as commit: "+(c.name||k)});cb.checked=!!c.commit;cb.onchange=()=>{c.commit=cb.checked;save();renderNumbers()};
+  const pr=el("input",{type:"number",min:"0",max:"100",step:"1",inputmode:"numeric",placeholder:"blank","aria-label":"Probability % for "+(c.name||k),style:"width:110px"});pr.value=c.prob==null?"":String(c.prob);
+  pr.oninput=()=>{const v=pr.value.trim(),n=Number(v);c.prob=v===""||!Number.isFinite(n)||n<0||n>100?null:n;save();renderNumbers()};
+  const sel=el("select",{"aria-label":"Open, won or lost: "+(c.name||k),style:"width:auto"},el("option",{value:"open"},"Open"),el("option",{value:"won"},"Won"),el("option",{value:"lost"},"Lost (excluded)"));sel.value=c.closed||"open";
+  sel.onchange=()=>{c.closed=sel.value;save();renderNumbers()};
+  return el("tr",{},el("th",{scope:"row",style:"font-weight:500"},c.name||k),el("td",{class:"num"},counts.get(k)),el("td",{},cb),el("td",{},pr),el("td",{},sel))}));
+ $("big-deal").value=S.bigDeal==null?"":String(S.bigDeal)}
+
+function renderOEM(C){const has=!!S.oem;$("oem-tiles").hidden=!has;$("move-panel").hidden=!has;if(!has)return;
+ const{fc,per,pf,dif,look,td}=C,range=`${fmtDate(per.start)} to ${fmtDate(per.end)}`;
+ const commitStages=Object.values(S.stages).filter(s=>s.commit).map(s=>s.name);
+ const line=x=>`${dealName(x.d)}: ${usd(x.d.amount)}`;
+ $("oem-tiles").replaceChildren(
+  tile("main","OEM committed",usd(fc.committed),`${plural(fc.commitDeals.length,"deal")} in commit stages${fc.atRiskOut.length?`; ${fc.atRiskOut.length} flagged at risk left out`:""}`,
+   how(el("p",{style:"margin:0"},`Committed = sum of amount for deals closing ${range} in stages marked commit (${commitStages.length?commitStages.join(", "):"none ticked yet"}) or marked won.${fc.atRiskOut.length?" Deals an owner marked at risk in check-in are left out of committed (they stay in best case and pipeline).":""}`),
+    fc.commitDeals.length?list(fc.commitDeals.map(d=>`${dealName(d)}: ${usd(d.amount)}`)):null,
+    fc.atRiskOut.length?el("p",{style:"margin:6px 0 0"},"Left out (at risk): "+fc.atRiskOut.map(x=>dealName(x.d)).join("; ")):null)),
+  tile("","OEM best case",usd(fc.best),"probability-weighted"+(fc.noProb.length?`; ${plural(fc.noProb.length,"deal")} with no probability set count as $0`:""),
+   how(el("p",{style:"margin:0"},`Best case = sum of (amount × probability) for the ${plural(fc.inPeriod.length,"deal")} closing ${range}. Probability comes from the export where the row has one (${fc.fromExport}), otherwise from your stage table (${fc.fromStage}); won deals count at 100% (${fc.won}).${fc.noProb.length?` ${plural(fc.noProb.length,"deal")} in stages with no probability set count as $0 until you set one: ${[...new Set(fc.noProb.map(d=>d.stage))].join(", ")}.`:""}`),
+    fc.inPeriod.length?list(fc.inPeriod.map(x=>`${dealName(x.d)}: ${usd(x.d.amount)} × ${x.p==null?"no probability":pctS(x.p)} = ${x.p==null?"$0":usd(x.d.amount*x.p)}`)):null)),
+  tile("","OEM pipeline",usd(fc.pipeline),`${plural(fc.inPeriod.length,"deal")} closing in the period`,
+   how(el("p",{style:"margin:0"},`Pipeline = sum of amount for every deal closing ${range}, except stages marked lost (${plural(fc.lost,"deal")} excluded). ${fc.noClose.length?plural(fc.noClose.length,"deal")+" with no readable close date are not counted. ":""}${fc.movedOut.length?plural(fc.movedOut.length,"deal")+" moved out of the period by a check-in. ":""}${fc.movedIn.length?plural(fc.movedIn.length,"deal")+" moved into the period by a check-in.":""}`))));
+ // gaps (neutral)
+ const stale=look.filter(x=>x.stale&&!x.done).length,past=look.filter(x=>x.past&&!x.done).length,chg=look.filter(x=>x.changed&&!x.done).length,g=[];
+ const go=()=>el("a",{href:"#sec-b"},"one-click check-in below");
+ if(stale)g.push(el("p",{class:"gap"},`${plural(stale,"OEM deal")} ${stale===1?"has":"have"} no update in ${S.staleDays} days: `,go()));
+ if(past)g.push(el("p",{class:"gap"},`${plural(past,"open OEM deal")} ${past===1?"has a close date":"have close dates"} that ${past===1?"has":"have"} passed: `,go()));
+ if(chg)g.push(el("p",{class:"gap"},`${plural(chg,"OEM deal")} changed a lot since last week: `,go()));
+ if(!S.oem.has.updated)g.push(el("p",{class:"gap muted"},"The export has no last-updated column, so update age isn't checked."));
+ if(fc.noProb.length)g.push(el("p",{class:"gap muted"},`${plural(fc.noProb.length,"deal")} in the period ${fc.noProb.length===1?"is in a stage":"are in stages"} with no probability set; set it in the stage table to include ${fc.noProb.length===1?"it":"them"} in best case.`));
+ if(!g.length)g.push(el("p",{class:"gap muted"},"Nothing needs a check-in right now."));
+ $("gaps").replaceChildren(...g);
+ // big deals
+ const byAmt=[...fc.inPeriod].sort((a,b)=>b.d.amount-a.d.amount),big=S.bigDeal!=null?byAmt.filter(x=>x.d.amount>=S.bigDeal):byAmt.slice(0,5);
+ $("big-empty").hidden=big.length>0;if(!big.length)$("big-empty").textContent=fc.inPeriod.length?"No deals at or above that amount.":"No deals close in this period.";
+ $("big-body").replaceChildren(...big.map(x=>el("tr",{},el("td",{class:"wrapc"},dealName(x.d)),el("td",{},ownerOf(x.d)),el("td",{},x.d.stage),el("td",{class:"num"},fmtDate(x.close),x.close!==x.d.close?el("div",{class:"hint"},"CRM: "+fmtDate(x.d.close)):null),el("td",{class:"num"},usd(x.d.amount)),
+  el("td",{},x.commit?chip("green","Committed"):x.atRisk?chip("red","At risk: not in committed"):null,x.p!=null?el("div",{class:"hint"},`Best case ${usd(x.d.amount*x.p)} (${pctS(x.p)})`):el("div",{class:"hint"},"No probability set")),el("td",{},ciChip(x.ci)))));
+ // past close
+ const pastRows=(S.oem.rows||[]).filter(d=>scfg(S.stages,d.stage).closed==="open").map(d=>{const ci=currentCheckin(d,S.checkins);const close=ci&&ci.status==="moving"&&dnum(ci.newDate)!=null?ci.newDate:d.close;return{d,ci,close}}).filter(x=>x.close&&x.close<td).sort((a,b)=>a.close<b.close?-1:1);
+ $("past-empty").hidden=pastRows.length>0;
+ $("past-body").replaceChildren(...pastRows.slice(0,50).map(x=>el("tr",{},el("td",{class:"wrapc"},dealName(x.d)),el("td",{},ownerOf(x.d)),el("td",{},x.d.stage),el("td",{class:"num"},fmtDate(x.close),el("div",{class:"hint"},`${dayDiff(x.close,td)} days ago${x.close<per.start?", before this period":""}`)),el("td",{class:"num"},usd(x.d.amount)),el("td",{},ciChip(x.ci)))));
+ // week over week
+ const W=$("wow");
+ if(!S.prev||!dif||!pf){W.replaceChildren(el("p",{class:"muted",style:"margin:0"},"No earlier import yet. Next Monday's import will be compared with this one, or paste last week's export above to compare now."));return}
+ const dl=(label,a,b)=>tile(b-a>0?"green":b-a<0?"amber":"",label,signed(b-a),`${usd(a)} → ${usd(b)}`,how(el("p",{style:"margin:0"},`This week's ${label.toLowerCase()} minus last week's, both for ${range} with today's stage settings. This week includes rep check-ins.`)));
+ const sec=(title,items)=>items.length?el("div",{style:"margin-top:10px"},el("h3",{},`${title} (${items.length})`),list(items,15)):null;
+ W.replaceChildren(el("p",{class:"hint",style:"margin:0 0 8px"},`Compared with ${S.prev.label}.`),
+  el("div",{class:"tiles"},dl("Committed",pf.committed,fc.committed),dl("Best case",pf.best,fc.best),dl("Pipeline",pf.pipeline,fc.pipeline)),
+  sec("Close dates pushed",dif.pushed.map(x=>`${dealName(x.d)} (${ownerOf(x.d)}): ${fmtDate(x.p.close)} → ${fmtDate(x.d.close)}, +${x.days} days${x.p.close<=per.end&&x.d.close>per.end?", out of this period":""}`)),
+  sec("Close dates pulled in",dif.pulled.map(x=>`${dealName(x.d)}: ${fmtDate(x.p.close)} → ${fmtDate(x.d.close)}`)),
+  sec(`Amount changed by ${S.bigPct}% or more`,dif.amount.map(x=>`${dealName(x.d)}: ${usd(x.p.amount)} → ${usd(x.d.amount)}`)),
+  sec("Stage changed",dif.stage.map(x=>`${dealName(x.d)}: ${x.p.stage} → ${x.d.stage}`)),
+  sec("New deals",dif.added.map(d=>`${dealName(d)}: ${usd(d.amount)}, ${d.stage}`)),
+  sec("No longer in the export",dif.removed.map(d=>`${dealName(d)}: ${usd(d.amount)}, was ${d.stage}`)),
+  dif.pushed.length+dif.pulled.length+dif.amount.length+dif.stage.length+dif.added.length+dif.removed.length?null:el("p",{class:"muted",style:"margin:8px 0 0"},"No deal-level changes."))}
+
+function renderDist(C){const df=C.df,has=!!df;$("dist-tiles").hidden=!has;$("dist-panel").hidden=!has;$("od-mult").value=String(S.overdueMult);if(!has)return;
+ const od=df.items.filter(x=>x.overdue);
+ $("dist-tiles").replaceChildren(
+  tile("main","Distributor run-rate",usd(df.total),`${plural(df.items.length,"distributor")} with 3+ orders, ${df.pdays}-day period`,
+   how(el("p",{style:"margin:0"},`For each distributor with at least 3 orders: average order value × expected orders, where expected orders = ${df.pdays} days in the period ÷ their median days between orders. Run-rate = the sum.`),list(df.items.map(x=>`${x.name}: ${mathText(x)}`)))),
+  tile(od.length?"amber":"","Past their usual reorder window",String(od.length),`days since last order > ${r1(df.mult)}× their median interval`,
+   how(el("p",{style:"margin:0"},`Overdue when days since the last order is more than ${r1(df.mult)} × the median days between that distributor's orders.`),od.length?list(od.map(x=>`${x.name}: ${x.since} days since last order > ${r1(df.mult)} × ${r1(x.interval)} = ${r1(x.limit)}`)):null)),
+  tile("","Not enough history",String(df.thin.length),"fewer than 3 orders; not in the run-rate",how(el("p",{style:"margin:0"},"A run-rate needs at least 3 orders (2 intervals). Distributors with fewer are listed below and left out, never guessed."))));
+ $("dist-body").replaceChildren(...df.items.map(x=>el("tr",{},el("td",{class:"wrapc"},x.name),el("td",{class:"num"},x.n),el("td",{class:"num"},mathText(x),el("div",{class:"hint"},`${df.pdays} days ÷ ${r1(x.interval)} = ${r1(x.k)} orders; ${usd(x.total)} over ${x.n} orders = ${usd(x.avg)} avg`)),
+  el("td",{class:"num"},fmtDate(x.last),el("div",{class:"hint"},x.since==null?"":`${x.since} days ago`)),
+  el("td",{},x.overdue?chip("amber","Past usual window"):chip("green","On pattern"),el("div",{class:"hint"},`window ${r1(x.limit)} days`)))));
+ $("thin-wrap").hidden=!df.thin.length;
+ $("thin-body").replaceChildren(...df.thin.map(x=>el("tr",{},el("td",{class:"wrapc"},x.name),el("td",{class:"num"},x.n),el("td",{class:"num"},usd(x.total)),el("td",{class:"num"},fmtDate(x.last)))))}
+
+function summaryText(C){const{per,fc,pf,df,dif}=C,lines=[],range=`${fmtDate(per.start)} to ${fmtDate(per.end)}`;
+ const hasO=!!S.oem,hasD=!!df,comb=(hasO?fc.best:0)+(hasD?df.total:0);
+ const para=[];
+ if(hasO)para.push(`For ${range}, OEM contracts show ${usd(fc.committed)} committed and ${usd(fc.best)} best case (probability-weighted) from ${usd(fc.pipeline)} of pipeline.`);
+ if(hasD)para.push(`Distributor reorders are running at about ${usd(df.total)} for the period, based on each distributor's own order rhythm.`);
+ if(hasO&&hasD)para.push(`Together, OEM best case plus distributor run-rate comes to ${usd(comb)}; the two channels are forecast separately.`);
+ lines.push(`Keelson Fastening Systems: Monday forecast, ${fmtDate(C.td)}`,"",para.join(" ")||"No data loaded yet.","");
+ if(hasO){lines.push(`OEM contracts (${plural(fc.inPeriod.length,"deal")} closing ${range})`,`- Committed: ${usd(fc.committed)} (${plural(fc.commitDeals.length,"deal")} in commit stages or won${fc.atRiskOut.length?`; ${fc.atRiskOut.length} flagged at risk in check-in left out`:""})`,`- Best case (probability-weighted): ${usd(fc.best)}`,`- Pipeline (total): ${usd(fc.pipeline)}`);
+  if(pf&&dif)lines.push(`- Since last Monday: committed ${signed(fc.committed-pf.committed)}, best case ${signed(fc.best-pf.best)}, pipeline ${signed(fc.pipeline-pf.pipeline)}; ${plural(dif.pushed.length,"close date")} pushed, ${plural(dif.added.length,"new deal")}, ${dif.removed.length} no longer in the export.`);
+  lines.push("")}
+ if(hasD){lines.push(`Distributor reorders (${plural(df.items.length,"distributor")} with at least 3 orders)`,`- Run-rate expected this period: ${usd(df.total)}`,`- ${plural(df.items.filter(x=>x.overdue).length,"distributor")} past their usual reorder window (more than ${r1(df.mult)}× their median days between orders)`,`- ${plural(df.thin.length,"distributor")} with fewer than 3 orders not included`,"")}
+ if(hasO&&hasD)lines.push(`Combined (OEM best case + distributor run-rate): ${usd(fc.best)} + ${usd(df.total)} = ${usd(comb)}`,"");
+ lines.push("How it was calculated: committed sums deals in stages marked commit or won. Best case multiplies each deal's amount by its probability (from the CRM export where given, otherwise a set stage probability). Distributor run-rate is each distributor's average order value times the orders expected in the period from their median days between orders.");
+ return lines.join("\n")}
+function renderSummary(C){const has=!!S.oem||!!C.df;$("sum-panel").hidden=!has;if(!has)return;const{fc,df}=C;
+ const oem=el("div",{class:"sumcol"},el("h3",{},"OEM contracts"),S.oem?[tile("main","Committed",usd(fc.committed),null,how(el("p",{style:"margin:0"},"Sum of amount for deals in the period in commit stages or won, less deals flagged at risk."))),tile("","Best case",usd(fc.best),"probability-weighted",how(el("p",{style:"margin:0"},"Sum of amount × probability for deals in the period."))),tile("","Pipeline",usd(fc.pipeline),null,how(el("p",{style:"margin:0"},"Sum of amount for all deals in the period except lost.")))]:el("p",{class:"muted"},"No OEM export loaded."));
+ const dist=el("div",{class:"sumcol"},el("h3",{},"Distributor reorders"),df?[tile("main","Run-rate this period",usd(df.total),`${plural(df.items.length,"distributor")}`,how(el("p",{style:"margin:0"},"Sum over distributors with 3+ orders of average order value × (days in period ÷ median days between orders)."))),tile(df.items.some(x=>x.overdue)?"amber":"","Past usual reorder window",String(df.items.filter(x=>x.overdue).length),null,how(el("p",{style:"margin:0"},`Days since last order > ${r1(df.mult)} × median interval.`))),tile("","Not enough history",String(df.thin.length),"left out",how(el("p",{style:"margin:0"},"Fewer than 3 orders.")))]:el("p",{class:"muted"},"No order history loaded."));
+ $("sum-split").replaceChildren(oem,dist);
+ const b=S.oem?fc.best:null,d=df?df.total:null;
+ $("sum-combined").replaceChildren(S.oem&&df?tile("main","OEM best case + distributor run-rate",usd(b+d),`${usd(b)} OEM best case + ${usd(d)} distributor run-rate`,how(el("p",{style:"margin:0"},`${usd(b)} (OEM best case) + ${usd(d)} (distributor run-rate) = ${usd(b+d)}. The two parts are forecast differently and are shown separately above.`))):el("p",{class:"hint",style:"margin:0"},"Load both channels to see a combined figure."));
+ $("sum-out").value=summaryText(C)}
+
+// ================= check-in =================
+function dealCard(it,ci,done,onSet){
+ const card=el("div",{class:"deal"}),extra=el("div",{class:"extra",hidden:true});
+ const meta=`${usd(it.amount)} · ${it.stage||"-"} · close ${fmtDate(it.close)}`;
+ const mk=(label,cls,fn,pressed)=>{const b=el("button",{type:"button",class:"btn "+cls,"aria-pressed":pressed?"true":"false"},label);b.onclick=fn;return b};
+ const showExtra=kind=>{extra.hidden=false;if(kind==="moving"){const inp=el("input",{type:"date","aria-label":"New close date for "+(it.account||it.opp)});if(ci&&ci.newDate)inp.value=ci.newDate;
+   const sv=el("button",{type:"button",class:"primary"},"Save date"),m=el("span",{class:"msg",role:"status"});sv.onclick=()=>{if(dnum(inp.value)==null){m.className="msg warn";m.textContent="Pick a date.";return}onSet({status:"moving",newDate:inp.value,reason:""})};
+   extra.replaceChildren(el("label",{class:"field"},"New close date",inp),sv,m);inp.focus()}
+  else{const inp=el("input",{type:"text",maxlength:"120",placeholder:"Optional: one line on why","aria-label":"Reason (optional)"});if(ci&&ci.reason)inp.value=ci.reason;
+   const sv=el("button",{type:"button",class:"primary"},"Save");sv.onclick=()=>onSet({status:"risk",newDate:null,reason:inp.value.trim().slice(0,120)});
+   inp.onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();sv.click()}};extra.replaceChildren(el("label",{class:"field"},"Reason (optional)",inp),sv);inp.focus()}};
+ const st=done&&ci?ci.status:null;
+ const acts=el("div",{class:"row"},mk("Still on track","ok",()=>onSet({status:"ontrack",newDate:null,reason:""}),st==="ontrack"),mk("Moving date","warn",()=>showExtra("moving"),st==="moving"),mk("At risk","risk",()=>showExtra("risk"),st==="risk"),
+  done?(()=>{const u=el("button",{type:"button",class:"ghost"},"Undo");u.onclick=()=>onSet(null);return u})():null);
+ card.append(el("div",{class:"deal-h"},(it.account||"")+(it.account&&it.opp?" · ":"")+(it.opp||"")),el("div",{class:"deal-m num"},meta),el("ul",{},...it.reasons.map(r=>el("li",{},r))),
+  done&&ci?el("div",{},ciChip(ci)):ci?el("div",{class:"hint"},`Earlier check-in: ${ciShort(ci)} (${fmtDate(ci.date)})`):null,acts,extra);
+ return card}
+function renderLookList(listEl,moreWrap,moreSum,moreEl,estEl,items,getCI,isDone,onSet){
+ const todo=items.filter(x=>!isDone(x)).length,first=items.slice(0,20),rest=items.slice(20);
+ estEl.textContent=items.length?(todo?`~${plural(Math.min(todo,20),"deal")}, about 10 seconds each (~${Math.max(1,Math.round(Math.min(todo,20)*10/60))} min)${todo>20?`; ${todo-20} more if you have time`:""}.`:`All ${plural(items.length,"deal")} answered. Thank you.`):"Nothing needs a look right now.";
+ const card=x=>dealCard(x,getCI(x),isDone(x),ci=>onSet(x,ci));
+ listEl.replaceChildren(...first.map(card));moreWrap.hidden=!rest.length;moreSum.textContent=`More if you have time (${rest.length})`;moreEl.replaceChildren(...rest.map(card))}
+function ownersOf(look){return[...new Set(look.map(x=>x.owner))].sort((a,b)=>a.localeCompare(b))}
+function renderCheckin(C){const has=!!S.oem;$("ci-none").hidden=has;$("ci-body").hidden=!has;if(!has)return;
+ $("ci-stale").value=String(S.staleDays);$("ci-pct").value=String(S.bigPct);
+ const owners=[...new Set(S.oem.rows.map(ownerOf))].sort((a,b)=>a.localeCompare(b));
+ if(!owners.includes(S.ciOwner))S.ciOwner=owners[0]||"";
+ const sel=$("ci-owner");sel.replaceChildren(...owners.map(o=>el("option",{value:o},o)));sel.value=S.ciOwner;
+ const items=C.look.filter(x=>x.owner===S.ciOwner);
+ renderLookList($("ci-list"),$("ci-more-wrap"),$("ci-more-sum"),$("ci-more"),$("ci-est"),items,x=>x.ci,x=>x.done,(x,ci)=>{
+  setCheckin(x.d.key,ci?{...ci,owner:x.owner,by:"page"}:null);
+  if(ci)logAdd("Check-in recorded",`${dealName(x.d)}: ${ciText(ci)}`);else logAdd("Check-in undone",dealName(x.d));
+  renderNumbers()})}
+function ownerUpdates(C){const items=C.look.filter(x=>x.owner===S.ciOwner&&x.done&&x.ci);
+ return updatesText(S.ciOwner,items.map(x=>({ref:x.ref,account:x.account,opp:x.opp,amount:x.amount,ci:x.ci})))}
+function updatesText(owner,items){const lines=[`Monday check-in from ${owner||"(no owner)"} (${today()})`];
+ for(const it of items)if(it.ci)lines.push(`- ${it.account||""}${it.account&&it.opp?" / ":""}${it.opp||""} (${usd(it.amount)}): ${ciText(it.ci)} [ref:${it.ref}]`);
+ if(lines.length===1)lines.push("(no updates yet)");return lines.join("\n")}
+function parseUpdates(text){const out=[];const t=String(text||"");const hd=t.match(/check-in from (.+?) \((\d{4}-\d{2}-\d{2})\)/i);const date=hd&&dnum(hd[2])!=null?hd[2]:null;
+ for(const line of t.split(/\r?\n/)){const m=line.match(/\[ref:([a-z0-9]{1,13})\]\s*$/i);if(!m)continue;const i=line.lastIndexOf("): "),tail=(i>=0?line.slice(i+3):line).replace(/\s*\[ref:[^\]]*\]\s*$/,"");let mm;
+  if(/^still on track/i.test(tail))out.push({ref:m[1].toLowerCase(),status:"ontrack",newDate:null,reason:""});
+  else if((mm=tail.match(/^moving close date to (\d{4}-\d{2}-\d{2})/i))&&dnum(mm[1])!=null)out.push({ref:m[1].toLowerCase(),status:"moving",newDate:mm[1],reason:""});
+  else if((mm=tail.match(/^at risk(?::\s*(.*))?$/i)))out.push({ref:m[1].toLowerCase(),status:"risk",newDate:null,reason:(mm[1]||"").trim().slice(0,120)})}
+ return{owner:hd?hd[1].slice(0,80):"",date,items:out}}
+function applyUpdates(text){const p=parseUpdates(text);if(!p.items.length)return{error:"No update lines found. Each line should end in [ref:...]."};if(!S.oem)return{error:"Import the OEM export first."};
+ const byRef=new Map(S.oem.rows.map(d=>[d.ref,d]));let n=0,miss=0;
+ for(const u of p.items){const d=byRef.get(u.ref);if(!d){miss++;continue}setCheckin(d.key,{status:u.status,newDate:u.newDate,reason:u.reason,date:p.date||today(),owner:d.owner,by:"pasted"});n++}
+ logAdd("Rep updates applied",`${plural(n,"update")}${p.owner?" from "+p.owner:""}${miss?`, ${miss} not matched`:""}`);
+ return{ok:true,n,miss,msg:`Applied ${plural(n,"update")}${miss?`; ${miss} didn't match a deal in the current export`:""}.`}}
+const b64e=s=>{const b=new TextEncoder().encode(s);let bin="";for(const x of b)bin+=String.fromCharCode(x);return btoa(bin).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"")};
+const b64d=s=>{s=String(s).replace(/-/g,"+").replace(/_/g,"/");while(s.length%4)s+="=";const bin=atob(s);return new TextDecoder().decode(Uint8Array.from(bin,c=>c.charCodeAt(0)))};
+function linkPayload(C){const items=C.look.filter(x=>x.owner===S.ciOwner).slice(0,40);
+ return{o:S.ciOwner,d:today(),i:items.map(x=>({r:x.ref,a:x.account.slice(0,80),n:x.opp.slice(0,80),v:x.amount,s:x.stage.slice(0,40),c:x.close||"",w:x.reasons.slice(0,3).map(r=>r.slice(0,120))}))}}
+function readPayload(hash){try{const m=String(hash||"").match(/^#ci=([A-Za-z0-9_-]{1,20000})$/);if(!m)return null;const p=JSON.parse(b64d(m[1]));if(!isObj(p)||!Array.isArray(p.i))return null;
+  const s=(v,n)=>typeof v==="string"?v.slice(0,n):"";
+  return{owner:s(p.o,80),date:dnum(p.d)!=null?p.d:null,items:p.i.slice(0,40).filter(isObj).map(x=>({ref:/^[a-z0-9]{1,13}$/.test(x.r)?x.r:"",account:s(x.a,80),opp:s(x.n,80),amount:typeof x.v==="number"&&Number.isFinite(x.v)?x.v:null,stage:s(x.s,40),close:dnum(x.c)!=null?x.c:null,reasons:Array.isArray(x.w)?x.w.slice(0,3).map(r=>s(r,120)).filter(Boolean):[]})).filter(x=>x.ref)}}catch{return null}}
+let REP=null;
+function renderRep(){const P=REP;$("rep-intro").textContent=`${P.owner?P.owner+", here":"Here"} ${P.items.length===1?"is the 1 OEM deal":`are the ${P.items.length} OEM deals`} that could use a quick word${P.date?` (list made ${fmtDate(P.date)})`:""}. For each one, pick one button. Nothing else is needed.`;
+ const ci=x=>S.repCI[x.ref]||null;
+ renderLookList($("rep-list"),$("rep-more-wrap"),$("rep-more-sum"),$("rep-more"),$("rep-est"),P.items,ci,x=>!!ci(x),(x,c)=>{if(c)S.repCI[x.ref]={...c,at:new Date().toISOString(),date:today()};else delete S.repCI[x.ref];save();renderRep()});
+ $("rep-out").value=updatesText(P.owner,P.items.map(x=>({...x,ci:ci(x)})))}
+
+// ================= mail =================
+function renderMail(){const M=S.mail,has=!!(M&&M.items.length);$("mail-tiles").hidden=!has;$("mail-panel").hidden=!has;$("use-ts").checked=S.useTs!==false;if(!has)return;
+ const orders=S.orders?S.orders.rows:[],td=today(),T=M.items.map(m=>triageItem(m,orders,td));
+ const ans=T.filter(x=>x.answerable).length,urg=T.filter(x=>x.urgent).length;
+ $("mail-tiles").replaceChildren(tile("main","Emails in",String(T.length),M.at?"triaged "+fmtTime(M.at):null),tile(ans?"green":"","Answerable now",String(ans),"status emails with a PO in the open-orders file"),
+  tile(T.length-ans?"amber":"","Need a person",String(T.length-ans),"everything without a ready reply"),tile(urg?"red":"","Urgent",String(urg),"upset, line-down or same-day"));
+ const mode=$("mail-mode");mode.className="st "+(M.mode==="ok"?"blue":"grey");mode.textContent=M.mode==="ok"?"Rules + TypeSafe":M.mode==="partial"?"Rules + TypeSafe (some rules only)":"Rules only";
+ const out=[];
+ for(const[g,title]of GROUPS){const items=T.filter(x=>x.group===g);if(!items.length)continue;
+  if(g==="first")items.sort((a,b)=>(b.kind==="quality")-(a.kind==="quality")||(b.urgent-a.urgent));
+  out.push(el("div",{class:"group"},el("h3",{},`${title} (${items.length})`),...items.map(mailCard)))}
+ $("mail-groups").replaceChildren(...out)}
+function mailCard(x){const c=el("div",{class:"mail"});
+ const chips=el("div",{},chip(KIND_CHIP[x.kind],KIND_LABEL[x.kind]),x.urgent?chip("red","Urgent"):null,x.checkType?chip("amber","Check type"):null,!x.ts?chip("grey","Rules only"):x.ts.confidence!=null?chip("grey",`TypeSafe ${Math.round(x.ts.confidence*100)}%`):null,x.late?chip("amber","Promised date passed"):null);
+ const kv=(k,v)=>v?el("div",{class:"kv"},el("b",{},k+": "),v):null;
+ const why=[];if(x.rules.hits.length)why.push(`rules matched "${x.rules.hits[0]}"`);if(x.rules.urgentHit)why.push(`urgent words "${x.rules.urgentHit}"`);if(x.tsUrgent)why.push("TypeSafe: likely needs a reply today");
+ if(x.checkType)why.push(`rules say ${KIND_LABEL[x.rules.kind]}, TypeSafe says ${KIND_LABEL[x.ts.kind]}`);
+ c.append(chips,kv("PO / order",x.x.pos.join(", ")||(x.kind==="status"?"none found":"")),kv("Parts",x.x.parts.join(", ")),kv("Dates mentioned",x.x.dates.join(", ")),kv("From",[x.x.sender,x.x.company&&!x.x.sender.toLowerCase().includes(x.x.company.toLowerCase())?x.x.company:""].filter(Boolean).join(" · ")),
+  why.length?el("div",{class:"hint"},"Why: "+why.join("; ")):null);
+ if(x.kind==="status"&&!x.lines.length)c.append(el("div",{class:"hint"},x.x.pos.length?(S.orders?"No line in the open-orders file matches "+x.x.pos.join(", ")+".":"Load an open-orders export to match "+x.x.pos.join(", ")+"."):"No PO or order number found in the email."));
+ if(x.late)c.append(el("div",{class:"hint"},"The open-orders file shows a promised ship date that has passed without a shipped status: check before replying."));
+ const ex=el("details",{},el("summary",{},"Email text"),el("p",{class:"quote"},x.text.slice(0,4000)));c.append(ex);
+ if(x.draft){const id="dr-"+String(x.id).replace(/[^\w-]/g,"_"),ta=el("textarea",{id,readonly:true,spellcheck:"false"});ta.value=x.draft;const msg=el("span",{class:"msg",role:"status","aria-live":"polite"});
+  const cp=el("button",{type:"button",class:"btn"},"Copy reply");cp.onclick=async()=>{const ok=await copyText(x.draft,ta,msg);if(ok)logAdd("Reply copied",`${x.id}: ${x.x.pos.join(", ")}`)};
+  c.append(el("div",{class:"draft"},el("label",{class:"field",for:id},"Draft reply (from the open-orders file; nothing is sent)"),ta,el("div",{class:"row",style:"margin-top:6px"},cp,msg)))}
+ return c}
+async function copyText(text,ta,msg){try{await navigator.clipboard.writeText(text);if(msg){msg.className="msg";msg.textContent="Copied."}return true}catch{if(ta){ta.hidden=false;ta.select()}if(msg){msg.className="msg warn";msg.textContent="Couldn't copy automatically; the text is selected, press Ctrl/Cmd+C."}return false}}
+async function runTriage(text){const parts=splitEmails(text);if(!parts.length)return{error:"Paste at least one email."};
+ const items=parts.slice(0,90).map((t,i)=>({id:"e"+(i+1),text:t.slice(0,8000),ts:null}));let mode="rules";
+ if(S.useTs!==false){try{const m=await tsClassify(items);for(const it of items)if(m.has(it.id))it.ts=m.get(it.id);mode=m.size===items.length?"ok":m.size?"partial":"rules"}catch{mode="rules"}}
+ S.mail={items,mode,at:new Date().toISOString()};save();
+ logAdd("Emails triaged",`${plural(items.length,"email")}, ${mode==="ok"?"rules + TypeSafe":mode==="partial"?"rules + TypeSafe (partial)":"rules only"}`);
+ return{ok:true,mode,msg:`Triaged ${plural(items.length,"email")}${parts.length>90?" (first 90 only)":""}.${S.useTs!==false&&mode==="rules"?" TypeSafe check unavailable, so these are rules-only.":""}`}}
+function loadOrders(text){const p=parseOpenOrders(text);if(p.error)return{error:p.error};S.orders={rows:p.rows,importedAt:new Date().toISOString()};save();logAdd("Open orders loaded",plural(p.rows.length,"line"));return{ok:true,msg:`Loaded ${plural(p.rows.length,"open-order line")}.${p.skipped?` Skipped ${p.skipped} without a PO or order number.`:""}`}}
+
+// ================= log =================
+function renderLog(){const L=[...S.log].reverse();$("log-empty").hidden=L.length>0;
+ $("log-body").replaceChildren(...L.slice(0,300).map(x=>el("tr",{},el("td",{class:"num",style:"white-space:nowrap"},fmtTime(x.at)),el("td",{},x.action),el("td",{class:"wrapc"},x.detail||"-"))))}
+function logCSV(){const q=v=>/[",\n]/.test(String(v))?'"'+String(v).replace(/"/g,'""')+'"':String(v);
+ return["logged_at_local,logged_at_utc,action,detail",...S.log.map(x=>[fmtTime(x.at),x.at,x.action,x.detail].map(q).join(","))].join("\n")}
+
+// ================= render =================
+let LAST=null;
+function renderNumbers(){const C=compute();LAST=C;renderOEM(C);renderDist(C);renderSummary(C);renderCheckin(C);return C}
+function renderAll(){renderPeriod();renderStages();const C=renderNumbers();renderMail();renderLog();return C}
+const setMsg=(id,r)=>{const m=$(id);m.className=r.error?"msg warn":"msg";m.textContent=r.error||r.msg||""};
+
+// ================= events =================
+function wireFile(inputId,targetId){$(inputId).onchange=async e=>{const f=e.target.files&&e.target.files[0];if(!f)return;if(f.size>5e6){alert("That file is over 5 MB; export fewer rows.");return}try{$(targetId).value=await f.text()}catch{}e.target.value=""}}
+function wire(){
+ wireFile("oem-file","oem-in");wireFile("oem-prior-file","oem-prior");wireFile("dist-file","dist-in");wireFile("oo-file","oo-in");
+ $("oem-form").onsubmit=e=>{e.preventDefault();const r=importOEM($("oem-in").value,$("oem-prior").value);setMsg("oem-msg",r);if(r.ok){$("oem-in").value="";$("oem-prior").value="";renderAll()}};
+ $("dist-form").onsubmit=e=>{e.preventDefault();const r=importDist($("dist-in").value);setMsg("dist-msg",r);if(r.ok){$("dist-in").value="";renderNumbers()}};
+ $("od-mult").onchange=()=>{S.overdueMult=num($("od-mult").value,1.5,1,10);save();renderNumbers()};
+ $("big-deal").onchange=()=>{const v=$("big-deal").value.trim();S.bigDeal=v===""?null:num(v,null,0,1e12);save();renderNumbers()};
+ const setP=p=>{S.period=p;save();renderPeriod();renderNumbers()};
+ $("p-start").onchange=$("p-end").onchange=()=>{const a=$("p-start").value,b=$("p-end").value;if(dnum(a)==null||dnum(b)==null||a>b){$("p-msg").className="msg warn";$("p-msg").textContent="Pick a start date on or before the end date.";return}$("p-msg").className="msg";setP({start:a,end:b})};
+ $("p-this").onclick=()=>setP(null);$("p-next").onclick=()=>setP(quarterOf(today(),1));
+ $("ci-owner").onchange=()=>{S.ciOwner=$("ci-owner").value;save();$("ci-out").hidden=true;renderNumbers()};
+ $("ci-stale").onchange=()=>{S.staleDays=num($("ci-stale").value,21,1,365);save();renderNumbers()};
+ $("ci-pct").onchange=()=>{S.bigPct=num($("ci-pct").value,20,1,1000);save();renderNumbers()};
+ $("ci-copy").onclick=async()=>{const C=LAST||compute(),t=ownerUpdates(C),ta=$("ci-out");ta.value=t;ta.hidden=false;if(await copyText(t,ta,$("ci-msg")))logAdd("Updates copied",S.ciOwner)};
+ $("ci-link").onclick=async()=>{const C=LAST||compute(),url=location.origin+location.pathname+"#ci="+b64e(JSON.stringify(linkPayload(C))),ta=$("ci-out");ta.value=url;ta.hidden=false;if(await copyText(url,ta,$("ci-msg"))){$("ci-msg").textContent="Link copied.";logAdd("Check-in link copied",S.ciOwner)}};
+ $("ci-apply").onclick=()=>{const r=applyUpdates($("ci-paste").value);setMsg("ci-apply-msg",r);if(r.ok){$("ci-paste").value="";renderNumbers()}};
+ $("sum-copy").onclick=async()=>{const t=summaryText(LAST||compute());$("sum-out").value=t;$("sum-out").closest("details").open=true;if(await copyText(t,$("sum-out"),$("sum-msg")))logAdd("Monday summary copied","")};
+ $("use-ts").onchange=e=>{S.useTs=e.target.checked;save()};
+ $("oo-in").onchange=()=>{if(!$("oo-in").value.trim())return;const r=loadOrders($("oo-in").value);setMsg("oo-msg",r);if(r.ok)renderMail()};
+ $("mail-form").onsubmit=async e=>{e.preventDefault();if($("oo-in").value.trim()){const r=loadOrders($("oo-in").value);setMsg("oo-msg",r)}
+  $("mail-msg").className="msg";$("mail-msg").textContent=S.useTs!==false?"Classifying…":"";const r=await runTriage($("mail-in").value);setMsg("mail-msg",r);renderMail()};
+ $("log-csv").onclick=()=>{if(!S.log.length)return;const a=el("a",{href:URL.createObjectURL(new Blob([logCSV()],{type:"text/csv"})),download:"keelson-cortex-activity-log.csv"});document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000)};
+ $("clear-all").onclick=()=>{if(!confirm("Clear all Keelson data saved in this browser? This removes imports, check-ins, emails and the log."))return;
+  try{localStorage.removeItem(KEY)}catch{}S=blank();REP=null;for(const id of["oem-in","oem-prior","dist-in","mail-in","oo-in","ci-paste","ci-out","sum-out","rep-out"])$(id).value="";
+  for(const id of["oem-msg","dist-msg","mail-msg","oo-msg","ci-msg","ci-apply-msg","sum-msg"])$(id).textContent="";$("clear-msg").className="msg";$("clear-msg").textContent="Cleared.";
+  if(location.hash.startsWith("#ci="))history.replaceState(null,"",location.pathname);showMode();renderAll()};
+ $("rep-copy").onclick=async()=>{const t=$("rep-out").value;if(await copyText(t,$("rep-out"),$("rep-msg")))logAdd("Updates copied",REP?REP.owner:"")};
+ addEventListener("hashchange",showMode)}
+const MAIN_IDS=["jump","sec-a","sec-b","sec-c","sec-log"];
+function showMode(){REP=readPayload(location.hash);const rep=!!REP;$("rep-view").hidden=!rep;
+ for(const s of document.querySelectorAll("main > section, main > h2.sec, main > nav"))if(s.id!=="rep-view"&&!s.closest("#rep-view")&&s.getAttribute("aria-label")!=="How this works")s.hidden=rep;
+ if(rep){$("title").textContent="Monday check-in";$("subtitle").textContent="A few OEM deals to confirm. About 10 seconds each.";renderRep()}
+ else{$("title").textContent="Monday forecast";$("subtitle").textContent="OEM contracts and distributor reorders forecast side by side, a short weekly check-in on the OEM deals that need a look, and order-status email triage for the inside-sales desk.";
+  // restore panels that are shown only with data
+  renderAll()}}
+
+load();wire();showMode();
+window.KeelsonCortex={parseOEM,parseDist,parseOpenOrders,parseDate,parseMoney,parseProb,forecast,diffSnap,needsLook,distForecast,splitEmails,rulesKind,extract,matchOrders,draftReply,triageItem,
+ importOEM,importDist,loadOrders,runTriage,applyUpdates,parseUpdates,updatesText,summaryText,compute,renderAll,setCheckin,readPayload,linkPayload,b64e,b64d,refOf,quarterOf,
+ logCSV,state:()=>S,setToday:d=>{TODAY=d},reload:()=>{load();showMode()}};
+})();
+</script>
+</body>
+</html>
