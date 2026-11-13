@@ -1,0 +1,9 @@
+{
+  "name": "little-sprouts-spending",
+  "main": "src/worker.js",
+  "compatibility_date": "2026-11-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": { "directory": "./public", "binding": "ASSETS", "run_worker_first": ["/api/*"] },
+  "vars": { "PLAID_ENV": "sandbox" },
+  "kv_namespaces": [{ "binding": "PLAID_KV", "id": "ac3d91d3a0e84f4caa6e5f30f41dae12" }]
+}

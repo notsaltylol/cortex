@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cortex</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#f5f6f8; --surface:#fff; --ink:#1b2230; --muted:#5d6879; --line:#dde2ea; --accent:#2b4fd8; --accent-ink:#fff;
+  --red:#b3261e; --red-bg:#fde8e6; --amber:#8a5a00; --amber-bg:#fff1d6; --green:#1d7a46; --green-bg:#e0f4e8;
+  --font-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif; --font-num:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){color-scheme:dark;
+  --bg:#12151c; --surface:#1a1f29; --ink:#e8ecf3; --muted:#9aa5b8; --line:#2b3342; --accent:#7f9bff; --accent-ink:#0b1020;
+  --red:#ff8a80; --red-bg:#3d1c1a; --amber:#f2c261; --amber-bg:#3a2d12; --green:#6fd09a; --green-bg:#16301f;}}
+*{box-sizing:border-box} html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:15px/1.5 var(--font-body)}
+.wrap{max-width:1040px;margin:0 auto;padding:24px 16px 32px;display:grid;gap:18px}
+h1{margin:0;font-size:26px;letter-spacing:-.01em} h2{margin:0 0 12px;font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600}
+.sub,.muted{color:var(--muted)} .sub{margin:2px 0 0}
+.num{font-family:var(--font-num);font-variant-numeric:tabular-nums}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px}
+[hidden]{display:none!important}
+#tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+.tile{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--line);border-radius:10px;padding:12px 14px}
+.tile.red{border-left-color:var(--red)} .tile.amber{border-left-color:var(--amber)} .tile.green{border-left-color:var(--green)}
+.tile-label{color:var(--muted);font-size:13px} .tile-value{font:500 24px var(--font-num)} .tile-note{font-size:12px;color:var(--muted)}
+.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:space-between;margin-bottom:10px}
+.filters{display:flex;gap:6px;flex-wrap:wrap}
+.chip{font:inherit;font-size:13px;padding:4px 12px;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:999px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.scroll{overflow-x:auto} table{width:100%;border-collapse:collapse;min-width:720px}
+th,td{text-align:left;padding:9px 8px;border-top:1px solid var(--line);vertical-align:top}
+thead th{border-top:0;font-size:12px;color:var(--muted);font-weight:600} td.num,th.num{text-align:right}
+.rag{display:inline-flex;align-items:center;gap:6px;font-weight:600;font-size:12px;padding:2px 10px;border-radius:999px;text-transform:uppercase;letter-spacing:.04em}
+.rag::before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor}
+.rag.red{background:var(--red-bg);color:var(--red)} .rag.amber{background:var(--amber-bg);color:var(--amber)} .rag.green{background:var(--green-bg);color:var(--green)}
+.why{font-size:13px;color:var(--muted);margin:0;padding-left:16px} .src{font-size:11px;color:var(--muted)}
+.neg{color:var(--red)} 
+form{display:grid;gap:10px} .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+label.field{display:grid;gap:4px;font-size:13px;color:var(--muted)}
+input,button,select{font:inherit}
+input[type=text],input[type=number],input[type=date]{padding:8px 10px;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:8px;width:100%}
+button.primary{padding:9px 14px;background:var(--accent);color:var(--accent-ink);border:0;border-radius:8px;font-weight:600;cursor:pointer;justify-self:start}
+button.ghost{background:none;border:0;color:var(--muted);cursor:pointer;padding:2px 6px;border-radius:6px} button.ghost:hover{color:var(--red)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+#banner{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;justify-content:space-between;background:var(--surface);border:1px dashed var(--line);border-radius:10px;padding:8px 14px;color:var(--muted)}
+.msg{margin:0;font-size:13px;color:var(--muted);min-height:1.4em}
+.bank{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+button.sec{padding:8px 12px;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:8px;font-weight:600;cursor:pointer}
+button:disabled{opacity:.6;cursor:default}
+footer{text-align:center;color:var(--muted);font-size:13px;padding:4px 16px 24px} footer a{color:var(--muted)}
+
+#spendwise{display:grid;gap:18px}
+#spendwise .sw-head{margin:0}
+#spendwise .sw-head h2{margin:0 0 2px}
+#spendwise #sw-tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+#spendwise .tile{border-left-color:var(--green)} #spendwise .tile.over{border-left-color:var(--red)}
+#spendwise table{min-width:560px} #spendwise table input{width:96px}
+#spendwise tr.over{background:var(--red-bg)} #spendwise tbody th{font-weight:500} #spendwise .count{font-weight:400;font-size:12px}
+#spendwise tfoot th,#spendwise tfoot td{font-weight:600;border-top:2px solid var(--line)}
+#spendwise .badge{display:inline-block;background:var(--red);color:var(--bg);font-weight:600;font-size:12px;padding:1px 8px;border-radius:999px}
+#spendwise .okay{color:var(--green)} #spendwise .dollar{color:var(--muted);margin-right:3px}
+#spendwise .two{display:grid;grid-template-columns:minmax(260px,340px) 1fr;gap:18px;align-items:start}
+#spendwise hr{border:0;border-top:1px solid var(--line);margin:14px 0}
+#spendwise #over-banner{background:var(--red-bg);color:var(--red);border:1px solid var(--red);border-radius:10px;padding:10px 14px;font-weight:600}
+#spendwise #sample-banner{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;justify-content:space-between;background:var(--surface);border:1px dashed var(--line);border-radius:10px;padding:8px 14px;color:var(--muted)}
+#spendwise .msg.warn{color:var(--red)}
+#spendwise #list{list-style:none;margin:0;padding:0}
+#spendwise .entry{display:grid;grid-template-columns:52px 1fr 120px 90px auto;gap:8px;align-items:baseline;padding:8px 0;border-top:1px solid var(--line);font-size:14px}
+#spendwise .entry:first-child{border-top:0}
+#spendwise .entry-date{color:var(--muted);font-size:13px;font-family:var(--font-num)} #spendwise .entry .num{text-align:right} #spendwise .entry-cat{color:var(--muted)}
+#spendwise .empty{color:var(--muted)}
+@media (max-width:760px){#spendwise .two{grid-template-columns:1fr}#spendwise .entry{grid-template-columns:48px 1fr auto auto}#spendwise .entry-cat{grid-column:2/4;grid-row:2;font-size:12px}}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <header>
+    <h1>Cortex</h1>
+    <p class="sub">An AI operations copilot for mid-market businesses. Cortex watches your operational data, automates repetitive busywork, forecasts demand, protects sensitive data, and keeps a compliance-grade audit trail. <span>by Pitch, Pray, Ship</span></p>
+  </header>
+  <div id="banner" hidden><span>These are sample accounts so you can see how it works.</span><button type="button" id="clear" class="ghost">Clear sample accounts</button></div>
+  <section id="tiles" aria-label="Summary">
+    <div class="tile red"><div class="tile-label">Red</div><div class="tile-value" id="t-red">0</div><div class="tile-note" id="n-red"></div></div>
+    <div class="tile amber"><div class="tile-label">Amber</div><div class="tile-value" id="t-amber">0</div><div class="tile-note" id="n-amber"></div></div>
+    <div class="tile green"><div class="tile-label">Green</div><div class="tile-value" id="t-green">0</div><div class="tile-note" id="n-green"></div></div>
+    <div class="tile"><div class="tile-label">MRR at risk (red + amber)</div><div class="tile-value" id="t-risk">$0</div><div class="tile-note" id="n-risk"></div></div>
+  </section>
+  <section class="panel" aria-labelledby="h-fc" id="forecast">
+    <div class="bar"><h2 id="h-fc" style="margin:0">Peak-season stock check (weeks 41 to 52)</h2></div>
+    <p class="muted" style="margin:0 0 12px;font-size:14px">Enter your own categories. Forecast demand per week = baseline weekly units x seasonal lift x (1 + growth). Seasonal lift follows a typical Oct to Dec retail curve (W48, Thanksgiving week, is the peak); "Peak intensity" scales it (1 = typical, 0 = flat, 2 = twice as peaky). Stock is simulated week by week: on-hand, plus one inbound delivery, minus forecast demand.</p>
+    <form id="fc-form" autocomplete="off">
+      <div class="grid">
+        <label class="field">Category<input id="fc-name" type="text" maxlength="40" placeholder="Outerwear"></label>
+        <label class="field">Baseline units / week<input id="fc-base" type="number" min="0" step="1" inputmode="decimal"></label>
+        <label class="field">Peak intensity<input id="fc-peak" type="number" min="0" step="0.1" value="1"></label>
+        <label class="field">Growth %<input id="fc-growth" type="number" step="0.1" value="0"></label>
+        <label class="field">On hand (units)<input id="fc-onhand" type="number" min="0" step="1" inputmode="decimal"></label>
+        <label class="field">Inbound (units)<input id="fc-inbound" type="number" min="0" step="1" value="0"></label>
+        <label class="field">Inbound arrives (wk 41-52)<input id="fc-arrive" type="number" min="41" max="52" step="1" value="45"></label>
+      </div>
+      <button class="primary" type="submit">Add category</button>
+      <p id="fc-msg" class="msg" role="status" aria-live="polite"></p>
+    </form>
+    <div id="fc-out" hidden>
+      <div id="fc-tiles" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:12px"></div>
+      <figure style="margin:0 0 12px"><svg id="fc-chart" viewBox="0 0 720 200" role="img" aria-label="Forecast weekly demand in units, with weeks that run out of stock highlighted" style="width:100%;height:auto;display:block"></svg>
+        <figcaption class="muted" style="font-size:12px">Total forecast units per week. Red bars: at least one category is out of stock that week.</figcaption></figure>
+      <div class="scroll"><table style="min-width:820px">
+        <thead><tr><th scope="col">Category</th><th class="num" scope="col">Baseline / wk</th><th class="num" scope="col">Growth %</th><th class="num" scope="col">Forecast units</th><th class="num" scope="col">On hand</th><th class="num" scope="col">Inbound</th><th class="num" scope="col">Arrives (wk)</th><th class="num" scope="col">Unmet units</th><th scope="col">First stockout</th><th scope="col">Status</th><th></th></tr></thead>
+        <tbody id="fc-body"></tbody></table></div>
+    </div>
+    <p id="fc-empty" class="muted" style="margin:12px 0 0">No categories yet. Add one above to see the forecast.</p>
+  </section>
+  <section class="panel" aria-labelledby="h-acc">
+    <div class="bar"><h2 id="h-acc" style="margin:0">Account health, highest risk first</h2>
+      <div class="filters" id="filters" role="group" aria-label="Filter by status"></div></div>
+    <div class="scroll"><table>
+      <thead><tr><th>Account</th><th>Status</th><th class="num">MRR</th><th class="num">Usage 30d</th><th class="num">Active seats</th><th class="num">Tickets</th><th class="num">Renews in</th><th>Last payment</th><th>Why</th><th></th></tr></thead>
+      <tbody id="body"></tbody></table></div>
+    <p id="empty" class="muted" hidden>No accounts here. Add one below.</p>
+    <p id="scoremsg" class="msg" role="status"></p>
+  </section>
+  <section class="panel" aria-labelledby="h-bank">
+    <h2 id="h-bank">Payment signal (optional)</h2>
+    <p class="muted" style="margin:0 0 10px;font-size:13px">Connect a bank to flag accounts whose payment has not arrived in 35+ days. This uses Plaid's <strong>sandbox</strong>, so the data is fake: sandbox returns generic transactions such as "United Airlines", which will not match your accounts. Use the sample payments to see the effect.</p>
+    <div class="bank"><button type="button" class="sec" id="b-connect">Connect bank (sandbox)</button><button type="button" class="ghost" id="b-off" hidden>Remove payment data</button></div>
+    <p id="bankmsg" class="msg" role="status" aria-live="polite"></p>
+  </section>
+  <section class="panel" aria-labelledby="h-prof">
+    <h2 id="h-prof">Customer profiles</h2>
+    <p style="margin:0 0 6px"><a href="/meridian.html">Meridian Retail: peak-season demand watch</a> <span class="muted">· Columbus, OH · omnichannel retail</span></p>
+    <p style="margin:0 0 6px"><a href="/tallowwood.html">Tallowwood Electrical Pty Ltd</a> <span class="muted">· Brisbane, AU · commercial and residential electrical, solar</span></p>
+    <p style="margin:0"><a href="/kauri-ridge.html">Kauri Ridge Roofing &amp; Solar Ltd</a> <span class="muted">· Auckland, NZ · residential roofing and rooftop solar</span></p>
+  </section>
+  <section class="panel" aria-labelledby="h-add">
+    <h2 id="h-add">Add an account</h2>
+    <form id="form" autocomplete="off">
+      <div class="grid">
+        <label class="field">Account<input id="f-name" type="text" maxlength="60" placeholder="Acme Corp"></label>
+        <label class="field">Plan<input id="f-plan" type="text" maxlength="30" placeholder="Pro"></label>
+        <label class="field">MRR ($)<input id="f-mrr" type="number" min="0" step="1" inputmode="decimal"></label>
+        <label class="field">Usage change, last 30d (%)<input id="f-usage" type="number" step="1" inputmode="decimal" placeholder="-25"></label>
+        <label class="field">Active seats (%)<input id="f-seats" type="number" min="0" max="100" step="1" inputmode="decimal"></label>
+        <label class="field">Open tickets<input id="f-tix" type="number" min="0" step="1" value="0"></label>
+        <label class="field">Renewal date<input id="f-renew" type="date"></label>
+        <label class="field" style="align-content:end;grid-auto-flow:column;justify-content:start;align-items:center;gap:8px"><input id="f-esc" type="checkbox"> Has an escalated ticket</label>
+      </div>
+      <button class="primary" type="submit">Add and score</button>
+      <p id="msg" class="msg" role="status" aria-live="polite"></p>
+    </form>
+  </section>
+  <section id="spendwise" aria-labelledby="h-sw">
+    <div class="sw-head"><h2 id="h-sw">Spendwise: expense tracker</h2><p class="sub">Log expenses as they happen and see overruns before the month closes.</p></div>
+  <div id="sample-banner" hidden>
+    <span>These are sample entries so you can see how it works.</span>
+    <button type="button" id="clear-sample" class="ghost">Clear sample entries</button>
+  </div>
+  <div id="over-banner" role="alert" hidden></div>
+  <section id="sw-tiles" aria-label="Totals">
+    <div class="tile"><div class="tile-label">Total spent</div><div class="tile-value" id="t-spent">$0.00</div></div>
+    <div class="tile"><div class="tile-label">Total budgeted</div><div class="tile-value" id="t-budget">$0.00</div></div>
+    <div class="tile" id="tile-over"><div class="tile-label">Categories over budget</div><div class="tile-value" id="t-over">0</div></div>
+  </section>
+  <section class="panel" aria-labelledby="h-cats">
+    <h2 id="h-cats">Categories and budgets</h2>
+    <div class="scroll">
+      <table>
+        <thead><tr><th>Category</th><th class="num">Spent</th><th>Budget</th><th class="num">Left</th><th>Status</th></tr></thead>
+        <tbody id="cat-body"></tbody>
+        <tfoot><tr><th scope="row">Grand total</th><td class="num" id="grand-spent">$0.00</td><td class="num" id="grand-budget">$0.00</td><td></td><td></td></tr></tfoot>
+      </table>
+    </div>
+    <hr>
+    <form id="budget-form" autocomplete="off" style="grid-template-columns: 1fr 140px auto; align-items: end">
+      <label class="field" for="b-cat">Set a budget for a category<input id="b-cat" type="text" list="cats-list" maxlength="40" placeholder="Snacks, Supplies, Repairs…"></label>
+      <label class="field" for="b-amt">Budget ($)<input id="b-amt" type="number" min="0" step="1" inputmode="decimal"></label>
+      <button class="primary" type="submit">Set budget</button>
+    </form>
+    <p id="bmsg" class="msg" role="status"></p>
+  </section>
+  <div class="two">
+    <section class="panel" aria-labelledby="h-log">
+      <h2 id="h-log">Log an expense</h2>
+      <form id="log-form" autocomplete="off">
+        <label class="field" for="f-desc">Description<input id="f-desc" type="text" maxlength="120" placeholder="Crackers and apple slices"></label>
+        <label class="field" for="f-cat">Category (type your own)<input id="f-cat" type="text" list="cats-list" maxlength="40" placeholder="Snacks"></label>
+        <datalist id="cats-list"></datalist>
+        <label class="field" for="f-amt">Amount ($)<input id="f-amt" type="number" min="0" step="0.01" inputmode="decimal"></label>
+        <button class="primary" type="submit">Add expense</button>
+        <p id="sw-msg" class="msg" role="status" aria-live="polite"></p>
+      </form>
+    </section>
+    <section class="panel" aria-labelledby="h-list">
+      <h2 id="h-list">Everything entered</h2>
+      <ul id="list"></ul>
+    </section>
+  </div>
+  </section>
+</main>
+<footer>Cortex by Pitch, Pray, Ship. Typesafe. Accounts save in this browser only.</footer>
+<script>
+"use strict";
+(()=>{
+const KEY="churnradar.v1", $=id=>document.getElementById(id), DAY=864e5;
+const usd=n=>new Intl.NumberFormat("en-US",{style:"currency",currency:"USD",maximumFractionDigits:0}).format(n);
+const el=(t,a={},...k)=>{const e=document.createElement(t);for(const[x,y]of Object.entries(a))e.setAttribute(x,y);e.append(...k);return e};
+const rid=()=>Math.random().toString(36).slice(2,10);
+const iso=d=>{const t=new Date(Date.now()+d*DAY);return `${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,"0")}-${String(t.getDate()).padStart(2,"0")}`};
+const daysTo=s=>Math.ceil((new Date(s+"T00:00:00")-new Date().setHours(0,0,0,0))/DAY);
+const empty=()=>({sample:false,accounts:[]});
+let S=(()=>{try{const v=JSON.parse(localStorage.getItem(KEY));if(v&&Array.isArray(v.accounts)&&!v.sample)return v}catch{}return empty()})();
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch{}};
+
+// Rules-based baseline: instant, works offline, and explains itself.
+function rules(a){let p=0;const why=[];const d=daysTo(a.renew);
+  if(a.usage<=-40){p+=40;why.push(`Usage down ${-a.usage}%`)}else if(a.usage<=-20){p+=25;why.push(`Usage down ${-a.usage}%`)}else if(a.usage<=-5){p+=10;why.push(`Usage slipping (${a.usage}%)`)}
+  if(a.seats<30){p+=20;why.push(`Only ${a.seats}% of seats active`)}else if(a.seats<60){p+=10;why.push(`${a.seats}% of seats active`)}
+  if(a.tix>=4){p+=15;why.push(`${a.tix} open tickets`)}else if(a.tix>=2){p+=8;why.push(`${a.tix} open tickets`)}
+  if(a.esc){p+=15;why.push("Escalated ticket")}
+  if(d<=30){p+=20;why.push(d<0?"Renewal date passed":`Renews in ${d} days`)}else if(d<=60){p+=12;why.push(`Renews in ${d} days`)}else if(d<=90){p+=5}
+  if(S.bank){const n=a.lastPay?Math.floor(-daysTo(a.lastPay)):null;if(n===null||n>=35){p+=20;why.push(n===null?"No payment in 90+ days":`No payment in ${n} days`)}}
+  return{p,rag:p>=55?"red":p>=25?"amber":"green",why}}
+const ORDER={red:0,amber:1,green:2};
+const rows=()=>S.accounts.map(a=>{const r=rules(a);const rag=a.ai||r.rag;return{a,rag,p:r.p,why:r.why,days:daysTo(a.renew)}})
+  .sort((x,y)=>ORDER[x.rag]-ORDER[y.rag]||y.p-x.p||x.days-y.days);
+let filter="all";
+function render(){
+  $("banner").hidden=!S.sample;const R=rows();
+  for(const k of["red","amber","green"]){const g=R.filter(r=>r.rag===k);$("t-"+k).textContent=g.length;$("n-"+k).textContent=g.length?usd(g.reduce((s,r)=>s+r.a.mrr,0))+" MRR":"";}
+  const risk=R.filter(r=>r.rag!=="green"),total=R.reduce((s,r)=>s+r.a.mrr,0);
+  $("t-risk").textContent=usd(risk.reduce((s,r)=>s+r.a.mrr,0));$("n-risk").textContent=total?`of ${usd(total)} total MRR`:"";
+  const f=$("filters");f.replaceChildren(...["all","red","amber","green"].map(k=>{const b=el("button",{type:"button",class:"chip","aria-pressed":String(filter===k)},k==="all"?`All (${R.length})`:`${k[0].toUpperCase()+k.slice(1)} (${R.filter(r=>r.rag===k).length})`);b.onclick=()=>{filter=k;render()};return b}));
+  const V=R.filter(r=>filter==="all"||r.rag===filter);$("empty").hidden=V.length>0;
+  $("body").replaceChildren(...V.map(({a,rag,why,days})=>{
+    const del=el("button",{type:"button",class:"ghost","aria-label":"Delete "+a.name},"Delete");
+    del.onclick=()=>{S.accounts=S.accounts.filter(x=>x.id!==a.id);save();render()};
+    return el("tr",{},
+      el("td",{},a.name,el("div",{class:"muted",style:"font-size:12px"},a.plan||"")),
+      el("td",{},el("span",{class:"rag "+rag},rag),el("div",{class:"src"},a.ai?"TypeSafe":"Rules")),
+      el("td",{class:"num"},usd(a.mrr)),
+      el("td",{class:"num"+(a.usage<=-20?" neg":"")},(a.usage>0?"+":"")+a.usage+"%"),
+      el("td",{class:"num"},a.seats+"%"),
+      el("td",{class:"num"},a.tix+(a.esc?" (esc.)":"")),
+      el("td",{class:"num"},days<0?"overdue":days+"d"),
+      el("td",{class:"muted"},S.bank?(a.lastPay?a.lastPay:"none found"):""),
+      el("td",{},why.length?el("ul",{class:"why"},...why.map(w=>el("li",{},w))):el("span",{class:"muted"},"No warning signs")),
+      el("td",{},del))}));
+}
+let seq=0;
+async function aiScore(){
+  const id=++seq,m=$("scoremsg");if(!S.accounts.length)return;
+  m.textContent="Scoring with TypeSafe…";
+  try{
+    const r=await fetch("/api/score",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({accounts:S.accounts.map(a=>({id:a.id,plan:a.plan,usageChange:a.usage,activeSeats:a.seats,openTickets:a.tix,escalated:a.esc,daysToRenewal:daysTo(a.renew)}))})});
+    if(id!==seq)return;if(!r.ok)throw 0;const j=await r.json();
+    for(const s of j.scores){const a=S.accounts.find(x=>x.id===s.id);if(a&&ORDER[s.rag]!==undefined)a.ai=s.rag}
+    save();render();m.textContent="Scored by TypeSafe. Reasons shown are the rule-based signals behind each account.";
+  }catch{if(id===seq)m.textContent="TypeSafe unavailable, showing rule-based scores."}
+}
+// Bank signal (Plaid sandbox). Only the random session id is stored separately in localStorage.
+const SK="churnradar.plaidsession";
+const sessionId=()=>{try{let s=localStorage.getItem(SK);if(s&&/^[A-Za-z0-9_-]{16,64}$/.test(s))return s;s=Array.from(crypto.getRandomValues(new Uint8Array(24)),b=>b.toString(16).padStart(2,"0")).join("");localStorage.setItem(SK,s);return s}catch{return rid()+rid()+rid()}};
+const bm=t=>{$("bankmsg").textContent=t};
+const post=async(u,b)=>{const r=await fetch(u,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(b)});let j={};try{j=await r.json()}catch{}if(!r.ok)throw new Error(j.error||"Request failed");return j};
+function matchPayments(tx){
+  for(const a of S.accounts){const n=a.name.toLowerCase();let best=null;
+    for(const t of tx){const nm=String(t.name||"").toLowerCase();
+      if((n&&nm.includes(n))||(a.mrr>0&&Math.abs(t.amount-a.mrr)<=a.mrr*0.02)){if(!best||t.date>best)best=t.date}}
+    a.lastPay=best}
+  S.bank=true;S.bankDemo=false;
+}
+function applyBank(){save();render();$("b-off").hidden=!S.bank}
+const loadScript=src=>new Promise((res,rej)=>{if(window.Plaid)return res();const s=document.createElement("script");s.src=src;s.onload=res;s.onerror=()=>rej(new Error("Could not load Plaid Link"));document.head.append(s)});
+$("b-connect").onclick=async()=>{
+  const btn=$("b-connect"),session=sessionId();btn.disabled=true;bm("Starting Plaid Link (sandbox)…");
+  try{
+    const{link_token}=await post("/api/plaid/link-token",{session});
+    await loadScript("https://cdn.plaid.com/link/v2/stable/link-initialize.js");
+    const h=window.Plaid.create({token:link_token,
+      onSuccess:async pt=>{try{
+        bm("Fetching transactions…");await post("/api/plaid/exchange",{public_token:pt,session});
+        const{transactions}=await post("/api/plaid/transactions",{session});
+        matchPayments(transactions);applyBank();
+        const hit=S.accounts.filter(a=>a.lastPay).length;
+        bm(`Loaded ${transactions.length} sandbox credits; matched ${hit} of ${S.accounts.length} accounts. Sandbox data is fake, so few or no accounts will match.`);
+      }catch(e){bm(e.message||"Could not load transactions. Try again in a moment.")}finally{btn.disabled=false}},
+      onExit:()=>{btn.disabled=false;if($("bankmsg").textContent.startsWith("Starting"))bm("")}});
+    h.open();bm("");
+  }catch(e){btn.disabled=false;bm((e&&e.message)||"Could not start bank connection.")}
+};
+$("b-off").onclick=()=>{S.bank=false;S.bankDemo=false;for(const a of S.accounts)delete a.lastPay;applyBank();bm("Payment data removed.")};
+$("b-off").hidden=!S.bank;
+$("clear").onclick=()=>{S={sample:false,accounts:[]};save();render();$("scoremsg").textContent=""};
+$("form").onsubmit=e=>{e.preventDefault();const m=$("msg"),num=id=>$(id).value===""?NaN:Number($(id).value);
+  const name=$("f-name").value.trim(),mrr=num("f-mrr"),usage=num("f-usage"),seats=num("f-seats"),tix=num("f-tix"),renew=$("f-renew").value;
+  if(!name||[mrr,usage,seats,tix].some(Number.isNaN)||!renew){m.textContent="Fill in every field (account, MRR, usage change, seats, tickets and renewal date).";m.className="msg";return}
+  if(seats<0||seats>100||mrr<0||tix<0){m.textContent="Check the numbers: seats 0-100, no negatives.";return}
+  if(S.sample){S={sample:false,accounts:[]}}
+  S.accounts.push({id:rid(),name,plan:$("f-plan").value.trim(),mrr,usage,seats,tix,esc:$("f-esc").checked,renew,ai:null});
+  save();render();$("form").reset();$("f-tix").value=0;m.textContent=`Added ${name}.`;aiScore()};
+render();aiScore();
+})();
+</script>
+<script>
+"use strict";
+(()=>{
+const WEEKS=[41,42,43,44,45,46,47,48,49,50,51,52],IDX=[.7,.7,.75,.8,.9,1,1.1,2.6,1.7,1.6,2,1.3],KEY="cortex.forecast.v1";
+let C=(()=>{try{const v=JSON.parse(localStorage.getItem(KEY));if(Array.isArray(v))return v}catch{}return[]})();
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(C))}catch{}};
+const n=new Intl.NumberFormat("en-US"),f=x=>n.format(Math.round(x)),$=id=>document.getElementById(id);
+const el=(t,a={},...k)=>{const e=document.createElement(t);for(const[x,y]of Object.entries(a))e.setAttribute(x,y);e.append(...k);return e};
+function sim(c){const dem=IDX.map(m=>c.base*Math.max(0,1+(m-1)*c.peak)*(1+c.growth/100));
+ let stock=c.onhand,unmet=0,first=null,low=Infinity;const short=[];
+ WEEKS.forEach((w,i)=>{if(w===c.arrive)stock+=c.inbound;const sold=Math.min(stock,dem[i]),miss=dem[i]-sold;stock-=sold;unmet+=miss;if(miss>.5&&first===null)first=w;low=Math.min(low,stock);short.push(miss>.5)});
+ const total=dem.reduce((a,b)=>a+b,0);
+ return{dem,unmet,first,short,total,rag:unmet>.5?"red":(stock<dem[11]||low<.03*total)?"amber":"green"}}
+function render(){
+ const has=C.length>0;$("fc-out").hidden=!has;$("fc-empty").hidden=has;if(!has)return;
+ const R=C.map(sim),tot=R.reduce((a,r)=>a+r.total,0),un=R.reduce((a,r)=>a+r.unmet,0);
+ const wk=WEEKS.map((_,i)=>R.reduce((a,r)=>a+r.dem[i],0)),pk=wk.indexOf(Math.max(...wk)),red=R.filter(r=>r.rag==="red").length;
+ const tile=(cls,l,v,note)=>{const d=el("div",{class:"tile "+cls},el("div",{class:"tile-label"},l),el("div",{class:"tile-value"},v));if(note)d.append(el("div",{class:"tile-note"},note));return d};
+ $("fc-tiles").replaceChildren(tile("","Forecast units, 12 weeks",f(tot)),
+  tile("","Peak week","W"+WEEKS[pk],tot>0?`${f(wk[pk])} units, ${(wk[pk]/(tot/12)).toFixed(1)}x the average week`:""),
+  tile(un>.5?"red":"green","Unmet demand",f(un)+" units",un>.5?`${(100*un/tot).toFixed(1)}% of forecast, across ${red} categor${red===1?"y":"ies"}`:"No stockouts forecast"));
+ const svg=$("fc-chart"),W=720,H=200,pl=44,pb=24,pt=12,bw=(W-pl-8)/12,mx=(Math.max(...wk)||1)*1.1,ns="http://www.w3.org/2000/svg";
+ const mk=(t,a)=>{const e=document.createElementNS(ns,t);for(const[k,v]of Object.entries(a))e.setAttribute(k,v);return e};
+ svg.replaceChildren();
+ [0,.5,1].forEach(g=>{const y=H-pb-g*(H-pb-pt);svg.append(mk("line",{x1:pl,x2:W-8,y1:y,y2:y,stroke:"var(--line)"}));const t=mk("text",{x:pl-6,y:y+4,"text-anchor":"end","font-size":"10",fill:"var(--muted)"});t.textContent=f(mx*g);svg.append(t)});
+ wk.forEach((v,i)=>{const h=v/mx*(H-pb-pt),x=pl+i*bw+4,short=R.some(r=>r.short[i]);
+  svg.append(mk("rect",{x,y:H-pb-h,width:bw-8,height:h,rx:2,fill:short?"var(--red)":"var(--accent)"}));
+  const t=mk("text",{x:x+(bw-8)/2,y:H-8,"text-anchor":"middle","font-size":"10",fill:"var(--muted)"});t.textContent="W"+WEEKS[i];svg.append(t)});
+ $("fc-body").replaceChildren(...C.map((c,i)=>{const r=R[i];
+  const inp=(k,min,w)=>{const x=el("input",{type:"number",min:String(min),step:"any",value:String(c[k]),style:`width:${w}px`,"aria-label":`${c.name}: ${k}`});
+   x.onchange=()=>{const v=Number(x.value);if(x.value===""||!Number.isFinite(v)||v<min){x.value=c[k];return}c[k]=k==="arrive"?Math.min(52,Math.max(41,Math.round(v))):v;save();render()};return x};
+  const del=el("button",{type:"button",class:"ghost","aria-label":"Delete "+c.name},"Delete");del.onclick=()=>{C.splice(i,1);save();render()};
+  return el("tr",{},el("th",{scope:"row",style:"font-weight:500"},c.name),
+   el("td",{class:"num"},inp("base",0,80)),el("td",{class:"num"},inp("growth",-100,64)),el("td",{class:"num"},f(r.total)),
+   el("td",{class:"num"},inp("onhand",0,90)),el("td",{class:"num"},inp("inbound",0,90)),el("td",{class:"num"},inp("arrive",41,56)),
+   el("td",{class:"num"+(r.unmet>.5?" neg":"")},f(r.unmet)),el("td",{},r.first?"W"+r.first:"None"),
+   el("td",{},el("span",{class:"rag "+r.rag},r.rag==="red"?"Short":r.rag==="amber"?"Tight":"Covered")),el("td",{},del))}));
+}
+$("fc-form").onsubmit=e=>{e.preventDefault();const m=$("fc-msg"),g=id=>$(id).value===""?NaN:Number($(id).value);
+ const name=$("fc-name").value.trim(),base=g("fc-base"),peak=g("fc-peak"),growth=g("fc-growth"),onhand=g("fc-onhand"),inbound=g("fc-inbound"),arrive=g("fc-arrive");
+ if(!name||[base,peak,growth,onhand,inbound,arrive].some(Number.isNaN)||base<0||peak<0||onhand<0||inbound<0||arrive<41||arrive>52){m.textContent="Fill in every field. Numbers can't be negative, and the arrival week must be 41 to 52.";return}
+ C.push({name,base,peak,growth,onhand,inbound,arrive:Math.round(arrive)});save();render();$("fc-form").reset();$("fc-peak").value=1;$("fc-growth").value=0;$("fc-inbound").value=0;$("fc-arrive").value=45;m.textContent=`Added ${name}.`;$("fc-name").focus()};
+render();
+})();
+</script>
+<script>"use strict";(()=>{var d=t=>t.trim().replace(/\s+/g," ").toLowerCase();function v(t,e){let s=new Map,n=new Map;for(let r of t)s.set(r.catKey,(s.get(r.catKey)??0)+r.cents),n.set(r.catKey,(n.get(r.catKey)??0)+1);let a=Object.entries(e).map(([r,i])=>{let p=s.get(r)??0,y=i.budget===null?null:i.budget-p;return{key:r,name:i.name,spent:p,count:n.get(r)??0,budget:i.budget,left:y,over:y!==null&&y<0}}).sort((r,i)=>r.name.localeCompare(i.name));return{rows:a,spent:a.reduce((r,i)=>r+i.spent,0),budgeted:a.reduce((r,i)=>r+(i.budget??0),0),overCount:a.filter(r=>r.over).length}}function f(t){let e=Number.parseFloat(t);return Number.isFinite(e)&&e>=0?Math.round(e*100):null}var S="littlesprouts.spendwise.v1",M=new Intl.NumberFormat("en-US",{style:"currency",currency:"USD"}),u=t=>M.format(t/100);function o(t){let e=document.getElementById(t);if(!e)throw new Error(`Missing #${t}`);return e}function c(t,e={},...s){let n=document.createElement(t);for(let[a,r]of Object.entries(e))n.setAttribute(a,r);return n.append(...s),n}var C=()=>Math.random().toString(36).slice(2,10),w=()=>{let t=new Date;return`${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,"0")}-${String(t.getDate()).padStart(2,"0")}`};function T(){return{sample:!1,categories:{},expenses:[]}}function k(){try{let t=localStorage.getItem(S);if(t){let e=JSON.parse(t);if(Array.isArray(e.expenses)&&e.categories&&typeof e.categories=="object"&&typeof e.sample=="boolean"&&!e.sample)return{expenses:e.expenses,categories:e.categories,sample:e.sample}}}catch{}return T()}var l=k(),m=()=>{try{localStorage.setItem(S,JSON.stringify(l))}catch{}},x=new Map;function E(){let t=v(l.expenses,l.categories);o("t-spent").textContent=u(t.spent),o("t-budget").textContent=u(t.budgeted),o("t-over").textContent=String(t.overCount),o("tile-over").className=`tile${t.overCount>0?" over":""}`,o("grand-spent").textContent=u(t.spent),o("grand-budget").textContent=u(t.budgeted);let e=t.rows.filter(n=>n.over).map(n=>n.name),s=o("over-banner");s.hidden=e.length===0,s.textContent=e.length?`Over budget: ${e.join(", ")}`:"";for(let n of t.rows){let a=x.get(n.key);a&&(a.tr.className=n.over?"over":"",a.status.replaceChildren(),n.left===null?(a.left.textContent="\u2014",a.status.append(c("span",{class:"muted"},"No budget set"))):n.over?(a.left.textContent=`-${u(-n.left)}`,a.status.append(c("span",{class:"badge"},"Over budget"),` by ${u(-n.left)}`)):(a.left.textContent=u(n.left),a.status.append(c("span",{class:"okay"},"Within budget"))))}}function $(){let t=v(l.expenses,l.categories);x.clear(),o("cat-body").replaceChildren(...t.rows.map(e=>{let s=c("input",{type:"number",min:"0",step:"1",inputmode:"decimal",placeholder:"No budget",id:`b-${e.key.replace(/[^a-z0-9]/g,"-")}-${C()}`,"aria-label":`Budget for ${e.name} in dollars`,value:e.budget===null?"":String(e.budget/100)});s.addEventListener("change",()=>{let i=l.categories[e.key];if(i){if(s.value.trim()==="")i.budget=null;else{let p=f(s.value);if(p===null){s.value=i.budget===null?"":String(i.budget/100);return}i.budget=p}m(),E()}});let n=c("td",{class:"num"}),a=c("td",{}),r=c("tr",{},c("th",{scope:"row"},e.name,c("span",{class:"muted count"},` ${e.count} ${e.count===1?"entry":"entries"}`)),c("td",{class:"num"},u(e.spent)),c("td",{},c("span",{class:"dollar"},"$"),s),n,a);return x.set(e.key,{tr:r,left:n,status:a}),r})),o("cats-list").replaceChildren(...t.rows.map(e=>c("option",{value:e.name}))),E()}function L(){o("sample-banner").hidden=!l.sample;let t=[...l.expenses].reverse();if(t.length===0){o("list").replaceChildren(c("li",{class:"empty"},"Nothing logged yet. Add your first expense above."));return}o("list").replaceChildren(...t.map(e=>{let s=c("button",{type:"button",class:"ghost","aria-label":`Delete ${e.description}`},"Delete");return s.addEventListener("click",()=>{l.expenses=l.expenses.filter(n=>n.id!==e.id),m(),g()}),c("li",{class:"entry"},c("span",{class:"entry-date"},e.date.slice(5)),c("span",{class:"entry-desc"},e.description),c("span",{class:"entry-cat"},l.categories[e.catKey]?.name??e.catKey),c("span",{class:"num"},u(e.cents)),s)}))}function g(){$(),L()}function b(t,e=!1){let s=o("sw-msg");s.textContent=t,s.className=e?"msg warn":"msg"}function h(t){let e=d(t);return l.categories[e]||(l.categories[e]={name:t.trim().replace(/\s+/g," "),budget:null}),e}function N(){o("clear-sample").addEventListener("click",()=>{l.expenses=[],l.categories={},l.sample=!1,m(),g()}),o("log-form").addEventListener("submit",t=>{t.preventDefault();let e=o("f-desc"),s=o("f-cat"),n=o("f-amt"),a=f(n.value);if(!e.value.trim()){b("Add a description, like \u201CCrayons\u201D.",!0),e.focus();return}if(!d(s.value)){b("Type a category, like Snacks or Repairs.",!0),s.focus();return}if(a===null||a===0){b("Enter an amount greater than $0.",!0),n.focus();return}let r=h(s.value);l.expenses.push({id:C(),description:e.value.trim(),catKey:r,cents:a,date:w()}),m(),g(),b(`Added ${u(a)} to ${l.categories[r]?.name??"category"}.`),e.value="",n.value="",e.focus()}),o("budget-form").addEventListener("submit",t=>{t.preventDefault();let e=o("b-cat"),s=o("b-amt"),n=f(s.value);if(!d(e.value)||n===null){o("bmsg").textContent="Enter a category and a budget amount.";return}let a=h(e.value),r=l.categories[a];r&&(r.budget=n),m(),g(),o("bmsg").textContent=`Budget for ${r?.name??"category"} set to ${u(n)}.`,e.value="",s.value=""}),g()}N();})();
+</script>
+<script>
+(()=>{const d=document.getElementById("f-desc"),c=document.getElementById("f-cat"),m=document.getElementById("sw-msg");let n=0,auto=false;
+c.addEventListener("input",()=>{auto=false});
+d.addEventListener("blur",async()=>{const t=d.value.trim();if(t.length<3||(c.value.trim()&&!auto))return;const id=++n;
+m.className="msg";m.textContent="Asking TypeSafe for a category\u2026";
+try{const r=await fetch("/api/categorize",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({description:t,
+categories:[...document.querySelectorAll("#cats-list option")].map(o=>o.value),
+recent:[...document.querySelectorAll("#list .entry-desc")].map(e=>e.textContent).slice(0,20)})});
+if(id!==n)return;if(!r.ok)throw 0;const j=await r.json();
+if(j.category&&(!c.value.trim()||auto)){c.value=j.category;auto=true}
+m.className=j.duplicate>0.7?"msg warn":"msg";
+m.textContent=j.duplicate>0.7?"This looks like a duplicate of a recent entry.":(j.category?"Suggested category: "+j.category+" (TypeSafe)":"")}
+catch{if(id===n)m.textContent=""}});})();
+</script>
+</body>
+</html>

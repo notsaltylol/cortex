@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spendwise</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout idea: one ledger page. Tiles, over-budget banner, category table with budgets, then log form beside the running list. */
+:root {
+  --bg: #f4f6f1; --surface: #ffffff; --ink: #1d2721; --muted: #5b6a61; --line: #dbe2dc;
+  --accent: #2f6f3e; --accent-ink: #ffffff; --ok: #2f7d4f; --crit: #b3342b; --crit-bg: #fbe5e2;
+  --font-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-num: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #131a15; --surface: #1b241e; --ink: #e7eee9; --muted: #9bab9f; --line: #2c3a31;
+    --accent: #6fbf80; --accent-ink: #0b1c10; --ok: #6fbf84; --crit: #ef7a70; --crit-bg: #3b1d1a;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #131a15; --surface: #1b241e; --ink: #e7eee9; --muted: #9bab9f; --line: #2c3a31;
+  --accent: #6fbf80; --accent-ink: #0b1c10; --ok: #6fbf84; --crit: #ef7a70; --crit-bg: #3b1d1a;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: var(--bg); color: var(--ink); font: 15px/1.5 var(--font-body); }
+.wrap { max-width: 980px; margin: 0 auto; padding: 24px 16px 32px; display: grid; gap: 18px; }
+h1 { margin: 0; font-size: 26px; letter-spacing: -0.01em; text-wrap: balance; }
+h2 { margin: 0 0 12px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); font-weight: 600; }
+.sub { margin: 2px 0 0; color: var(--muted); }
+.num, .tile-value, .entry-date { font-family: var(--font-num); font-variant-numeric: tabular-nums; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px; }
+.muted { color: var(--muted); }
+#sample-banner { display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: center; justify-content: space-between; background: var(--surface); border: 1px dashed var(--line); border-radius: 10px; padding: 8px 14px; color: var(--muted); }
+[hidden] { display: none !important; }
+#over-banner { background: var(--crit-bg); color: var(--crit); border: 1px solid var(--crit); border-radius: 10px; padding: 10px 14px; font-weight: 600; }
+#tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+.tile { background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 10px; padding: 12px 14px; }
+.tile.over { border-left-color: var(--crit); }
+.tile-label { color: var(--muted); font-size: 13px; } .tile-value { font-size: 24px; font-weight: 500; }
+.scroll { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; min-width: 560px; }
+th, td { text-align: left; padding: 9px 8px; border-top: 1px solid var(--line); vertical-align: middle; }
+thead th { border-top: 0; font-size: 12px; color: var(--muted); font-weight: 600; }
+tbody th { font-weight: 500; } .count { font-weight: 400; font-size: 12px; }
+td.num { text-align: right; } thead th.num { text-align: right; }
+tr.over { background: var(--crit-bg); }
+tfoot th, tfoot td { font-weight: 600; border-top: 2px solid var(--line); }
+.badge { display: inline-block; background: var(--crit); color: #fff; font-weight: 600; font-size: 12px; padding: 1px 8px; border-radius: 999px; }
+.okay { color: var(--ok); }
+.dollar { color: var(--muted); margin-right: 3px; }
+table input { width: 96px; }
+.two { display: grid; grid-template-columns: minmax(260px, 340px) 1fr; gap: 18px; align-items: start; }
+form { display: grid; gap: 10px; }
+label.field { display: grid; gap: 4px; font-size: 13px; color: var(--muted); }
+input, button { font: inherit; }
+input[type="text"], input[type="number"] { padding: 8px 10px; background: var(--bg); color: var(--ink); border: 1px solid var(--line); border-radius: 8px; width: 100%; }
+button.primary { padding: 9px 14px; background: var(--accent); color: var(--accent-ink); border: 0; border-radius: 8px; font-weight: 600; cursor: pointer; }
+button.ghost { background: none; border: 0; color: var(--muted); cursor: pointer; padding: 2px 6px; border-radius: 6px; }
+button.ghost:hover { color: var(--crit); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.msg { margin: 0; min-height: 1.4em; font-size: 13px; color: var(--muted); } .msg.warn { color: var(--crit); }
+hr { border: 0; border-top: 1px solid var(--line); margin: 14px 0; }
+#list { list-style: none; margin: 0; padding: 0; }
+.entry { display: grid; grid-template-columns: 52px 1fr 120px 90px auto; gap: 8px; align-items: baseline; padding: 8px 0; border-top: 1px solid var(--line); font-size: 14px; }
+.entry:first-child { border-top: 0; }
+.entry-date { color: var(--muted); font-size: 13px; } .entry .num { text-align: right; } .entry-cat { color: var(--muted); }
+.empty { color: var(--muted); }
+footer { text-align: center; color: var(--muted); font-size: 13px; padding: 4px 16px 24px; }
+@media (max-width: 760px) {
+  .two { grid-template-columns: 1fr; }
+  .entry { grid-template-columns: 48px 1fr auto auto; }
+  .entry-cat { grid-column: 2 / 4; grid-row: 2; font-size: 12px; }
+}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <header>
+    <h1>Spendwise</h1>
+    <p class="sub">Log expenses as they happen and see overruns before the month closes. <span class="muted">by Pitch, Pray, Ship</span></p>
+  </header>
+  <div id="sample-banner" hidden>
+    <span>These are sample entries so you can see how it works.</span>
+    <button type="button" id="clear-sample" class="ghost">Clear sample entries</button>
+  </div>
+  <div id="over-banner" role="alert" hidden></div>
+  <section id="tiles" aria-label="Totals">
+    <div class="tile"><div class="tile-label">Total spent</div><div class="tile-value" id="t-spent">$0.00</div></div>
+    <div class="tile"><div class="tile-label">Total budgeted</div><div class="tile-value" id="t-budget">$0.00</div></div>
+    <div class="tile" id="tile-over"><div class="tile-label">Categories over budget</div><div class="tile-value" id="t-over">0</div></div>
+  </section>
+  <section class="panel" aria-labelledby="h-cats">
+    <h2 id="h-cats">Categories and budgets</h2>
+    <div class="scroll">
+      <table>
+        <thead><tr><th>Category</th><th class="num">Spent</th><th>Budget</th><th class="num">Left</th><th>Status</th></tr></thead>
+        <tbody id="cat-body"></tbody>
+        <tfoot><tr><th scope="row">Grand total</th><td class="num" id="grand-spent">$0.00</td><td class="num" id="grand-budget">$0.00</td><td></td><td></td></tr></tfoot>
+      </table>
+    </div>
+    <hr>
+    <form id="budget-form" autocomplete="off" style="grid-template-columns: 1fr 140px auto; align-items: end">
+      <label class="field" for="b-cat">Set a budget for a category<input id="b-cat" type="text" list="cats-list" maxlength="40" placeholder="Snacks, Supplies, Repairs…"></label>
+      <label class="field" for="b-amt">Budget ($)<input id="b-amt" type="number" min="0" step="1" inputmode="decimal"></label>
+      <button class="primary" type="submit">Set budget</button>
+    </form>
+    <p id="bmsg" class="msg" role="status"></p>
+  </section>
+  <div class="two">
+    <section class="panel" aria-labelledby="h-log">
+      <h2 id="h-log">Log an expense</h2>
+      <form id="log-form" autocomplete="off">
+        <label class="field" for="f-desc">Description<input id="f-desc" type="text" maxlength="120" placeholder="Crackers and apple slices"></label>
+        <label class="field" for="f-cat">Category (type your own)<input id="f-cat" type="text" list="cats-list" maxlength="40" placeholder="Snacks"></label>
+        <datalist id="cats-list"></datalist>
+        <label class="field" for="f-amt">Amount ($)<input id="f-amt" type="number" min="0" step="0.01" inputmode="decimal"></label>
+        <button class="primary" type="submit">Add expense</button>
+        <p id="msg" class="msg" role="status" aria-live="polite"></p>
+      </form>
+    </section>
+    <section class="panel" aria-labelledby="h-list">
+      <h2 id="h-list">Everything entered</h2>
+      <ul id="list"></ul>
+    </section>
+  </div>
+</main>
+<footer>Spendwise by Pitch, Pray, Ship. Typesafe. Entries save in this browser only.</footer>
+<script>"use strict";(()=>{var d=t=>t.trim().replace(/\s+/g," ").toLowerCase();function v(t,e){let s=new Map,n=new Map;for(let r of t)s.set(r.catKey,(s.get(r.catKey)??0)+r.cents),n.set(r.catKey,(n.get(r.catKey)??0)+1);let a=Object.entries(e).map(([r,i])=>{let p=s.get(r)??0,y=i.budget===null?null:i.budget-p;return{key:r,name:i.name,spent:p,count:n.get(r)??0,budget:i.budget,left:y,over:y!==null&&y<0}}).sort((r,i)=>r.name.localeCompare(i.name));return{rows:a,spent:a.reduce((r,i)=>r+i.spent,0),budgeted:a.reduce((r,i)=>r+(i.budget??0),0),overCount:a.filter(r=>r.over).length}}function f(t){let e=Number.parseFloat(t);return Number.isFinite(e)&&e>=0?Math.round(e*100):null}var S="littlesprouts.spendwise.v1",M=new Intl.NumberFormat("en-US",{style:"currency",currency:"USD"}),u=t=>M.format(t/100);function o(t){let e=document.getElementById(t);if(!e)throw new Error(`Missing #${t}`);return e}function c(t,e={},...s){let n=document.createElement(t);for(let[a,r]of Object.entries(e))n.setAttribute(a,r);return n.append(...s),n}var C=()=>Math.random().toString(36).slice(2,10),w=()=>{let t=new Date;return`${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,"0")}-${String(t.getDate()).padStart(2,"0")}`};function T(){let t=w(),e=(s,n,a)=>({id:C(),description:s,catKey:d(n),cents:Math.round(a*100),date:t});return{sample:!0,categories:{snacks:{name:"Snacks",budget:1e4},supplies:{name:"Supplies",budget:2e4},repairs:{name:"Repairs",budget:25e3}},expenses:[e("Crackers and apple slices","Snacks",62.4),e("Snack restock","Snacks",48.15),e("Construction paper and glue sticks","Supplies",86.2),e("Crayons","Supplies",24.99),e("Fix door latch","Repairs",135)]}}function k(){try{let t=localStorage.getItem(S);if(t){let e=JSON.parse(t);if(Array.isArray(e.expenses)&&e.categories&&typeof e.categories=="object"&&typeof e.sample=="boolean")return{expenses:e.expenses,categories:e.categories,sample:e.sample}}}catch{}return T()}var l=k(),m=()=>{try{localStorage.setItem(S,JSON.stringify(l))}catch{}},x=new Map;function E(){let t=v(l.expenses,l.categories);o("t-spent").textContent=u(t.spent),o("t-budget").textContent=u(t.budgeted),o("t-over").textContent=String(t.overCount),o("tile-over").className=`tile${t.overCount>0?" over":""}`,o("grand-spent").textContent=u(t.spent),o("grand-budget").textContent=u(t.budgeted);let e=t.rows.filter(n=>n.over).map(n=>n.name),s=o("over-banner");s.hidden=e.length===0,s.textContent=e.length?`Over budget: ${e.join(", ")}`:"";for(let n of t.rows){let a=x.get(n.key);a&&(a.tr.className=n.over?"over":"",a.status.replaceChildren(),n.left===null?(a.left.textContent="\u2014",a.status.append(c("span",{class:"muted"},"No budget set"))):n.over?(a.left.textContent=`-${u(-n.left)}`,a.status.append(c("span",{class:"badge"},"Over budget"),` by ${u(-n.left)}`)):(a.left.textContent=u(n.left),a.status.append(c("span",{class:"okay"},"Within budget"))))}}function $(){let t=v(l.expenses,l.categories);x.clear(),o("cat-body").replaceChildren(...t.rows.map(e=>{let s=c("input",{type:"number",min:"0",step:"1",inputmode:"decimal",placeholder:"No budget",id:`b-${e.key.replace(/[^a-z0-9]/g,"-")}-${C()}`,"aria-label":`Budget for ${e.name} in dollars`,value:e.budget===null?"":String(e.budget/100)});s.addEventListener("change",()=>{let i=l.categories[e.key];if(i){if(s.value.trim()==="")i.budget=null;else{let p=f(s.value);if(p===null){s.value=i.budget===null?"":String(i.budget/100);return}i.budget=p}m(),E()}});let n=c("td",{class:"num"}),a=c("td",{}),r=c("tr",{},c("th",{scope:"row"},e.name,c("span",{class:"muted count"},` ${e.count} ${e.count===1?"entry":"entries"}`)),c("td",{class:"num"},u(e.spent)),c("td",{},c("span",{class:"dollar"},"$"),s),n,a);return x.set(e.key,{tr:r,left:n,status:a}),r})),o("cats-list").replaceChildren(...t.rows.map(e=>c("option",{value:e.name}))),E()}function L(){o("sample-banner").hidden=!l.sample;let t=[...l.expenses].reverse();if(t.length===0){o("list").replaceChildren(c("li",{class:"empty"},"Nothing logged yet. Add your first expense above."));return}o("list").replaceChildren(...t.map(e=>{let s=c("button",{type:"button",class:"ghost","aria-label":`Delete ${e.description}`},"Delete");return s.addEventListener("click",()=>{l.expenses=l.expenses.filter(n=>n.id!==e.id),m(),g()}),c("li",{class:"entry"},c("span",{class:"entry-date"},e.date.slice(5)),c("span",{class:"entry-desc"},e.description),c("span",{class:"entry-cat"},l.categories[e.catKey]?.name??e.catKey),c("span",{class:"num"},u(e.cents)),s)}))}function g(){$(),L()}function b(t,e=!1){let s=o("msg");s.textContent=t,s.className=e?"msg warn":"msg"}function h(t){let e=d(t);return l.categories[e]||(l.categories[e]={name:t.trim().replace(/\s+/g," "),budget:null}),e}function N(){o("clear-sample").addEventListener("click",()=>{l.expenses=[],l.categories={},l.sample=!1,m(),g()}),o("log-form").addEventListener("submit",t=>{t.preventDefault();let e=o("f-desc"),s=o("f-cat"),n=o("f-amt"),a=f(n.value);if(!e.value.trim()){b("Add a description, like \u201CCrayons\u201D.",!0),e.focus();return}if(!d(s.value)){b("Type a category, like Snacks or Repairs.",!0),s.focus();return}if(a===null||a===0){b("Enter an amount greater than $0.",!0),n.focus();return}let r=h(s.value);l.expenses.push({id:C(),description:e.value.trim(),catKey:r,cents:a,date:w()}),m(),g(),b(`Added ${u(a)} to ${l.categories[r]?.name??"category"}.`),e.value="",n.value="",e.focus()}),o("budget-form").addEventListener("submit",t=>{t.preventDefault();let e=o("b-cat"),s=o("b-amt"),n=f(s.value);if(!d(e.value)||n===null){o("bmsg").textContent="Enter a category and a budget amount.";return}let a=h(e.value),r=l.categories[a];r&&(r.budget=n),m(),g(),o("bmsg").textContent=`Budget for ${r?.name??"category"} set to ${u(n)}.`,e.value="",s.value=""}),g()}N();})();
+</script>
+<script>
+(()=>{const d=document.getElementById("f-desc"),c=document.getElementById("f-cat"),m=document.getElementById("msg");let n=0,auto=false;
+c.addEventListener("input",()=>{auto=false});
+d.addEventListener("blur",async()=>{const t=d.value.trim();if(t.length<3||(c.value.trim()&&!auto))return;const id=++n;
+m.className="msg";m.textContent="Asking TypeSafe for a category\u2026";
+try{const r=await fetch("/api/categorize",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({description:t,
+categories:[...document.querySelectorAll("#cats-list option")].map(o=>o.value),
+recent:[...document.querySelectorAll("#list .entry-desc")].map(e=>e.textContent).slice(0,20)})});
+if(id!==n)return;if(!r.ok)throw 0;const j=await r.json();
+if(j.category&&(!c.value.trim()||auto)){c.value=j.category;auto=true}
+m.className=j.duplicate>0.7?"msg warn":"msg";
+m.textContent=j.duplicate>0.7?"This looks like a duplicate of a recent entry.":(j.category?"Suggested category: "+j.category+" (TypeSafe)":"")}
+catch{if(id===n)m.textContent=""}});})();
+</script>
+</body>
+</html>

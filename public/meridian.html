@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Peak-Season Demand Watch | Cortex for Meridian Retail</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f5f6f8;--surface:#fff;--ink:#1b2230;--muted:#5d6879;--line:#dde2ea;--accent:#2b4fd8;--accent-ink:#fff;
+ --red:#b3261e;--red-bg:#fde8e6;--amber:#8a5a00;--amber-bg:#fff1d6;--green:#1d7a46;--green-bg:#e0f4e8;
+ --font-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;--font-num:"IBM Plex Mono",ui-monospace,Menlo,monospace}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#12151c;--surface:#1a1f29;--ink:#e8ecf3;--muted:#9aa5b8;--line:#2b3342;--accent:#7f9bff;--accent-ink:#0b1020;
+ --red:#ff8a80;--red-bg:#3d1c1a;--amber:#f2c261;--amber-bg:#3a2d12;--green:#6fd09a;--green-bg:#16301f}}
+*{box-sizing:border-box}html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:15px/1.55 var(--font-body)}
+.wrap{max-width:1100px;margin:0 auto;padding:24px 16px 32px;display:grid;gap:18px}
+a{color:var(--accent)}h1{margin:0;font-size:26px;letter-spacing:-.01em;text-wrap:balance}
+h2{margin:0 0 10px;font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600}
+.back{font-size:13px}.sub,.muted{color:var(--muted)}.sub{margin:4px 0 0}
+.num{font-family:var(--font-num);font-variant-numeric:tabular-nums}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px}
+.panel p{margin:0 0 10px}.panel p:last-child{margin-bottom:0}
+.heard{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px}
+.heard div{border-left:3px solid var(--accent);padding-left:12px}.heard strong{display:block;margin-bottom:2px}
+ul{margin:0;padding-left:18px;display:grid;gap:4px}
+[hidden]{display:none!important}
+#tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+.tile{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--line);border-radius:10px;padding:12px 14px}
+.tile.red{border-left-color:var(--red)}.tile.amber{border-left-color:var(--amber)}.tile.green{border-left-color:var(--green)}
+.tile-label{color:var(--muted);font-size:13px}.tile-value{font:500 24px var(--font-num)}.tile-note{font-size:12px;color:var(--muted)}
+.scroll{overflow-x:auto}table{width:100%;border-collapse:collapse;min-width:900px}
+th,td{text-align:left;padding:8px;border-top:1px solid var(--line);vertical-align:top}
+thead th{border-top:0;font-size:12px;color:var(--muted);font-weight:600}td.num,th.num{text-align:right}
+.rag{display:inline-flex;align-items:center;gap:6px;font-weight:600;font-size:12px;padding:2px 10px;border-radius:999px;text-transform:uppercase;letter-spacing:.04em}
+.rag::before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor}
+.rag.red{background:var(--red-bg);color:var(--red)}.rag.amber{background:var(--amber-bg);color:var(--amber)}.rag.green{background:var(--green-bg);color:var(--green)}
+.acts{margin:0;padding-left:16px;font-size:13px}.neg{color:var(--red)}
+form{display:grid;gap:10px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+label.field{display:grid;gap:4px;font-size:13px;color:var(--muted)}
+input,button,textarea{font:inherit}
+input[type=text],input[type=number],textarea{padding:8px 10px;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:8px;width:100%}
+textarea{font-family:var(--font-num);font-size:13px;min-height:110px;resize:vertical}
+td input[type=number]{width:78px;padding:4px 6px}
+button.primary{padding:9px 14px;background:var(--accent);color:var(--accent-ink);border:0;border-radius:8px;font-weight:600;cursor:pointer;justify-self:start}
+button.chip{font-size:13px;padding:6px 12px;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:999px;cursor:pointer}
+button.ghost{background:none;border:0;color:var(--muted);cursor:pointer;padding:2px 6px;border-radius:6px}button.ghost:hover{color:var(--red)}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.msg{margin:0;font-size:13px;color:var(--muted);min-height:1.4em}.msg.warn{color:var(--red)}
+code{font-family:var(--font-num);font-size:12.5px;background:var(--bg);padding:1px 5px;border-radius:4px;border:1px solid var(--line)}
+details summary{cursor:pointer;color:var(--muted);font-size:14px}details[open] summary{margin-bottom:8px}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+footer{text-align:center;color:var(--muted);font-size:13px;padding:4px 16px 24px}footer a{color:var(--muted)}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <a class="back" href="/">&larr; Back to Cortex</a>
+  <header>
+    <h1>Peak-season demand watch</h1>
+    <p class="sub">Prepared for Meridian Retail. Paste the planning spreadsheet, and see which SKUs have outrun the plan, which will run out before a reorder can land, and where stores are dry while stock sits elsewhere.</p>
+  </header>
+
+  <section class="panel" aria-labelledby="h-try" id="try">
+    <h2 id="h-try">Try it: paste a stock line or an overdue invoice</h2>
+    <p class="muted" style="font-size:14px">Paste one line per item, in your own words: a stock line, or an overdue invoice. For stock, Cortex says what the item is, warns when on-hand stock is a stock-out or reorder risk, and suggests an order quantity. For an invoice, it gives the next step and a draft message. Every check is added to the activity log below.</p>
+    <form id="try-form">
+      <label class="field" for="try-in">Stock lines (one per line)<textarea id="try-in" spellcheck="false" placeholder="Stock: description, N on hand, N/wk, lead time N days. Invoice: invoice number, amount, who, days overdue."></textarea></label>
+      <div class="row"><button class="primary" type="submit" id="try-go">Check these lines</button><span id="try-msg" class="msg" role="status" aria-live="polite"></span></div>
+    </form>
+    <div id="try-out" style="display:grid;gap:10px;margin-top:12px"></div>
+  </section>
+
+  <section class="panel" aria-labelledby="h-log" id="activity">
+    <div class="row" style="justify-content:space-between"><h2 id="h-log" style="margin:0">Activity log <span id="log-count" class="muted" style="text-transform:none;letter-spacing:0;font-weight:400"></span></h2>
+      <div class="row"><button type="button" class="chip" id="log-export">Download CSV</button><button type="button" class="chip" id="log-clear">Clear log</button></div></div>
+    <p class="muted" style="font-size:13px;margin:8px 0">Each check and each change to the SKU list is recorded with a timestamp, what was entered, what Cortex concluded and what it recommended. The log is stored in this browser only; download the CSV to keep a copy.</p>
+    <p id="log-empty" class="muted">Nothing logged yet. Run a check above.</p>
+    <div class="scroll" id="log-wrap" hidden><table style="min-width:900px"><thead><tr><th scope="col">Time</th><th scope="col">Type</th><th scope="col">Input</th><th scope="col">Result</th><th scope="col">Recommended</th><th scope="col">Source</th></tr></thead><tbody id="log-body"></tbody></table></div>
+  </section>
+
+  <section class="panel" aria-labelledby="h-heard">
+    <h2 id="h-heard">What we heard</h2>
+    <div class="heard">
+      <div><strong>Manual, spreadsheet-based planning</strong>Sales history, promo calendars, supplier lead times and inventory are pulled into spreadsheets, then regional managers make the call on what to move or reorder.</div>
+      <div><strong>The plan goes stale quickly</strong>The slowest step is spotting where demand moved fast enough that the spreadsheet is already out of date, which is how stockouts land in the weeks you can least afford them.</div>
+      <div><strong>Stores dry while e-commerce climbs</strong>On promoted items, stores ran out while e-commerce demand was still rising, and by the time anyone reacted the window had passed.</div>
+    </div>
+  </section>
+
+  <section id="tiles" aria-label="Summary" hidden></section>
+
+  <section class="panel" aria-labelledby="h-res">
+    <h2 id="h-res">SKUs, most urgent first</h2>
+    <div class="scroll"><table>
+      <thead><tr><th scope="col">SKU</th><th scope="col">Status</th><th class="num" scope="col">vs plan</th><th class="num" scope="col">Projected / wk</th><th class="num" scope="col">Stock runs out in</th><th class="num" scope="col">Lead time</th><th scope="col">What to do</th><th></th></tr></thead>
+      <tbody id="body"></tbody></table></div>
+    <p id="empty" class="muted">No SKUs yet. Paste rows from your spreadsheet or add one below.</p>
+    <details id="edit" hidden><summary>Edit the underlying numbers</summary>
+      <div class="scroll"><table style="min-width:1100px"><thead id="edit-head"></thead><tbody id="edit-body"></tbody></table></div></details>
+  </section>
+
+  <section class="panel" aria-labelledby="h-in">
+    <h2 id="h-in">Bring in your data</h2>
+    <form id="paste-form">
+      <label class="field" for="paste">Paste from a spreadsheet (first row = column headers, tab or comma separated)<textarea id="paste" spellcheck="false" placeholder="sku, plan_weekly, sales_last_wk, ..."></textarea></label>
+      <div class="row"><button class="primary" type="submit">Import rows</button>
+        <button type="button" class="chip" id="copy-hdr">Copy header row</button>
+        <button type="button" class="chip" id="export">Download CSV</button>
+        <button type="button" class="chip" id="clear">Clear all SKUs</button></div>
+      <p id="pmsg" class="msg" role="status" aria-live="polite"></p>
+    </form>
+    <details><summary>Column definitions</summary><ul id="cols"></ul></details>
+  </section>
+
+  <section class="panel" aria-labelledby="h-add">
+    <h2 id="h-add">Add one SKU</h2>
+    <form id="add-form" autocomplete="off"><div class="grid" id="add-grid"></div>
+      <button class="primary" type="submit">Add SKU</button><p id="amsg" class="msg" role="status" aria-live="polite"></p></form>
+  </section>
+
+  <section class="panel" aria-labelledby="h-set">
+    <h2 id="h-set">Thresholds</h2>
+    <div class="grid">
+      <label class="field">Plan is stale when sales differ by (%)<input id="s-drift" type="number" min="0" step="1"></label>
+      <label class="field">Store cover is low below (days)<input id="s-safe" type="number" min="0" step="1"></label>
+      <label class="field">E-commerce is climbing at (% wk on wk)<input id="s-ecom" type="number" min="0" step="1"></label>
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="h-how">
+    <h2 id="h-how">How the numbers are worked out</h2>
+    <ul>
+      <li><strong>Projected weekly demand</strong> = last week's sales, moved by half of the week-on-week change (capped at 50%), plus any promo uplift you enter.</li>
+      <li><strong>vs plan</strong> = last week's sales compared with the weekly figure the plan assumed. Past your threshold, the plan is flagged stale.</li>
+      <li><strong>Stock runs out in</strong> = units on hand (stores + DC) divided by projected daily demand. A delivery that lands before that point extends it. One that lands after it leaves a gap, shown in the actions.</li>
+      <li><strong>Reorder</strong>: if stock runs out sooner than the supplier lead time, a standard reorder can't land in time, and the row is red.</li>
+      <li><strong>Stores low</strong> uses store sales (total less e-commerce) against store stock, and points to DC stock if there is any.</li>
+    </ul>
+    <p class="muted" style="margin-top:10px">This is a plain rules-based calculation on the numbers you enter. It is not a statistical forecast. Everything stays in this browser; nothing is uploaded.</p>
+  </section>
+</main>
+<footer>Cortex by Pitch, Pray, Ship. Typesafe.</footer>
+<script>
+"use strict";
+(()=>{
+const KEY="meridian.watch.v1",SKEY="meridian.watch.settings.v1",$=id=>document.getElementById(id);
+const COLS=[
+ ["sku","SKU","text","SKU or item name"],
+ ["plan_weekly","Plan, units/wk","number","Weekly units the current plan assumes (all channels)"],
+ ["sales_last_wk","Sales last wk","number","Units sold last week, all channels"],
+ ["sales_prev_wk","Sales prior wk","number","Units sold the week before"],
+ ["ecom_last_wk","E-com last wk","number","Of last week's sales, units sold online"],
+ ["ecom_prev_wk","E-com prior wk","number","Online units the week before"],
+ ["stores_on_hand","Stores stock","number","Units on hand across stores"],
+ ["dc_on_hand","DC stock","number","Units on hand in distribution centres"],
+ ["inbound_units","Inbound units","number","Units on order and not yet received (0 if none)"],
+ ["inbound_in_days","Inbound in (days)","number","Days until that delivery lands"],
+ ["lead_time_days","Lead time (days)","number","Supplier lead time for a new order"],
+ ["promo_uplift_pct","Promo uplift %","number","Expected lift from a promotion in the coming week (0 if none)"]];
+const ST={drift:20,safe:7,ecom:15};
+const L=(t,d)=>window.dispatchEvent(new CustomEvent("cortex-log",{detail:{type:t,detail:d}}));
+const el=(t,a={},...k)=>{const e=document.createElement(t);for(const[x,y]of Object.entries(a))e.setAttribute(x,y);e.append(...k);return e};
+const nf=new Intl.NumberFormat("en-US"),f0=x=>nf.format(Math.round(x)),pct=x=>(x>0?"+":"")+Math.round(x*100)+"%";
+let rows=[];try{const v=JSON.parse(localStorage.getItem(KEY));if(Array.isArray(v))rows=v}catch{}
+try{Object.assign(ST,JSON.parse(localStorage.getItem(SKEY))||{})}catch{}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(rows))}catch{}};
+const saveS=()=>{try{localStorage.setItem(SKEY,JSON.stringify(ST))}catch{}};
+
+function analyse(r){
+ const trend=r.sales_prev_wk>0?Math.max(-.5,Math.min(.5,(r.sales_last_wk-r.sales_prev_wk)/r.sales_prev_wk)):0;
+ const promo=1+r.promo_uplift_pct/100;
+ const proj=(r.sales_last_wk>0?r.sales_last_wk*(1+trend*.5):r.plan_weekly)*promo,daily=proj/7;
+ const drift=r.plan_weekly>0?(r.sales_last_wk-r.plan_weekly)/r.plan_weekly:0;
+ const oh=r.stores_on_hand+r.dc_on_hand;
+ const own=daily>0?oh/daily:Infinity;
+ const lands=r.inbound_units>0;
+ const gap=lands&&r.inbound_in_days>own?r.inbound_in_days-own:0;
+ const runOut=lands&&r.inbound_in_days<=own?(oh+r.inbound_units)/daily:own;
+ const storeSales=Math.max(0,r.sales_last_wk-r.ecom_last_wk),storeDaily=storeSales*(1+trend*.5)*promo/7;
+ const storeCover=storeDaily>0?r.stores_on_hand/storeDaily:Infinity;
+ const ecomGrowth=r.ecom_prev_wk>0?(r.ecom_last_wk-r.ecom_prev_wk)/r.ecom_prev_wk:0;
+ const acts=[];let rag="green";const bump=l=>{if(l==="red")rag="red";else if(rag!=="red")rag="amber"};
+ if(daily===0){acts.push("No demand projected; nothing to act on.")}
+ else{
+  if(gap>0){bump("red");acts.push(`Stock-out for about ${Math.ceil(gap)} days before the inbound delivery lands. Expedite or reallocate.`)}
+  if(runOut<r.lead_time_days){bump("red");acts.push(`A new order takes ${f0(r.lead_time_days)} days, but stock lasts ${runOut<1?"under a day":f0(runOut)+" days"}. A standard reorder arrives about ${Math.ceil(r.lead_time_days-runOut)} days late.`)}
+  else if(isFinite(runOut)&&runOut-r.lead_time_days<=7){bump("amber");acts.push(`Order within ${Math.max(0,Math.floor(runOut-r.lead_time_days))} days to avoid a stock-out.`)}
+  if(Math.abs(drift)*100>=ST.drift){bump("amber");acts.push(`Plan is stale: selling ${Math.round(Math.abs(drift)*100)}% ${drift>0?"above":"below"} plan. Re-plan this SKU.`)}
+  if(storeCover<ST.safe){bump("amber");acts.push(`Stores cover only ${storeCover<1?"under a day":f0(storeCover)+" days"}${r.dc_on_hand>0?`; ${f0(r.dc_on_hand)} units sit in the DC. Replenish stores.`:"."}`)}
+  if(ecomGrowth*100>=ST.ecom){bump("amber");acts.push(`E-commerce demand up ${Math.round(ecomGrowth*100)}% week on week.`)}
+ }
+ return{proj,drift,runOut,rag,acts,stale:Math.abs(drift)*100>=ST.drift,storeLow:storeCover<ST.safe,short:gap>0||runOut<r.lead_time_days}}
+const ORD={red:0,amber:1,green:2};
+function render(){
+ const A=rows.map(r=>({r,a:analyse(r)})).sort((x,y)=>ORD[x.a.rag]-ORD[y.a.rag]||x.a.runOut-y.a.runOut);
+ const has=A.length>0;$("tiles").hidden=!has;$("empty").hidden=has;$("edit").hidden=!has;
+ const cnt=k=>A.filter(x=>x.a.rag===k).length;
+ const tile=(c,l,v,n)=>{const d=el("div",{class:"tile "+c},el("div",{class:"tile-label"},l),el("div",{class:"tile-value"},String(v)));if(n)d.append(el("div",{class:"tile-note"},n));return d};
+ $("tiles").replaceChildren(tile("red","Red",cnt("red"),"Will run out before a reorder lands"),tile("amber","Amber",cnt("amber"),"Needs a look this week"),tile("green","Green",cnt("green")),
+  tile("","Plans gone stale",A.filter(x=>x.a.stale).length,`sales ${ST.drift}%+ off plan`),tile("","Stores running low",A.filter(x=>x.a.storeLow).length,`under ${ST.safe} days of cover`));
+ $("body").replaceChildren(...A.map(({r,a})=>el("tr",{},
+  el("th",{scope:"row",style:"font-weight:500"},r.sku),
+  el("td",{},el("span",{class:"rag "+a.rag},a.rag)),
+  el("td",{class:"num"+(a.stale?" neg":"")},r.plan_weekly>0?pct(a.drift):"n/a"),
+  el("td",{class:"num"},f0(a.proj)),
+  el("td",{class:"num"+(a.short?" neg":"")},isFinite(a.runOut)?(a.runOut<1?"<1 day":f0(a.runOut)+" days"):"n/a"),
+  el("td",{class:"num"},f0(r.lead_time_days)+" d"),
+  el("td",{},a.acts.length?el("ul",{class:"acts"},...a.acts.map(t=>el("li",{},t))):el("span",{class:"muted"},"No action needed")),
+  el("td",{},(()=>{const b=el("button",{type:"button",class:"ghost","aria-label":"Delete "+r.sku},"Delete");b.onclick=()=>{L("SKU deleted",r.sku);rows.splice(rows.indexOf(r),1);save();render()};return b})()))));
+ $("edit-head").replaceChildren(el("tr",{},...COLS.map(c=>el("th",{scope:"col",class:c[2]==="number"?"num":""},c[1]))));
+ $("edit-body").replaceChildren(...rows.map(r=>el("tr",{},...COLS.map(c=>{
+  if(c[2]==="text")return el("th",{scope:"row",style:"font-weight:500"},r[c[0]]);
+  const x=el("input",{type:"number",min:"0",step:"any",value:String(r[c[0]]),"aria-label":`${r.sku}: ${c[1]}`});
+  x.onchange=()=>{const v=Number(x.value);if(x.value===""||!Number.isFinite(v)||v<0){x.value=r[c[0]];return}L("SKU edited",`${r.sku}: ${c[1]} = ${v}`);r[c[0]]=v;save();render()};
+  return el("td",{class:"num"},x)}))));
+}
+function clean(o){const out={};
+ for(const[k,,t]of COLS){const v=o[k];
+  if(t==="text"){out[k]=String(v??"").trim().slice(0,60);if(!out[k])return"Missing SKU name."}
+  else{const s=String(v??"").trim().replace(/,/g,"");const n=s===""?0:Number(s);if(!Number.isFinite(n)||n<0)return`"${k}" must be a number, zero or more (got "${v}").`;out[k]=n}}
+ if(out.ecom_last_wk>out.sales_last_wk)return`${out.sku}: e-commerce units last week exceed total sales. E-com is a part of total sales.`;
+ if(out.ecom_prev_wk>out.sales_prev_wk&&out.sales_prev_wk>0)return`${out.sku}: e-commerce units the prior week exceed total sales.`;
+ return out}
+function parseTable(text){const first=text.split(/\r?\n/,1)[0]||"",d=first.includes("\t")?"\t":",";const out=[];let row=[],cur="",q=false;
+ for(let i=0;i<text.length;i++){const ch=text[i];
+  if(q){if(ch==='"'&&text[i+1]==='"'){cur+='"';i++}else if(ch==='"')q=false;else cur+=ch}
+  else if(ch==='"')q=true;else if(ch===d){row.push(cur);cur=""}
+  else if(ch==="\n"||ch==="\r"){if(ch==="\r"&&text[i+1]==="\n")i++;row.push(cur);cur="";if(row.some(x=>x.trim()))out.push(row);row=[]}
+  else cur+=ch}
+ row.push(cur);if(row.some(x=>x.trim()))out.push(row);return out}
+$("paste-form").onsubmit=e=>{e.preventDefault();const m=$("pmsg");m.className="msg warn";
+ const t=parseTable($("paste").value);if(t.length<2){m.textContent="Paste a header row plus at least one data row.";return}
+ const hdr=t[0].map(h=>h.trim().toLowerCase().replace(/[\s-]+/g,"_")),miss=COLS.map(c=>c[0]).filter(k=>!hdr.includes(k));
+ if(miss.length){m.textContent="Missing columns: "+miss.join(", ")+". Use “Copy header row” for the exact names.";return}
+ const add=[];for(let i=1;i<t.length;i++){const o={};hdr.forEach((h,j)=>o[h]=t[i][j]);const c=clean(o);if(typeof c==="string"){m.textContent=`Row ${i+1}: ${c}`;return}add.push(c)}
+ for(const c of add){const i=rows.findIndex(r=>r.sku.toLowerCase()===c.sku.toLowerCase());if(i>=0)rows[i]=c;else rows.push(c)}
+ L("SKUs imported",`${add.length} row(s): ${add.map(a=>a.sku).join(", ").slice(0,200)}`);save();render();$("paste").value="";m.className="msg";m.textContent=`Imported ${add.length} SKU${add.length===1?"":"s"}. Rows with an existing SKU name were updated.`};
+$("copy-hdr").onclick=async()=>{const h=COLS.map(c=>c[0]).join("\t");try{await navigator.clipboard.writeText(h);$("pmsg").className="msg";$("pmsg").textContent="Header row copied. Paste it into row 1 of your sheet."}catch{$("paste").value=h;$("pmsg").className="msg";$("pmsg").textContent="Header row placed in the box above. Copy it from there."}};
+$("export").onclick=()=>{if(!rows.length){$("pmsg").className="msg";$("pmsg").textContent="Nothing to download yet.";return}
+ const q=v=>/[",\n]/.test(String(v))?'"'+String(v).replace(/"/g,'""')+'"':String(v);
+ const csv=[COLS.map(c=>c[0]).join(","),...rows.map(r=>COLS.map(c=>q(r[c[0]])).join(","))].join("\n");
+ const a=el("a",{href:URL.createObjectURL(new Blob([csv],{type:"text/csv"})),download:"demand-watch.csv"});a.click();URL.revokeObjectURL(a.href)};
+$("clear").onclick=()=>{if(!rows.length)return;L("SKU list cleared",`${rows.length} SKU(s) removed`);rows=[];save();render();$("pmsg").className="msg";$("pmsg").textContent="Cleared."};
+$("cols").replaceChildren(...COLS.map(c=>el("li",{},el("code",{},c[0]),` ${c[3]}`)));
+$("add-grid").replaceChildren(...COLS.map(c=>el("label",{class:"field"},c[1],el("input",{id:"a-"+c[0],type:c[2]==="number"?"number":"text",...(c[2]==="number"?{min:"0",step:"any",inputmode:"decimal"}:{maxlength:"60"})}))));
+$("add-form").onsubmit=e=>{e.preventDefault();const o={};for(const c of COLS)o[c[0]]=$("a-"+c[0]).value;const m=$("amsg");m.className="msg warn";
+ const c=clean(o);if(typeof c==="string"){m.textContent=c;return}
+ const i=rows.findIndex(r=>r.sku.toLowerCase()===c.sku.toLowerCase());if(i>=0)rows[i]=c;else rows.push(c);
+ L(i>=0?"SKU updated":"SKU added",c.sku);save();render();$("add-form").reset();m.className="msg";m.textContent=`${i>=0?"Updated":"Added"} ${c.sku}.`;$("a-sku").focus()};
+for(const[id,k]of[["s-drift","drift"],["s-safe","safe"],["s-ecom","ecom"]]){const x=$(id);x.value=ST[k];x.onchange=()=>{const v=Number(x.value);if(x.value===""||!Number.isFinite(v)||v<0){x.value=ST[k];return}ST[k]=v;saveS();render()}}
+render();
+})();
+</script>
+<script>
+"use strict";
+(()=>{
+const $=id=>document.getElementById(id),el=(t,a={},...k)=>{const e=document.createElement(t);for(const[x,y]of Object.entries(a))e.setAttribute(x,y);e.append(...k);return e};
+const num=s=>Number(String(s).replace(/,/g,"")),nf=new Intl.NumberFormat("en-US"),f0=x=>nf.format(Math.round(x));
+const usd=x=>new Intl.NumberFormat("en-US",{style:"currency",currency:"USD"}).format(x);
+const LOGKEY="meridian.activity.v1";
+let LOG=[];try{const v=JSON.parse(localStorage.getItem(LOGKEY));if(Array.isArray(v))LOG=v}catch{}
+const saveLog=()=>{try{localStorage.setItem(LOGKEY,JSON.stringify(LOG.slice(-500)))}catch{}};
+const stamp=ts=>new Date(ts).toLocaleString(undefined,{year:"numeric",month:"short",day:"2-digit",hour:"2-digit",minute:"2-digit",second:"2-digit",timeZoneName:"short"});
+function log(type,input,result,rag,actions,source){LOG.push({ts:new Date().toISOString(),type,input:String(input).slice(0,300),result,rag:rag||"",actions:(actions||[]).join(" | "),source:source||"rules"});if(LOG.length>500)LOG=LOG.slice(-500);saveLog();renderLog()}
+window.addEventListener("cortex-log",e=>log(e.detail.type,e.detail.detail,"","","","user action"));
+function renderLog(){
+ const rows=[...LOG].reverse();$("log-empty").hidden=rows.length>0;$("log-wrap").hidden=rows.length===0;$("log-count").textContent=rows.length?`${rows.length} entr${rows.length===1?"y":"ies"}`:"";
+ $("log-body").replaceChildren(...rows.slice(0,100).map(r=>el("tr",{},el("td",{class:"num",style:"white-space:nowrap"},stamp(r.ts)),el("td",{},r.type),el("td",{},r.input),el("td",{},r.result?el("span",{},r.rag?el("span",{class:"rag "+r.rag,style:"margin-right:6px"},r.rag):"",r.result):el("span",{class:"muted"},"-")),el("td",{style:"font-size:13px"},r.actions||""),el("td",{class:"muted"},r.source))))}
+function csvLog(){const q=v=>/[",\n]/.test(String(v))?'"'+String(v).replace(/"/g,'""')+'"':String(v);
+ return["timestamp_iso,type,input,result,status,actions,source",...LOG.map(r=>[r.ts,r.type,r.input,r.result,r.rag,r.actions,r.source].map(q).join(","))].join("\n")}
+$("log-export").onclick=()=>{const a=el("a",{href:URL.createObjectURL(new Blob([csvLog()],{type:"text/csv"})),download:"cortex-activity-log.csv"});a.click();URL.revokeObjectURL(a.href)};
+$("log-clear").onclick=()=>{LOG=[];saveLog();renderLog()};
+
+function parse(line){
+ const o={};let m;
+ if(m=line.match(/\b(?:oh|on[\s-]*hand|in[\s-]*stock|stock(?:\s*level)?|qty|quantity|inventory|units?\s*left)\b\s*(?:of|is|=|:|-)?\s*(\d[\d,]*)/i))o.onHand=num(m[1]);
+ else if(m=line.match(/(\d[\d,]*)\s*(?:units?\s*|pcs\s*|pieces\s*)?(?:on[\s-]*hand|oh\b|in[\s-]*stock|left\b|remaining|available|in inventory)/i))o.onHand=num(m[1]);
+ else if(m=line.match(/\bonly\s+(\d[\d,]*)\b/i))o.onHand=num(m[1]);
+ if(/\b(?:out of stock|sold out|stock[\s-]?out|none left|zero (?:units|stock))\b/i.test(line)&&o.onHand===undefined)o.onHand=0;
+ if(m=line.match(/(?:reorder[\s-]*(?:point|level|pt)|\brop\b|minimum(?:\s*stock)?|\bmin\b|safety\s*stock|\bpar(?:\s*level)?)\s*(?:of|is|=|:)?\s*(\d[\d,]*)/i))o.rop=num(m[1]);
+ if(m=line.match(/(\d[\d,]*)\s*(?:units?\s*)?(?:\/|per|a|each)\s*(wk|week)/i))o.perWeek=num(m[1]);
+ else if(m=line.match(/(?:sell(?:s|ing)?|sales?|demand|velocity|moving|usage|burn)\D{0,15}(\d[\d,]*)\s*(?:units?\s*)?(?:\/|per|a|each)\s*(wk|week|day)/i))o.perWeek=num(m[1])*(/day/i.test(m[2])?7:1);
+ if(o.perWeek===undefined&&(m=line.match(/(\d[\d,]*)\s*(?:units?\s*)?(?:\/|per|a|each)\s*day/i)))o.perWeek=num(m[1])*7;
+ if(m=line.match(/lead(?:[\s-]*time)?\s*(?:of|is|=|:)?\s*(\d+(?:\.\d+)?)\s*(d(?:ays?)?|w(?:k|ks|eeks?)?)\b/i))o.lead=Number(m[1])*(/^w/i.test(m[2])?7:1);
+ else if(m=line.match(/(\d+(?:\.\d+)?)\s*(d(?:ays?)?|w(?:k|ks|eeks?)?)\s*lead/i))o.lead=Number(m[1])*(/^w/i.test(m[2])?7:1);
+ if(m=line.match(/(\d[\d,]*)\s*(?:units?\s*)?(?:inbound|incoming|on[\s-]*order)/i))o.inbound=num(m[1]);
+ else if(m=line.match(/(?:inbound|incoming|on[\s-]*order)\s*(?:of|:|=)?\s*(\d[\d,]*)/i))o.inbound=num(m[1]);
+ if(m=line.match(/(?:inbound|incoming|on[\s-]*order|arriv\w*|lands?)[^.;]*?\bin\s*(\d+)\s*(d(?:ays?)?|w(?:k|ks|eeks?)?)\b/i))o.inboundIn=Number(m[1])*(/^w/i.test(m[2])?7:1);
+ o.lowWord=/\b(?:low|running low|almost out|nearly out|critical|below (?:min|minimum|reorder|par))\b/i.test(line);
+ return o}
+function parseInvoice(line){
+ const o={};let m;
+ if(m=line.match(/invoice\s*(?:no\.?|number|#)?\s*[:#]?\s*([A-Za-z0-9][A-Za-z0-9-]{2,})/i))o.no=m[1];
+ if(m=line.match(/(?:\$|USD\s*)\s?(\d[\d,]*(?:\.\d{1,2})?)/i)||line.match(/(\d[\d,]*(?:\.\d{1,2})?)\s*(?:USD|dollars)/i))o.amount=num(m[1]);
+ if(m=line.match(/(\d+)\s*days?\s*(?:overdue|past\s*due|late|outstanding)/i)||line.match(/(?:overdue|past\s*due|late)\s*(?:by|for)?\s*(\d+)\s*days?/i))o.days=Number(m[1]);
+ if(o.days===undefined&&(m=line.match(/\bdue\s*(?:on|date)?\s*[:\-]?\s*(\d{4}-\d{2}-\d{2}|\d{1,2}\/\d{1,2}\/\d{2,4}|(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\.?\s+\d{1,2}(?:,?\s*\d{4})?)/i))){
+  let d;const s=m[1];
+  if(/^\d{1,2}\//.test(s)){const[a,b,c]=s.split("/").map(Number);d=new Date(c<100?2000+c:c,a-1,b)}
+  else if(/^\d{4}-/.test(s))d=new Date(s+"T00:00:00");
+  else{d=new Date(/\d{4}/.test(s)?s:`${s} ${new Date().getFullYear()}`)}
+  if(d&&!isNaN(d)){o.days=Math.floor((new Date().setHours(0,0,0,0)-d.getTime())/864e5);o.dueText=s}}
+ if(m=line.match(/(?:from|vendor|supplier|customer|client|bill(?:ed)?\s*to)\s*[:\-]?\s*([A-Z][\w&.'-]*(?:\s+[A-Z][\w&.'-]*){0,3})/))o.party=m[1];
+ if(/\b(?:vendor|supplier|we owe|payable|\bAP\b|owed by us|to pay|our payment|billed by)\b|\binvoice\b[^.]{0,30}\bfrom\b|\bfrom\s+(?:vendor|supplier)/i.test(line))o.dir="payable";
+ else if(/\b(?:customer|client|owes us|receivable|\bAR\b|owed to us|collect|their payment)\b|\binvoice\b[^.]{0,30}\bto\s+[A-Z]/i.test(line))o.dir="receivable";
+ return o}
+const isInvoice=l=>/\binvoice\b|\binv[-#\s]?\d|\bpast\s*due\b|\boverdue\b|\bamount\s*due\b|\bpayment\s*(?:due|late)\b/i.test(l);
+function watchRow(line){try{const rows=JSON.parse(localStorage.getItem("meridian.watch.v1"))||[],L=line.toLowerCase();return rows.find(r=>r.sku&&r.sku.length>=2&&L.includes(r.sku.toLowerCase()))||null}catch{return null}}
+function rowDemand(r){const t=r.sales_prev_wk>0?Math.max(-.5,Math.min(.5,(r.sales_last_wk-r.sales_prev_wk)/r.sales_prev_wk)):0;return(r.sales_last_wk>0?r.sales_last_wk*(1+t*.5):r.plan_weekly)*(1+r.promo_uplift_pct/100)}
+
+function assessStock(p,row){
+ const notes=[];
+ if(row){if(p.perWeek===undefined){p.perWeek=rowDemand(row);notes.push(`Demand taken from your watch list for ${row.sku}: about ${f0(p.perWeek)} a week.`)}
+  if(p.onHand===undefined)p.onHand=row.stores_on_hand+row.dc_on_hand;if(p.lead===undefined)p.lead=row.lead_time_days}
+ const acts=[];let rag="green",head="Covered";
+ const up=r=>{if(r==="red")rag="red";else if(rag!=="red")rag="amber"};
+ if(p.onHand===undefined)return{rag:"amber",head:"No stock level found",acts:["Add units on hand, for example “12 on hand”, and I'll check it. Demand per week and lead time make the answer exact."],notes};
+ if(p.onHand<=0){return{rag:"red",head:"Out of stock",acts:["Raise a reorder now."+(p.lead!==undefined?` A new order takes ${f0(p.lead)} days, so expect to be without stock until then. Look for an expedite option or stock in another location.`:" Check whether stock can be moved from another location while it is on order."),],notes}}
+ if(p.rop!==undefined&&p.onHand<=p.rop){up("red");acts.push(`On hand (${f0(p.onHand)}) is at or below the reorder point (${f0(p.rop)}). Reorder now.`)}
+ if(p.perWeek!==undefined&&p.perWeek>0){
+  const daily=p.perWeek/7,cover=p.onHand/daily;let runOut=cover,gap=0;
+  if(p.inbound>0&&p.inboundIn!==undefined){if(p.inboundIn<=cover)runOut=(p.onHand+p.inbound)/daily;else gap=p.inboundIn-cover}
+  else if(p.inbound>0)notes.push(`${f0(p.inbound)} inbound not counted: no arrival time given (add “arriving in N days”).`);
+  const lead=p.lead,runTxt=runOut<1?"under a day":f0(runOut)+" days";
+  if(gap>0){up("red");acts.push(`Stock runs out in about ${f0(cover)} days, ${Math.ceil(gap)} days before the inbound delivery lands. Expedite it or move stock in.`)}
+  if(lead!==undefined){
+   if(runOut<lead){up("red");acts.push(`Stock-out risk: ${runTxt} of stock against a ${f0(lead)}-day lead time. A reorder placed today lands about ${Math.ceil(lead-runOut)} days after you run out.`)}
+   else if(runOut-lead<=7){up("amber");acts.push(`Reorder risk: order within ${Math.max(0,Math.floor(runOut-lead))} days or you will run out before it arrives.`)}
+  }else{acts.push("No lead time given, so cover is compared against 14 days.");if(runOut<7)up("red");else if(runOut<14)up("amber")}
+  if(rag!=="green"){const target=daily*((lead??14)+14),qty=Math.ceil(Math.max(0,target-p.onHand-(gap>0?0:(p.inbound||0))));if(qty>0)acts.push(`Suggested order: about ${f0(qty)} units, enough to cover the lead time plus 14 days at the current rate.`)}
+  if(rag==="green")acts.push(`Covered: ${runTxt} of stock${lead!==undefined?` against a ${f0(lead)}-day lead time`:""}.`);
+ }else{
+  // on hand known, demand not stated: still warn, with the break-even rate
+  const horizon=p.lead??14,perWk=p.onHand/horizon*7;
+  up(p.lowWord||p.onHand<=0?"red":"amber");
+  acts.push(`${f0(p.onHand)} units on hand. Demand wasn't stated, so exact cover is unknown, but this item will run out before a new order lands${p.lead!==undefined?` (${f0(p.lead)} days)`:" (14 days assumed)"} if it sells more than ${f0(perWk)} a week (${(perWk/7).toFixed(perWk/7<10?1:0)} a day).`);
+  acts.push("Check recent weekly sales against that rate. If it is higher, reorder now. Add “"+"N/wk” to this line for a firm answer.");
+  if(p.lowWord)acts.unshift("The line says stock is low. Treat as a reorder risk until demand is confirmed.");
+ }
+ if(!acts.length)acts.push("Stock on hand covers demand beyond the lead time.");
+ head=rag==="red"?"Stock-out risk. Reorder.":rag==="amber"?"Reorder risk. Watch closely.":"Covered";
+ return{rag,head,acts,notes}}
+
+function assessInvoice(p,dirAI){
+ const guessed=!p.dir&&(dirAI==="We owe it"||dirAI==="Owed to us"),dir=p.dir||(dirAI==="We owe it"?"payable":dirAI==="Owed to us"?"receivable":"unclear");
+ const d=p.days,who=p.party?` ${p.party}`:"",inv=p.no?` ${p.no}`:"",amt=p.amount!==undefined?` for ${usd(p.amount)}`:"";
+ const ladderR=d===undefined?["Confirm the due date, then: if 1-7 days late send a reminder; 8-30 days, phone their accounts payable contact; 31+ days, escalate and pause new credit orders."]:
+  d<=0?["Not overdue yet. Set a reminder for the due date."]:
+  d<=7?[`Send a friendly reminder today with a copy of the invoice${amt?"":""} and payment details.`,"Diary a follow-up in 3 business days."]:
+  d<=30?[`Phone their accounts payable contact today. Confirm they have the invoice and get a firm payment date.`,"Log the promise-to-pay date and follow up the day after."]:
+  d<=60?["Escalate to a named senior contact and send a second notice in writing.","Pause new credit orders until the balance is cleared or a payment plan is agreed."]:
+  ["Final notice today and refer for collections review.","Stop credit and confirm any open orders."];
+ const ladderP=d===undefined?["Confirm the due date. If it is past due: pay in the next payment run, and check whether the supplier has paused shipments."]:
+  d<=0?["Not overdue yet. Schedule payment before the due date."]:
+  d<=14?[`Approve and pay in the next payment run${amt?"":""}. Check first that there is no dispute on the invoice.`]:
+  d<=30?["Pay this week. Confirm the supplier hasn't put new orders on hold."]:
+  ["Escalate to your finance lead now and call the supplier to agree a payment date.","Ask whether they have put orders on hold, and check peak-season stock from this supplier against open purchase orders."];
+ let rag=d===undefined?"amber":d<=0?"green":d>=30?"red":"amber";
+ const acts=[],head=d===undefined?"Overdue invoice: confirm the date":d<=0?"Not overdue yet":`Overdue ${d} day${d===1?"":"s"}`;
+ let draft="";
+ if(dir==="receivable"){acts.push(...ladderR);
+  draft=`Hi${who?" "+p.party.split(" ")[0]:""},\n\nOur records show invoice${inv}${amt} is ${d>0?d+" days past due":"outstanding"}. Could you confirm you have it and let me know the payment date?\n\nThanks,`}
+ else if(dir==="payable"){acts.push(...ladderP);
+  draft=`Hi${who?" "+p.party.split(" ")[0]:""},\n\nI'm following up on invoice${inv}${amt}. We are arranging payment and will confirm the date shortly. Please let us know if any shipments are affected.\n\nThanks,`}
+ else{acts.push("Direction isn't clear from the line. Add “vendor/supplier” if you owe it, or “customer” if it is owed to you.");
+  acts.push("If you owe it: "+ladderP[0]);acts.push("If it is owed to you: "+ladderR[0])}
+ return{rag,head,acts,notes:[],draft,label:`Invoice (${dir==="payable"?"you owe it":dir==="receivable"?"owed to you":"direction unclear"}${guessed?", assumed. Say \u201Cvendor\u201D or \u201Ccustomer\u201D to confirm":""})`}}
+
+$("try-form").onsubmit=async e=>{e.preventDefault();
+ const lines=$("try-in").value.split(/\r?\n/).map(s=>s.trim()).filter(Boolean).slice(0,20),m=$("try-msg"),out=$("try-out");
+ if(!lines.length){m.textContent="Paste at least one line.";return}
+ const btn=$("try-go");btn.disabled=true;m.textContent="Reading your lines…";
+ let ai=null;
+ try{const r=await fetch("/api/classify-stock",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({lines})});if(r.ok)ai=(await r.json()).results}catch{}
+ const cards=[];
+ lines.forEach((line,i)=>{
+  const x=ai&&ai[i],inv=isInvoice(line)||(x&&x.kind==="Invoice or payment"&&!parse(line).onHand&&!parse(line).perWeek);
+  let res,label,known;
+  if(inv){const p=parseInvoice(line);res=assessInvoice(p,x&&x.direction);label=res.label;
+   known=[["Invoice",p.no],["Amount",p.amount!==undefined&&usd(p.amount)],["Days overdue",p.days!==undefined&&String(p.days)],["Party",p.party]].filter(k=>k[1])}
+  else{const p=parse(line),row=watchRow(line);res=assessStock(p,row);
+   label=x?`${x.category} · ${x.seasonal>.7?"season- or event-driven demand":x.seasonal<.3?"steady, not season-driven":"may be partly seasonal"}`:"Stock line";
+   known=[["On hand",p.onHand!==undefined&&f0(p.onHand)+" units"],["Demand",p.perWeek!==undefined&&f0(p.perWeek)+" / wk"],["Reorder point",p.rop!==undefined&&f0(p.rop)],["Lead time",p.lead!==undefined&&f0(p.lead)+" days"],["Inbound",p.inbound!==undefined&&f0(p.inbound)+" units"+(p.inboundIn!==undefined?" in "+f0(p.inboundIn)+" days":"")]].filter(k=>k[1]);
+   if(row)known.push(["Watch list match",row.sku])}
+  const card=el("div",{class:"panel",style:"padding:12px;background:var(--bg)"},
+   el("div",{class:"row",style:"justify-content:space-between"},el("strong",{},line),el("span",{class:"rag "+res.rag},res.head)),
+   el("div",{class:"muted",style:"font-size:13px"},label),
+   el("div",{style:"font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin:8px 0 2px"},"Next step"),
+   el("ul",{class:"acts",style:"font-size:14px"},...res.acts.map(t=>el("li",{},t))));
+  if(res.notes&&res.notes.length)card.append(el("div",{class:"muted",style:"font-size:12px;margin-top:4px"},res.notes.join(" ")));
+  if(res.draft){const dd=el("details",{style:"margin-top:6px"},el("summary",{},"Draft message"),el("pre",{style:"white-space:pre-wrap;font:13px var(--font-num);margin:6px 0 0"},res.draft));card.append(dd)}
+  card.append(el("div",{class:"muted",style:"font-size:12px;margin-top:6px"},"Read from the line: "+(known.length?known.map(k=>`${k[0]} ${k[1]}`).join(", "):"nothing numeric found")));
+  cards.push(card);
+  log(inv?"Invoice check":"Stock check",line,res.head+(label?" ("+label+")":""),res.rag,res.acts,x?"rules + TypeSafe":"rules");
+ });
+ out.replaceChildren(...cards);
+ m.textContent=`Processed ${lines.length} line${lines.length===1?"":"s"} and added to the activity log below${ai?"":" (item identification unavailable right now)"}.`;
+ btn.disabled=false};
+renderLog();
+})();
+</script>
+</body>
+</html>
