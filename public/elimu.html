@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Family Follow-up &amp; Fees | Cortex for Elimu Plus</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f5f6f8;--surface:#fff;--ink:#1b2230;--muted:#5d6879;--line:#dde2ea;--accent:#2b4fd8;--accent-ink:#fff;
+ --red:#b3261e;--red-bg:#fde8e6;--amber:#8a5a00;--amber-bg:#fff1d6;--green:#1d7a46;--green-bg:#e0f4e8;
+ --font-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;--font-num:"IBM Plex Mono",ui-monospace,Menlo,monospace}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#12151c;--surface:#1a1f29;--ink:#e8ecf3;--muted:#9aa5b8;--line:#2b3342;--accent:#7f9bff;--accent-ink:#0b1020;
+ --red:#ff8a80;--red-bg:#3d1c1a;--amber:#f2c261;--amber-bg:#3a2d12;--green:#6fd09a;--green-bg:#16301f}}
+*{box-sizing:border-box}html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:15px/1.5 var(--font-body)}
+.wrap{max-width:1080px;margin:0 auto;padding:20px 16px 32px;display:grid;gap:16px}
+a{color:var(--accent)}h1{margin:0;font-size:26px;letter-spacing:-.01em}
+.tool h3,#intake h3,.sec-h{margin:0 0 10px;font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600}
+.back{font-size:13px}.sub,.muted{color:var(--muted)}.sub{margin:4px 0 0}
+.num{font-family:var(--font-num);font-variant-numeric:tabular-nums}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px}
+[hidden]{display:none!important}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
+label.field{display:grid;gap:4px;font-size:13px;color:var(--muted)}
+input,button,textarea,select{font:inherit}
+input[type=text],input[type=number],input[type=date],input[type=tel],textarea,select{padding:7px 9px;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:8px;width:100%}
+textarea{font-family:var(--font-num);font-size:13px;min-height:100px;resize:vertical}
+.scroll{overflow-x:auto}table{width:100%;border-collapse:collapse;min-width:820px}
+th,td{text-align:left;padding:7px 8px;border-top:1px solid var(--line);vertical-align:top}
+thead th{border-top:0;font-size:12px;color:var(--muted);font-weight:600}td.num,th.num{text-align:right}
+.st{display:inline-block;font-size:11px;font-weight:600;padding:1px 9px;border-radius:999px;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap}
+.st.red{background:var(--red-bg);color:var(--red)}.st.amber{background:var(--amber-bg);color:var(--amber)}.st.green{background:var(--green-bg);color:var(--green)}
+a.st{text-decoration:none}a.st:hover{text-decoration:underline}
+#tiles,#fee-tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px}
+.tile{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--line);border-radius:10px;padding:10px 14px}
+.tile.red{border-left-color:var(--red)}.tile.green{border-left-color:var(--green)}.tile.main{border-left-color:var(--accent)}
+.tile-label{color:var(--muted);font-size:13px}.tile-value{font:500 21px var(--font-num)}.hint{font-size:12px;color:var(--muted)}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+button.primary{padding:8px 14px;background:var(--accent);color:var(--accent-ink);border:0;border-radius:8px;font-weight:600;cursor:pointer}
+button.btn{font-size:13px;padding:5px 12px;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:999px;cursor:pointer}
+button.ghost{background:none;border:0;color:var(--muted);cursor:pointer;padding:2px 6px;border-radius:6px}button.ghost:hover{color:var(--red)}
+.msg{font-size:13px;color:var(--muted);margin:0;min-height:1.3em}.msg.warn{color:var(--red)}
+code{font-family:var(--font-num);font-size:12.5px;background:var(--bg);padding:1px 5px;border-radius:4px;border:1px solid var(--line)}
+details summary{cursor:pointer;color:var(--muted);font-size:14px}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+footer{text-align:center;color:var(--muted);font-size:13px;padding:4px 16px 24px}
+/* page header and tabs */
+.eyebrow{margin:0 0 2px;font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);overflow-x:auto}
+.tabs [role=tab]{font:600 15px var(--font-body);padding:10px 14px;background:none;border:0;border-bottom:3px solid transparent;margin-bottom:-1px;color:var(--muted);cursor:pointer;white-space:nowrap;border-radius:6px 6px 0 0}
+.tabs [role=tab]:hover{color:var(--ink)}
+.tabs [role=tab][aria-selected=true]{color:var(--ink);border-bottom-color:var(--accent)}
+.tool{display:grid;gap:16px;min-width:0}.tool:focus-visible{outline-offset:6px}
+.tool-title{margin:0;font-size:20px;letter-spacing:-.01em}
+/* follow-up and inbox cards */
+:is(#panel-follow-up,#intake) .list{display:grid;gap:10px}
+:is(#panel-follow-up,#intake) .card{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--line);border-radius:10px;padding:12px 14px;display:grid;gap:6px;min-width:0}
+:is(#panel-follow-up,#intake) .card.red{border-left-color:var(--red)}:is(#panel-follow-up,#intake) .card.amber{border-left-color:var(--amber)}:is(#panel-follow-up,#intake) .card.green{border-left-color:var(--green)}
+:is(#panel-follow-up,#intake) .sub-list .card{background:var(--bg)}
+:is(#panel-follow-up,#intake) .who{font-size:16px;font-weight:600;word-break:break-word}
+:is(#panel-follow-up,#intake) .chips{display:flex;gap:6px;flex-wrap:wrap}:is(#panel-follow-up,#intake) .chips .st{white-space:normal}
+:is(#panel-follow-up,#intake) .quote{font-size:14px;border-left:3px solid var(--line);padding-left:8px;word-break:break-word}
+:is(#panel-follow-up,#intake) .next{margin:0;font-size:14px}
+:is(#panel-follow-up,#intake) .card details summary{padding:4px 0}
+:is(#panel-follow-up,#intake) .rec-form{margin-top:6px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+:is(#panel-follow-up,#intake) .hist{margin:6px 0 0;padding-left:18px;font-size:13px;display:grid;gap:4px}:is(#panel-follow-up,#intake) .hist li{word-break:break-word}
+:is(#panel-follow-up,#intake) .logs{margin:8px 0 0;padding-left:18px;font-size:13px;display:grid;gap:3px;max-height:360px;overflow-y:auto}
+.recent ul,ul.recent{margin:2px 0 0;padding-left:16px;font-size:12px;color:var(--muted);display:grid;gap:2px}.recent li,ul.recent li{word-break:break-word}
+ul.recent{font-weight:400}
+#intake .card .acts{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+#intake .card .sub-form{margin-top:4px;padding:10px;border:1px dashed var(--line);border-radius:8px}
+#intake .card textarea{min-height:70px}#in-text{min-height:64px}
+#intake .st.blue{background:var(--bg);color:var(--accent);border:1px solid var(--line)}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <a class="back" href="/">&larr; Back to Cortex</a>
+  <header>
+    <p class="eyebrow">Cortex for Elimu Plus Learning Centres</p>
+    <h1>Elimu Plus</h1>
+    <p class="sub">Follow up with families who may not come back next term, and keep track of termly fees at every centre, in one place.</p>
+  </header>
+
+  <section class="panel" id="intake" aria-labelledby="h-intake">
+    <h2 class="sec-h" id="h-intake">Drop in notes</h2>
+    <form id="in-form">
+      <label class="field" for="in-text">Paste M-Pesa or bank confirmations, overdue invoice lines, parent messages or absence notes. One note per line, or put a blank line between longer notes. Cortex says what each one is and suggests the next step.<textarea id="in-text" spellcheck="false" placeholder="Paste notes here"></textarea></label>
+      <div class="row" style="margin-top:8px"><button class="primary" type="submit">Read notes</button><span id="in-msg" class="msg" role="status" aria-live="polite"></span></div>
+    </form>
+    <p class="hint" style="margin:6px 0 0">Only the note text is sent to Cortex to work out what each note is. Matching, payments and follow-ups stay in this browser.</p>
+    <p id="in-hint" class="hint" style="margin:4px 0 0" hidden>Tip: load the student list in the Fees tab and payments and invoices will match to a family automatically.</p>
+    <div id="in-needs-wrap" style="margin-top:12px" hidden><h3 id="h-in-needs">Inbox: needs a family</h3><div id="in-needs" class="list"></div></div>
+    <div id="in-ready-wrap" style="margin-top:12px" hidden><h3 id="h-in-ready">Ready for the next step</h3><div id="in-ready" class="list"></div></div>
+    <details id="in-done-wrap" style="margin-top:12px" hidden><summary id="in-done-sum"></summary><ol id="in-done" class="hist" reversed></ol></details>
+  </section>
+
+  <div class="tabs" role="tablist" aria-label="Elimu Plus tools">
+    <button type="button" role="tab" id="tab-follow-up" aria-controls="panel-follow-up" aria-selected="true" tabindex="0">Family follow-up</button>
+    <button type="button" role="tab" id="tab-fees" aria-controls="panel-fees" aria-selected="false" tabindex="-1">Fees</button>
+  </div>
+
+<div class="tool" role="tabpanel" id="panel-follow-up" aria-labelledby="tab-follow-up" tabindex="0">
+  <header class="tool-head">
+    <h2 class="tool-title">Family follow-up</h2>
+    <p class="sub">For centre managers. See which families have stopped coming or still have an open complaint, call them before term ends, and note what happens next, all from a spreadsheet paste with no login and no setup. Tutors don't need to do anything.</p>
+    <p class="hint" style="margin:6px 0 0">Your data stays in this browser on this device. Nothing is uploaded, and each manager's list lives in their own browser. Clearing browser data deletes it, so use the download buttons to keep a copy.</p>
+    <p id="store-msg" class="msg warn" role="alert" hidden></p>
+  </header>
+
+  <section class="row" aria-label="Centre and term" style="gap:8px 20px">
+    <label class="field" id="filter-row" style="grid-auto-flow:column;align-items:center;gap:8px" hidden>Showing<select id="f-centre" style="width:auto"></select></label>
+    <label class="field" style="grid-auto-flow:column;align-items:center;gap:8px">Term ends<input id="term-end" type="date" style="width:auto"></label>
+    <span id="term-left" style="font-weight:600"></span>
+  </section>
+
+  <section class="panel" aria-labelledby="h-today">
+    <div class="row" style="justify-content:space-between;margin-bottom:8px"><h3 id="h-today" tabindex="-1" style="margin:0">This morning: families to contact</h3>
+      <button type="button" class="btn" id="dl-list">Download follow-up list CSV</button></div>
+    <p id="list-msg" class="msg" role="status" aria-live="polite"></p>
+    <p id="today-empty" class="muted" style="margin:0"></p>
+    <div id="today-list" class="list"></div>
+    <p id="ok-note" class="hint" style="margin:10px 0 0"></p>
+    <details id="later-wrap" style="margin-top:12px" hidden><summary id="later-sum"></summary>
+      <p class="hint" style="margin:6px 0">Already followed up this term. They come back onto today's list on their next-action date.</p>
+      <div id="later-list" class="list sub-list"></div></details>
+    <details id="done-wrap" style="margin-top:12px" hidden><summary id="done-sum"></summary>
+      <p class="hint" style="margin:6px 0">Families who told you they are coming back next term, or that they are not returning.</p>
+      <div id="done-list" class="list sub-list"></div></details>
+  </section>
+
+  <section id="tiles" aria-label="Summary" hidden></section>
+
+  <section class="panel" aria-labelledby="h-cen" id="centres-panel" hidden>
+    <h3 id="h-cen">By centre</h3>
+    <div class="scroll"><table style="min-width:600px"><thead><tr><th scope="col">Centre</th><th class="num" scope="col">Families</th><th class="num" scope="col">Flagged</th><th class="num" scope="col">To follow up today</th><th class="num" scope="col">Contacted</th><th class="num" scope="col">Coming back</th><th class="num" scope="col">Not returning</th></tr></thead><tbody id="cen-body"></tbody></table></div>
+    <p class="hint" style="margin:6px 0 0">Contacted means a follow-up was recorded this term other than "No answer".</p>
+  </section>
+
+  <section class="panel" aria-labelledby="h-imp">
+    <h3 id="h-imp">Import families</h3>
+    <form id="imp-form">
+      <label class="field" for="imp-in">Paste from a spreadsheet (first row = column headers, tab or comma separated). Paste again any time to update: follow-ups and notes are kept.<textarea id="imp-in" spellcheck="false" placeholder="student, parent, phone, centre, last_attended, sessions_last_4_weeks, usual_sessions_per_4_weeks, open_complaint, complaint_date"></textarea></label>
+      <div class="row" style="margin-top:8px"><button class="primary" type="submit">Import families</button><button type="button" class="btn" id="hdr">Copy header row</button></div>
+      <p id="imp-msg" class="msg" role="status" aria-live="polite"></p>
+    </form>
+    <details><summary>Columns</summary><ul class="muted" style="font-size:14px;margin:8px 0 0">
+      <li><code>student</code> student's name (required)</li>
+      <li><code>parent</code> parent or guardian name</li>
+      <li><code>phone</code> parent's phone number</li>
+      <li><code>centre</code> which centre (optional). Fill it in and each centre manager can show just their own centre's list.</li>
+      <li><code>last_attended</code> date of the student's last session (required). Use YYYY-MM-DD or DD/MM/YYYY (day first).</li>
+      <li><code>sessions_last_4_weeks</code> sessions attended in the last 4 weeks (optional)</li>
+      <li><code>usual_sessions_per_4_weeks</code> sessions they normally attend in 4 weeks (optional)</li>
+      <li><code>open_complaint</code> what the parent complained about, if it is still open (leave blank if none)</li>
+      <li><code>complaint_date</code> when the complaint was raised (optional, same date formats)</li></ul>
+      <p class="hint" style="margin:8px 0 0">A family is matched on student name plus centre, so re-importing updates them. If you also use the <a href="#fees">Termly fee tracker</a> in this browser, any fee balance is shown next to the family.</p></details>
+    <details style="margin-top:8px"><summary>Add or update one family</summary>
+      <form id="add-form" class="grid" style="margin-top:8px">
+        <label class="field">Student (required)<input id="a-student" type="text" maxlength="80" required></label>
+        <label class="field">Centre<input id="a-centre" type="text" maxlength="40" list="centre-list"></label>
+        <label class="field">Parent<input id="a-parent" type="text" maxlength="80"></label>
+        <label class="field">Phone<input id="a-phone" type="tel" maxlength="20"></label>
+        <label class="field">Last attended (required)<input id="a-last" type="date" required></label>
+        <label class="field">Open complaint<input id="a-complaint" type="text" maxlength="300"></label>
+        <label class="field">Complaint date<input id="a-cdate" type="date"></label>
+        <div class="row" style="align-self:end"><button class="primary" type="submit">Save family</button></div>
+      </form>
+      <datalist id="centre-list"></datalist>
+      <p id="add-msg" class="msg" role="status" aria-live="polite"></p>
+    </details>
+  </section>
+
+  <section class="panel" aria-labelledby="h-set">
+    <h3 id="h-set">Settings</h3>
+    <form id="set-form" class="grid">
+      <label class="field">Flag as stopped attending after (days)<input id="s-absent" type="number" min="1" max="365" step="1"></label>
+      <label class="field">Flag dropping attendance below (% of usual)<input id="s-drop" type="number" min="1" max="100" step="1"></label>
+      <label class="field">Complaint turns red after (days open)<input id="s-complaint" type="number" min="0" max="365" step="1"></label>
+      <div class="row" style="align-self:end"><button type="button" class="btn" id="s-reset">Reset to defaults</button></div>
+    </form>
+    <p id="set-msg" class="msg" role="status" aria-live="polite"></p>
+  </section>
+
+  <section class="panel" aria-labelledby="h-log">
+    <h3 id="h-log">Term</h3>
+    <div class="row"><button type="button" class="btn" id="new-term">Start a new term</button></div>
+    <p id="term-msg" class="msg" role="status" aria-live="polite" style="margin-top:6px"></p>
+    <p class="hint" style="margin:0">Starting a new term clears this term's outcomes and next actions so every flagged family is looked at again. Families, notes and history are kept. Every action is listed with its date and time under “Activity” at the bottom of the page, with a CSV download.</p>
+  </section>
+</div>
+
+<div class="tool" role="tabpanel" id="panel-fees" aria-labelledby="tab-fees" tabindex="0" hidden>
+  <header class="tool-head">
+    <h2 class="tool-title">Termly fee tracker</h2>
+    <p class="sub">For the fee office at Elimu Plus. Load the student list once, paste M-Pesa or bank payment messages as they come in, and see who has paid, who is part-paid and who is overdue at each centre, with a reminder ready to send to each parent. No login. Nothing leaves this browser.</p>
+  </header>
+
+  <section class="panel" aria-labelledby="fee-h-term">
+    <h3 id="fee-h-term">This term</h3>
+    <div class="grid">
+      <label class="field">Term name<input id="fee-t-name" type="text" maxlength="40" placeholder="Term 1"></label>
+      <label class="field">Fees due by<input id="fee-t-due" type="date"></label>
+      <label class="field">Paybill / till number (for reminders, optional)<input id="fee-t-paybill" type="text" maxlength="20"></label>
+    </div>
+  </section>
+
+  <section id="fee-tiles" aria-label="Summary" hidden></section>
+
+  <section class="panel" aria-labelledby="fee-h-pay">
+    <h3 id="fee-h-pay">Paste payments</h3>
+    <p class="muted" style="margin:0 0 8px;font-size:14px">One payment message per line, copied from M-Pesa, the bank or your own notes. Cortex reads the amount, the receipt code, the phone number, the account number and the payer's name, then matches each payment to a student by account number (student ID), parent phone or name. A receipt code is only ever counted once.</p>
+    <form id="fee-pay-form">
+      <textarea id="fee-pay-in" spellcheck="false" aria-label="Payment messages, one per line" placeholder="Paste payment confirmations here, one per line"></textarea>
+      <div class="row" style="margin-top:8px"><button class="primary" type="submit">Match payments</button><span id="fee-pay-msg" class="msg" role="status" aria-live="polite"></span></div>
+    </form>
+    <div id="fee-unmatched" style="margin-top:10px"></div>
+  </section>
+
+  <section class="panel" aria-labelledby="fee-h-cen" id="fee-centres-panel" hidden>
+    <h3 id="fee-h-cen">By centre</h3>
+    <div class="scroll"><table style="min-width:620px"><thead><tr><th scope="col">Centre</th><th class="num" scope="col">Students</th><th class="num" scope="col">Expected</th><th class="num" scope="col">Collected</th><th class="num" scope="col">Outstanding</th><th class="num" scope="col">Collected %</th><th class="num" scope="col">Overdue</th></tr></thead><tbody id="fee-cen-body"></tbody></table></div>
+  </section>
+
+  <section class="panel" aria-labelledby="fee-h-stu">
+    <div class="row" style="justify-content:space-between;margin-bottom:8px"><h3 id="fee-h-stu" style="margin:0">Students</h3>
+      <div class="row"><select id="fee-f-centre" aria-label="Filter by centre" style="width:auto"></select><select id="fee-f-status" aria-label="Filter by status" style="width:auto">
+        <option value="all">All statuses</option><option value="owing">Owing (unpaid or part-paid)</option><option value="overdue">Overdue</option><option value="paid">Paid</option></select>
+        <button type="button" class="btn" id="fee-copy-rem">Copy reminders for this list</button></div></div>
+    <p id="fee-rem-msg" class="msg" role="status" aria-live="polite"></p>
+    <div class="scroll"><table><thead><tr><th scope="col">Student</th><th scope="col">Centre</th><th scope="col">Parent / phone</th><th class="num" scope="col">Fee</th><th class="num" scope="col">Paid</th><th class="num" scope="col">Balance</th><th scope="col">Status</th><th scope="col">Reminder</th><th></th></tr></thead><tbody id="fee-stu-body"></tbody></table></div>
+    <p id="fee-stu-empty" class="muted">No students yet. Add the student list below.</p>
+  </section>
+
+  <section class="panel" aria-labelledby="fee-h-reg">
+    <h3 id="fee-h-reg">Student list</h3>
+    <form id="fee-reg-form">
+      <label class="field" for="fee-reg-in">Paste from a spreadsheet (first row = column headers, tab or comma separated)<textarea id="fee-reg-in" spellcheck="false" placeholder="student, student_id, centre, parent, phone, term_fee, paid"></textarea></label>
+      <div class="row" style="margin-top:8px"><button class="primary" type="submit">Import students</button><button type="button" class="btn" id="fee-hdr">Copy header row</button><button type="button" class="btn" id="fee-export">Download CSV with balances</button><button type="button" class="btn" id="fee-new-term">Start a new term</button></div>
+      <p id="fee-reg-msg" class="msg" role="status" aria-live="polite"></p>
+    </form>
+    <details><summary>Columns</summary><ul class="muted" style="font-size:14px;margin:8px 0 0">
+      <li><code>student</code> student's name (required)</li><li><code>student_id</code> the account number parents use when paying (recommended)</li>
+      <li><code>centre</code> which centre (required)</li><li><code>parent</code> parent or guardian name</li><li><code>phone</code> parent phone, e.g. 07XX XXX XXX</li>
+      <li><code>term_fee</code> fee for this term in KES (required)</li><li><code>paid</code> anything already paid this term (optional, default 0)</li></ul></details>
+  </section>
+</div>
+  <section class="panel" id="activity" aria-labelledby="h-act">
+    <div class="row" style="justify-content:space-between;margin-bottom:6px"><h2 class="sec-h" id="h-act" style="margin:0">Activity</h2>
+      <div class="row"><label class="field" style="grid-auto-flow:column;align-items:center;gap:8px">Family<select id="act-family" style="width:auto;max-width:260px"></select></label><button type="button" class="btn" id="act-csv">Download activity CSV</button></div></div>
+    <p class="hint" style="margin:0 0 8px">Everything done on this page in both tabs, newest first, with the date and time. Kept in this browser.</p>
+    <p id="act-msg" class="msg" role="status" aria-live="polite"></p>
+    <p id="act-empty" class="muted" style="margin:0">Nothing yet. Every note, payment, reminder and follow-up you record is listed here.</p>
+    <div class="scroll" id="act-wrap" hidden><table style="min-width:680px"><thead><tr><th scope="col">When</th><th scope="col">Centre</th><th scope="col">Family</th><th scope="col">Action</th><th scope="col">Detail</th></tr></thead><tbody id="act-body"></tbody></table></div>
+    <p id="act-more" class="hint" style="margin:6px 0 0"></p>
+  </section>
+</main>
+<footer>Cortex by Pitch, Pray, Ship. Typesafe.</footer>
+<script>
+/* Shared: one timestamped activity trail for the whole page (elimu.activity.v1) */
+"use strict";
+(()=>{
+const KEY="elimu.activity.v1",$=id=>document.getElementById(id);
+const el=(t,a={},...k)=>{const e=document.createElement(t);for(const[x,y]of Object.entries(a))if(y!==null)e.setAttribute(x,y);e.append(...k);return e};
+const norm=s=>String(s||"").trim().replace(/\s+/g," ").toLowerCase();
+const clip=(s,n)=>String(s??"").replace(/\s+/g," ").trim().slice(0,n);
+const fmtStamp=t=>new Date(t).toLocaleString("en-KE",{day:"numeric",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit"});
+let A={entries:[],migrated:{}};
+try{const v=JSON.parse(localStorage.getItem(KEY));if(v&&Array.isArray(v.entries))A={entries:v.entries.filter(x=>x&&x.at&&x.action),migrated:v.migrated&&typeof v.migrated==="object"?v.migrated:{}}}catch{}
+let saveOk=true;
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(A));saveOk=true}catch{saveOk=false}};
+let queued=false;const schedule=()=>{if(queued)return;queued=true;queueMicrotask(()=>{queued=false;render()})};
+function log(o){const e={at:new Date().toISOString(),centre:clip(o.centre,40),family:clip(o.family,80),action:clip(o.action,60),detail:clip(o.detail,600),src:clip(o.src,20)};
+ A.entries.push(e);if(A.entries.length>5000)A.entries=A.entries.slice(-5000);save();schedule();return e}
+// Copies an older per-tool log in once, so nothing that was already logged disappears.
+function migrate(src,list){if(A.migrated[src])return;
+ for(const x of list)A.entries.push({at:x.at,centre:clip(x.centre,40),family:clip(x.family,80),action:clip(x.action,60),detail:clip(x.detail,600),src:clip(src,20)});
+ A.entries.sort((a,b)=>a.at<b.at?-1:a.at>b.at?1:0);if(A.entries.length>5000)A.entries=A.entries.slice(-5000);
+ A.migrated[src]=true;save();schedule()}
+const sameFam=(e,student,centre)=>norm(e.family)===norm(student)&&(!e.centre||!centre||norm(e.centre)===norm(centre));
+function forFamily(student,centre,n=3){const out=[];if(!student)return out;
+ for(let i=A.entries.length-1;i>=0&&out.length<n;i--){const e=A.entries[i];if(e.family&&sameFam(e,student,centre))out.push(e)}return out}
+const visible=()=>{const f=$("act-family").value;return A.entries.filter(e=>!f||norm(e.family)===f)};
+function render(){const sel=$("act-family"),cur=sel.value;
+ const names=new Map();for(const e of A.entries)if(e.family&&!names.has(norm(e.family)))names.set(norm(e.family),e.family);
+ const keys=[...names.keys()].sort((a,b)=>names.get(a).localeCompare(names.get(b)));
+ sel.replaceChildren(el("option",{value:""},"All families"),...keys.map(k=>el("option",{value:k},names.get(k))));sel.value=keys.includes(cur)?cur:"";
+ const V=visible(),has=V.length>0,shown=V.slice(-300).reverse();
+ $("act-empty").hidden=has;$("act-wrap").hidden=!has;
+ $("act-body").replaceChildren(...shown.map(e=>el("tr",{},el("td",{class:"num",style:"white-space:nowrap"},el("time",{datetime:e.at},fmtStamp(e.at))),el("td",{},e.centre||""),el("td",{},e.family||""),el("td",{style:"font-weight:500"},e.action),el("td",{style:"word-break:break-word"},e.detail||""))));
+ $("act-more").textContent=V.length>300?`Showing the latest 300 of ${V.length}. The CSV has them all.`:has?`${V.length} entr${V.length===1?"y":"ies"}.`:"";
+ const m=$("act-msg");m.className=saveOk?"msg":"msg warn";m.textContent=saveOk?"":"This browser would not save the activity trail (storage is full or blocked). Download the CSV to keep a copy."}
+const q=v=>{let s=String(v??"");if(/^[=@\t\r]/.test(s)||/^[+-](?!\d)/.test(s))s="'"+s;return/[",\n\r]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s};
+$("act-family").onchange=render;
+$("act-csv").onclick=()=>{const V=visible();if(!V.length){$("act-msg").className="msg";$("act-msg").textContent="Nothing to download yet.";return}
+ const csv=[["local_date_time","time_utc","centre","family","action","detail"],...V.map(e=>[fmtStamp(e.at),e.at,e.centre,e.family,e.action,e.detail])].map(r=>r.map(q).join(",")).join("\n");
+ const d=new Date(),day=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+ const a=el("a",{href:URL.createObjectURL(new Blob([csv],{type:"text/csv"})),download:`elimu-activity-${day}.csv`});document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000)};
+window.Elimu={activity:{log,migrate,forFamily,entries:()=>A.entries.slice()},fmtStamp};
+render();
+})();
+</script>
+<script>
+/* Family follow-up */
+"use strict";
+(()=>{
+const E=window.Elimu,KEY="elimu.retention.v1",SKEY="elimu.retention.settings.v1",FEES="elimu.fees.v1",$=id=>document.getElementById(id);
+const el=(t,a={},...k)=>{const e=document.createElement(t);for(const[x,y]of Object.entries(a))if(y!==null)e.setAttribute(x,y);e.append(...k);return e};
+const kes=x=>"KES "+new Intl.NumberFormat("en-KE",{maximumFractionDigits:0}).format(Math.round(x));
+const COLS=["student","parent","phone","centre","last_attended","sessions_last_4_weeks","usual_sessions_per_4_weeks","open_complaint","complaint_date"];
+const FIELD={student:"student",parent:"parent",phone:"phone",centre:"centre",last_attended:"last",sessions_last_4_weeks:"s4",usual_sessions_per_4_weeks:"usual",open_complaint:"complaint",complaint_date:"cdate"};
+const NOANS="No answer / try again",BACK="Coming back next term",LEAVING="Not returning",RESOLVED="Complaint resolved",FUDATE="Follow-up date set";
+const contacted=o=>!!o&&o!==NOANS&&o!==FUDATE;
+const OUTCOMES=["Spoke to parent",NOANS,BACK,LEAVING,RESOLVED,"Other"];
+const DEF={absentDays:14,dropPct:50,complaintDays:7};
+const blank=()=>({families:[],log:[]});
+let S=blank();try{const v=JSON.parse(localStorage.getItem(KEY));if(v&&Array.isArray(v.families))S={...blank(),...v,log:Array.isArray(v.log)?v.log:[]}}catch{}
+let C={...DEF,centre:"all",termEnd:""};try{const v=JSON.parse(localStorage.getItem(SKEY));if(v&&typeof v==="object"){for(const k of Object.keys(DEF)){const n=Number(v[k]);if(Number.isFinite(n)&&n>=0)C[k]=n}if(typeof v.centre==="string")C.centre=v.centre;if(typeof v.termEnd==="string"&&/^\d{4}-\d{2}-\d{2}$/.test(v.termEnd))C.termEnd=v.termEnd}}catch{}
+function storeWarn(ok){const m=$("store-msg");m.hidden=ok;m.textContent=ok?"":"This browser would not save your changes (storage is full or blocked, for example in a private window). Download the CSVs to keep your work."}
+const save=()=>{let ok=true;try{localStorage.setItem(KEY,JSON.stringify(S))}catch{ok=false}storeWarn(ok);return ok};
+const saveC=()=>{try{localStorage.setItem(SKEY,JSON.stringify(C))}catch{storeWarn(false)}};
+const rid=()=>Math.random().toString(36).slice(2,10);
+const normPhone=s=>{const d=String(s||"").replace(/\D/g,"");if(/^254\d{9}$/.test(d))return d;if(/^0\d{9}$/.test(d))return"254"+d.slice(1);if(/^[17]\d{8}$/.test(d))return"254"+d;return d||""};
+const phoneDisp=p=>p?(p.startsWith("254")?"+"+p:p):"";
+const norm=s=>String(s||"").trim().replace(/\s+/g," ").toLowerCase();
+const fkey=(a,b)=>norm(a)+"|"+norm(b);
+const plural=(n,w,p=w+"s")=>`${n} ${n===1?w:p}`;
+const fams=n=>plural(n,"family","families");
+const named=(s,c)=>c?`${s} (${c})`:s;
+
+// ---------- dates (local calendar days, Kenya is day-first) ----------
+const pad=n=>String(n).padStart(2,"0");
+const iso=d=>d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
+const todayISO=()=>iso(new Date());
+const addDays=(s,n)=>{const d=new Date(s+"T00:00:00");d.setDate(d.getDate()+n);return iso(d)};
+const daysBetween=(a,b)=>Math.round((Date.parse(b+"T00:00:00Z")-Date.parse(a+"T00:00:00Z"))/864e5);
+const MON={jan:1,feb:2,mar:3,apr:4,may:5,jun:6,jul:7,aug:8,sep:9,oct:10,nov:11,dec:12};
+function parseDate(s){s=String(s||"").trim();if(!s)return"";let m,y,mo,d;
+ if(m=s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})(?:[T\s].*)?$/)){y=+m[1];mo=+m[2];d=+m[3]}
+ else if(m=s.match(/^(\d{1,2})[\/.\-](\d{1,2})[\/.\-](\d{2}|\d{4})$/)){d=+m[1];mo=+m[2];y=+m[3];if(y<100)y+=2000}
+ else if(m=s.match(/^(\d{1,2})[\s\-]([A-Za-z]{3,9})\.?[\s\-,]+(\d{4})$/)){d=+m[1];mo=MON[m[2].slice(0,3).toLowerCase()];y=+m[3]}
+ else return null;
+ if(!mo)return null;const t=new Date(y,mo-1,d);if(t.getFullYear()!==y||t.getMonth()!==mo-1||t.getDate()!==d)return null;return iso(t)}
+const fmtDate=s=>s?new Date(s+"T00:00:00").toLocaleDateString("en-KE",{day:"numeric",month:"short",year:"numeric"}):"";
+const fmtStamp=t=>new Date(t).toLocaleString("en-KE",{day:"numeric",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit",timeZoneName:"short"});
+
+// ---------- fee tracker (read-only) ----------
+// m: balance by student+centre. m.byName: balance by student name alone, only when that name is unique in the fee list (for families with no centre set).
+function feeBalances(){const m=new Map(),seen=new Map();m.byName=new Map();try{const v=JSON.parse(localStorage.getItem(FEES));if(!v||!Array.isArray(v.students))return m;
+ const paid=new Map();for(const p of Array.isArray(v.payments)?v.payments:[])if(p&&p.sid)paid.set(p.sid,(paid.get(p.sid)||0)+(Number(p.amount)||0));
+ for(const s of v.students){if(!s||!s.student||!s.centre)continue;const bal=(Number(s.fee)||0)-(Number(s.opening)||0)-(paid.get(s.id)||0),n=norm(s.student);seen.set(n,(seen.get(n)||0)+1);if(bal>0){m.set(fkey(s.student,s.centre),bal);m.byName.set(n,bal)}}
+ for(const[n,c]of seen)if(c>1)m.byName.delete(n)}catch{}return m}
+
+// ---------- flags ----------
+const hasComplaint=f=>!!f.complaint&&norm(f.complaint)!==norm(f.resolved);
+function assess(f,fees,today){const R=[],cur=f.cur||{};let absent=null;
+ if(f.last){absent=Math.max(0,daysBetween(f.last,today));if(absent>=C.absentDays)R.push({k:"absent",c:"red",t:`Not attended for ${plural(absent,"day")}`})}
+ if(!R.length&&f.s4!=null&&f.usual!=null&&f.usual>0&&f.s4<f.usual*C.dropPct/100)R.push({k:"drop",c:"amber",t:`Attendance dropping (${f.s4} of usual ${f.usual} sessions)`});
+ // Absence reported from a dropped-in note: stays until a later attendance date is imported.
+ if(f.gapDate&&(!f.last||f.last<=f.gapDate))R.push({k:"gap",c:"red",t:"Absence reported "+fmtDate(f.gapDate)});
+ if(hasComplaint(f)){const age=f.cdate?Math.max(0,daysBetween(f.cdate,today)):null;R.push({k:"complaint",c:f.urgent||age===null||age>C.complaintDays?"red":"amber",t:(age===null?"Open complaint":age===0?"Complaint opened today":`Complaint open ${plural(age,"day")}`)+(f.urgent?", urgent":"")})}
+ const bal=fees.get(fkey(f.student,f.centre))||(f.centre?0:fees.byName.get(norm(f.student))||0),done=cur.done||"";
+ const due=!done&&!!cur.nd&&cur.nd<=today,overdue=!done&&!!cur.nd&&cur.nd<today,flagged=R.length>0;
+ return{f,R,bal,absent,flagged,due,overdue,done,onList:!done&&((flagged&&!cur.outcome)||due),rank:R.some(r=>r.c==="red")||overdue?0:flagged?1:2}}
+function suggest(a){const f=a.f,cur=f.cur||{},k=new Set(a.R.map(r=>r.k));let t;
+ if(a.due&&cur.outcome===NOANS)t=`Try again: no answer on ${fmtDate(iso(new Date(cur.at)))}. If there is still no answer, send an SMS asking when is a good time to call.`;
+ else if(a.due&&cur.next)t=`Planned: ${cur.next}.`;
+ else if(k.has("complaint"))t=(f.urgent?"Call today. ":"")+"Call about the complaint and agree what will be fixed before next term.";
+ else if(k.has("absent")||k.has("gap"))t="Call the parent: ask how things are and whether anything is stopping them coming back.";
+ else if(k.has("drop"))t="Check in with the parent: ask whether the timetable, subjects or tutor still suit them.";
+ else t="Follow-up due: check in with the parent.";
+ if(a.bal>0&&(a.flagged||a.due))t+=" Fees are outstanding: if cost is the worry, put them in touch with the fee office.";
+ return t}
+const reasonsText=a=>[...a.R.map(r=>r.t+(r.k==="complaint"?": "+a.f.complaint:"")),...(a.bal>0?["Fee balance "+kes(a.bal)]:[]),...(a.overdue?["Follow-up overdue since "+fmtDate(a.f.cur.nd)]:a.due?["Follow-up due today"]:[])].join("; ");
+
+// ---------- log ----------
+// Everything goes to the shared, timestamped activity trail (elimu.activity.v1). The old per-tool log (S.log) is copied in once and left as it was.
+function addLog(action,detail,f){E.activity.log({action,detail,family:f?f.student:"",centre:f?f.centre:"",src:"follow-up"})}
+E.activity.migrate("follow-up",(Array.isArray(S.log)?S.log:[]).filter(x=>x&&x.at).map(x=>{const m=/^(.+?) \(([^()]+)\): /.exec(x.t||"");return{at:x.at,action:"Earlier log entry",detail:x.t,family:m?m[1]:"",centre:m?m[2]:"",src:"follow-up"}}));
+
+// ---------- import ----------
+function parseTable(text){const d=(text.split(/\r?\n/,1)[0]||"").includes("\t")?"\t":",";const out=[];let row=[],cur="",q=false;
+ for(let i=0;i<text.length;i++){const ch=text[i];
+  if(q){if(ch==='"'&&text[i+1]==='"'){cur+='"';i++}else if(ch==='"')q=false;else cur+=ch}
+  else if(ch==='"')q=true;else if(ch===d){row.push(cur);cur=""}
+  else if(ch==="\n"||ch==="\r"){if(ch==="\r"&&text[i+1]==="\n")i++;row.push(cur);cur="";if(row.some(x=>x.trim()))out.push(row);row=[]}else cur+=ch}
+ row.push(cur);if(row.some(x=>x.trim()))out.push(row);return out}
+// o: raw values keyed by column name. Returns {row} or {err}.
+function cleanRow(o,label,today){const name=(o.student||"").trim();const who=name?`${label} (${name})`:label;
+ if(!name)return{err:`${label}: student is required.`};
+ const r={student:name.slice(0,80),centre:(o.centre||"").trim().slice(0,40),parent:(o.parent||"").trim().slice(0,80),phone:normPhone(o.phone),complaint:(o.open_complaint||"").trim().slice(0,300)};
+ const last=parseDate(o.last_attended);
+ if(!last)return{err:`${who}: last_attended ${last===""?"is missing":`"${String(o.last_attended).trim().slice(0,20)}" is not a date`}. Use YYYY-MM-DD or DD/MM/YYYY.`};
+ if(last>today)return{err:`${who}: last_attended ${fmtDate(last)} is after today. Dates are read day first (DD/MM/YYYY).`};
+ r.last=last;
+ const cd=parseDate(o.complaint_date);if(cd===null)return{err:`${who}: complaint_date "${String(o.complaint_date).trim().slice(0,20)}" is not a date. Use YYYY-MM-DD or DD/MM/YYYY.`};
+ if(cd>today)return{err:`${who}: complaint_date ${fmtDate(cd)} is after today. Dates are read day first (DD/MM/YYYY).`};
+ r.cdate=cd;
+ for(const[c,k]of[["sessions_last_4_weeks","s4"],["usual_sessions_per_4_weeks","usual"]]){const v=String(o[c]??"").trim();
+  if(!v){r[k]=null;continue}const n=Number(v);if(!Number.isFinite(n)||n<0)return{err:`${who}: ${c} must be a number of sessions (0 or more).`};r[k]=n}
+ return{row:r}}
+function upsert(rows,present){let added=0,upd=0,newC=0;const fields=new Set([...present].map(c=>FIELD[c]).filter(Boolean));
+ for(const r of rows){let ex=S.families.find(f=>fkey(f.student,f.centre)===fkey(r.student,r.centre));
+  // A family first added without a centre takes the centre the first time one is given.
+  if(!ex&&r.centre){ex=S.families.find(f=>!f.centre&&norm(f.student)===norm(r.student));if(ex)ex.centre=r.centre}
+  if(!ex){S.families.push({id:rid(),student:r.student,centre:r.centre,parent:r.parent,phone:r.phone,last:r.last,s4:r.s4,usual:r.usual,complaint:r.complaint,cdate:r.cdate,resolved:"",cur:null,history:[],added:new Date().toISOString()});added++;if(r.complaint)addLog("Complaint opened",r.complaint,r);continue}
+  const before=ex.complaint;
+  for(const k of fields)if(k!=="student"&&k!=="centre")ex[k]=r[k];
+  // A different complaint from the one on file (and not the one already resolved) is a new issue: put the family back on the list.
+  if(!ex.complaint)ex.resolved="";
+  if(ex.complaint&&norm(ex.complaint)!==norm(before)&&hasComplaint(ex)){newC++;ex.urgent=false;if(ex.cur){ex.cur=null}addLog("Complaint opened",ex.complaint,ex)}
+  upd++}
+ return{added,upd,newC}}
+$("imp-form").onsubmit=e=>{e.preventDefault();const m=$("imp-msg");m.className="msg warn";
+ const t=parseTable($("imp-in").value);if(t.length<2){m.textContent="Paste a header row plus at least one family.";return}
+ const h=t[0].map(x=>x.trim().toLowerCase().replace(/[\s-]+/g,"_").replace(/^center$/,"centre")),need=["student","last_attended"].filter(k=>!h.includes(k));
+ if(need.length){m.textContent="Missing columns: "+need.join(", ")+". Use “Copy header row” for the exact names.";return}
+ const today=todayISO(),rows=[],errs=[];
+ for(let i=1;i<t.length;i++){const o={};h.forEach((k,j)=>o[k]=(t[i][j]??""));const c=cleanRow(o,`Row ${i+1}`,today);
+  if(c.err){errs.push(c.err);if(errs.length>=5)break}else rows.push(c.row)}
+ if(errs.length){m.textContent="Nothing imported. Please fix: "+errs.join(" ");return}
+ const r=upsert(rows,new Set(h.filter(k=>COLS.includes(k))));
+ const txt=`Imported ${fams(rows.length)} (${r.added} new, ${r.upd} updated${r.newC?`, ${r.newC} with a new complaint put back on the list`:""}).`;
+ addLog("Families imported",txt);save();render();if(E.intake)E.intake.refresh();$("imp-in").value="";m.className="msg";m.textContent=txt};
+$("hdr").onclick=async()=>{const h=COLS.join("\t");try{await navigator.clipboard.writeText(h);$("imp-msg").className="msg";$("imp-msg").textContent="Header row copied. Paste it as the first row of your spreadsheet."}catch{$("imp-in").value=h}};
+$("add-form").onsubmit=e=>{e.preventDefault();const m=$("add-msg");m.className="msg warn";
+ const o={student:$("a-student").value,centre:$("a-centre").value,parent:$("a-parent").value,phone:$("a-phone").value,last_attended:$("a-last").value,open_complaint:$("a-complaint").value,complaint_date:$("a-cdate").value};
+ const c=cleanRow(o,"This family",todayISO());if(c.err){m.textContent=c.err;return}
+ const present=new Set(["student","centre","last_attended",...Object.keys(o).filter(k=>String(o[k]).trim())]);
+ const r=upsert([c.row],present);const txt=`${r.added?"Added":"Updated"} ${named(c.row.student,c.row.centre)} by hand.`;
+ addLog(r.added?"Family added":"Family updated","Entered by hand.",c.row);save();render();for(const id of["a-student","a-parent","a-phone","a-last","a-complaint","a-cdate"])$(id).value="";m.className="msg";m.textContent=txt};
+
+// ---------- record a follow-up ----------
+// With no date given, a family comes back onto the list tomorrow after "No answer" and in 7 days after anything else, so nobody is forgotten. Coming back / Not returning close them for the term.
+const defaultNd=o=>o===BACK||o===LEAVING?"":addDays(todayISO(),o===NOANS?1:7);
+function record(id,o){const f=S.families.find(x=>x.id===id);if(!f)return false;const at=new Date().toISOString();
+ const nd=o.nd||defaultNd(o.outcome);
+ const done=o.outcome===BACK?"back":o.outcome===LEAVING?"leaving":"";
+ if(!Array.isArray(f.history))f.history=[];
+ f.history.push({at,outcome:o.outcome,note:o.note||"",next:o.next||"",nd});
+ f.cur={outcome:o.outcome,at,note:o.note||"",next:o.next||"",nd:done?"":nd,done};
+ addLog("Outcome logged",`${o.outcome}.${o.note?" Note: "+o.note+".":""}${!done&&(o.next||nd)?` Next: ${o.next||"follow up"}${nd?" by "+fmtDate(nd):""}.`:""}`,f);
+ if(o.outcome===RESOLVED&&f.complaint){f.resolved=f.complaint;f.urgent=false;addLog("Complaint closed",f.complaint,f)}
+ save();return f.cur}
+
+// ---------- render ----------
+const tile=(c,l,v,n)=>{const d=el("div",{class:"tile "+c},el("div",{class:"tile-label"},l),el("div",{class:"tile-value"},String(v)));if(n)d.append(el("div",{class:"hint"},n));return d};
+const histLine=h=>`${fmtStamp(h.at)}: ${h.outcome}.${h.note?" "+h.note+(/[.!?]$/.test(h.note)?"":"."):""}${h.next||h.nd?` Next: ${h.next||"follow up"}${h.nd?" by "+fmtDate(h.nd):""}.`:""}`;
+function card(a){const f=a.f,cur=f.cur||{};
+ const color=a.done==="back"?"green":a.R.some(r=>r.c==="red")||a.overdue?"red":a.R.length||a.due?"amber":"";
+ const contact=el("div",{style:"font-size:14px"},f.parent||el("span",{class:"muted"},"Parent not listed"));
+ if(f.phone)contact.append(" · ",el("a",{href:"tel:"+phoneDisp(f.phone),class:"num","aria-label":`Call ${f.parent||"parent"} on ${phoneDisp(f.phone)}`},phoneDisp(f.phone)));else contact.append(el("span",{class:"muted"}," · no phone"));
+ const chips=el("div",{class:"chips"},...a.R.map(r=>el("span",{class:"st "+r.c},r.t)));
+ if(a.bal>0)chips.append(el("a",{class:"st amber",href:"#fees",title:"Open the Fees tab"},"Fee balance "+kes(a.bal)));
+ if(a.overdue)chips.append(el("span",{class:"st red"},"Follow-up overdue since "+fmtDate(cur.nd)));else if(a.due)chips.append(el("span",{class:"st amber"},"Follow-up due today"));
+ if(a.done)chips.append(el("span",{class:"st "+(a.done==="back"?"green":"red")},a.done==="back"?"Coming back next term":"Not returning"));
+ if(!chips.childNodes.length)chips.append(el("span",{class:"st green"},"No flags now"));
+ const parts=[el("div",{class:"row",style:"justify-content:space-between;align-items:baseline"},el("span",{class:"who"},f.student),el("span",{class:"hint"},f.centre)),contact,chips];
+ if(hasComplaint(f))parts.push(el("div",{class:"quote"},el("strong",{},"Complaint: "),f.complaint));
+ parts.push(el("div",{class:"hint"},(f.last?`Last attended ${fmtDate(f.last)}`:"Last attended not recorded")+(f.s4!=null&&f.usual!=null?` · ${f.s4} of usual ${f.usual} sessions in the last 4 weeks`:"")));
+ if(cur.outcome)parts.push(el("div",{class:"hint"},`This term: ${cur.outcome} on ${fmtDate(iso(new Date(cur.at)))}${cur.next||cur.nd?` · next: ${cur.next||"follow up"}${cur.nd?" by "+fmtDate(cur.nd):""}`:""}`));
+ if(!a.done&&(a.onList||a.flagged))parts.push(el("p",{class:"next"},el("strong",{},"Next step: "),suggest(a)));
+ const recent=E.activity.forFamily(f.student,f.centre,3);
+ if(recent.length)parts.push(el("div",{class:"recent"},el("span",{class:"hint"},"Recent activity"),el("ul",{},...recent.map(x=>el("li",{},el("span",{class:"num"},fmtStamp(x.at)),` ${x.action}${x.detail?": "+x.detail.slice(0,140)+(x.detail.length>140?"…":""):""}`)))));
+ // record form
+ const fld=(l,i)=>el("label",{class:"field"},l,i);
+ const sel=el("select",{required:""},el("option",{value:""},"Choose…"),...OUTCOMES.map(o=>el("option",{value:o},o)));
+ const note=el("input",{type:"text",maxlength:"200",placeholder:"What did the parent say?"});
+ const next=el("input",{type:"text",maxlength:"120"});
+ const nd=el("input",{type:"date"});
+ const msg=el("p",{class:"msg",role:"status","aria-live":"polite"});
+ let ndTouched=false;nd.oninput=()=>{ndTouched=true};
+ sel.onchange=()=>{if(!ndTouched)nd.value=OUTCOMES.includes(sel.value)?defaultNd(sel.value):""};
+ const form=el("form",{class:"grid rec-form"},fld("Outcome",sel),fld("Note (optional)",note),fld("Next action (optional)",next),fld("Follow up again on",nd),el("div",{class:"row",style:"align-self:end"},el("button",{type:"submit",class:"primary"},"Save"),msg));
+ form.onsubmit=e=>{e.preventDefault();if(!OUTCOMES.includes(sel.value)){msg.className="msg warn";msg.textContent="Choose an outcome.";return}
+  const d=nd.value&&parseDate(nd.value);if(nd.value&&!d){msg.className="msg warn";msg.textContent="That date isn't valid.";return}
+  const c=record(f.id,{outcome:sel.value,note:note.value.trim().slice(0,200),next:next.value.trim().slice(0,120),nd:d||""});render();
+  $("list-msg").textContent=`Saved for ${f.student}: ${sel.value}.`+(c&&c.nd?` Off today's list, back on it ${c.nd<=todayISO()?"now":fmtDate(c.nd)}.`:c&&c.done?" Moved to done this term.":"");try{$("h-today").focus()}catch{}};
+ const rec=el("details",{},el("summary",{},a.onList?"Record what happened":"Record another follow-up"),form);
+ if(a.onList)rec.open=true;
+ const H=Array.isArray(f.history)?f.history:[];
+ const del=el("button",{type:"button",class:"ghost","aria-label":"Remove "+f.student+" and their history"},"Remove family");
+ del.onclick=()=>{if(!confirm(`Remove ${named(f.student,f.centre)} and their follow-up history from this browser?`))return;S.families=S.families.filter(x=>x.id!==f.id);addLog("Family removed","Removed with their follow-up history.",f);save();render()};
+ const hist=el("details",{},el("summary",{},`History (${H.length})`),H.length?el("ol",{class:"hist",reversed:""},...[...H].reverse().map(h=>el("li",{},histLine(h)))):el("p",{class:"hint",style:"margin:6px 0"},"No follow-ups recorded yet."),el("div",{style:"margin-top:6px"},del));
+ parts.push(rec,hist);
+ return el("article",{class:"card "+color,"aria-label":f.centre?`${f.student}, ${f.centre}`:f.student},...parts)}
+function compute(){const today=todayISO(),fees=feeBalances(),A=S.families.map(f=>assess(f,fees,today)),c=C.centre;
+ return{A,V:A.filter(a=>c==="all"||a.f.centre===c)}}
+const sortList=L=>L.sort((x,y)=>x.rank-y.rank||(y.absent??-1)-(x.absent??-1)||x.f.student.localeCompare(y.f.student));
+function render(){const{A,V}=compute(),has=S.families.length>0;
+ // Centre filter: only when at least one family has a centre. Families with no centre get their own option so nobody is hidden.
+ const cens=[...new Set(S.families.map(f=>f.centre).filter(Boolean))].sort((a,b)=>a.localeCompare(b)),noC=S.families.some(f=>!f.centre),opts=[...cens,...(cens.length&&noC?[""]:[])];
+ if(C.centre!=="all"&&!opts.includes(C.centre)){C.centre="all";saveC()}
+ const fc=$("f-centre");fc.replaceChildren(el("option",{value:"all"},"All centres"),...opts.map(c=>el("option",{value:c},c||"No centre set")));fc.value=C.centre;
+ $("centre-list").replaceChildren(...cens.map(c=>el("option",{value:c})));
+ $("filter-row").hidden=!cens.length;$("tiles").hidden=!has;$("centres-panel").hidden=!cens.length;
+ renderTerm();
+ const L=sortList(V.filter(a=>a.onList)),later=sortList(V.filter(a=>!a.onList&&!a.done&&a.f.cur&&a.f.cur.outcome)),done=V.filter(a=>a.done).sort((x,y)=>x.f.student.localeCompare(y.f.student));
+ const fu=V.filter(a=>a.f.cur&&a.f.cur.outcome),reached=fu.filter(a=>contacted(a.f.cur.outcome)).length,flg=V.filter(a=>a.flagged).length,ov=V.filter(a=>a.overdue).length;
+ const back=done.filter(a=>a.done==="back").length,leaving=done.length-back;
+ $("tiles").replaceChildren(tile("main","To follow up today",L.length,C.centre==="all"?"All centres":C.centre||"No centre set"),
+  tile(flg?"red":"","Families flagged",flg,`of ${fams(V.length)}`),
+  tile("","Followed up this term",fu.length,`${reached} reached a parent`),
+  tile(back?"green":"","Coming back",back,"next term"),
+  tile("","Not returning",leaving,leaving?"note why in their history":""),
+  tile(ov?"red":"","Overdue follow-ups",ov,ov?"next-action date has passed":"none overdue"));
+ $("h-today").textContent=L.length?`This morning: ${fams(L.length)} to contact`:"This morning: no families to contact";
+ $("today-list").replaceChildren(...L.map(card));
+ const em=$("today-empty");em.hidden=L.length>0;
+ if(!has){const go=el("button",{type:"button",class:"btn"},"Paste or add families");go.onclick=()=>{$("imp-in").focus()};
+  em.replaceChildren("No families yet. First step: paste your family list (or add one family by hand) under “Import families” below. ",go)}
+ else em.textContent="Nobody to follow up today. Families appear here when they stop attending, raise a complaint, or a follow-up date arrives.";
+ const okN=V.filter(a=>!a.flagged&&!a.onList&&!a.done&&!(a.f.cur&&a.f.cur.outcome)).length;
+ $("ok-note").textContent=has?`${fams(okN)} attending normally with no open complaint.`:"";
+ $("later-wrap").hidden=!later.length;$("later-sum").textContent=`Followed up, next step later (${later.length})`;$("later-list").replaceChildren(...later.map(card));
+ $("done-wrap").hidden=!done.length;$("done-sum").textContent=`Done this term (${done.length}): ${back} coming back, ${leaving} not returning`;$("done-list").replaceChildren(...done.map(card));
+ $("cen-body").replaceChildren(...opts.map(c=>{const g=A.filter(a=>a.f.centre===c),n=fn=>String(g.filter(fn).length);
+  return el("tr",{},el("th",{scope:"row",style:"font-weight:500"},c||"No centre set"),el("td",{class:"num"},String(g.length)),el("td",{class:"num"},n(a=>a.flagged)),el("td",{class:"num"},n(a=>a.onList)),
+   el("td",{class:"num"},n(a=>a.f.cur&&contacted(a.f.cur.outcome))),el("td",{class:"num"},n(a=>a.done==="back")),el("td",{class:"num"},n(a=>a.done==="leaving")))}));
+}
+$("f-centre").onchange=e=>{C.centre=e.target.value;saveC();render()};
+// ---------- term end ----------
+function renderTerm(){const i=$("term-end"),t=$("term-left");if(document.activeElement!==i)i.value=C.termEnd||"";
+ if(!C.termEnd){t.className="muted";t.style.fontWeight="400";t.textContent="Set the date to see how many days are left.";return}
+ const n=daysBetween(todayISO(),C.termEnd);t.className="";t.style.fontWeight="600";
+ t.textContent=n>1?`${n} days left in term`:n===1?"1 day left in term":n===0?"Term ends today":`Term ended ${plural(-n,"day")} ago`}
+$("term-end").onchange=e=>{const v=e.target.value,d=v?parseDate(v):"";if(v&&!d)return;C.termEnd=d||"";saveC();renderTerm()};
+
+// ---------- downloads ----------
+const q=v=>{let s=String(v??"");if(/^[=@\t\r]/.test(s)||/^[+-](?!\d)/.test(s))s="'"+s;return/[",\n\r]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s};
+function download(name,rows){const csv=rows.map(r=>r.map(q).join(",")).join("\n");const a=el("a",{href:URL.createObjectURL(new Blob([csv],{type:"text/csv"})),download:name});document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
+$("dl-list").onclick=()=>{const L=sortList(compute().V.filter(a=>a.onList));if(!L.length){$("list-msg").textContent="Nobody on the list to download.";return}
+ download(`elimu-follow-up-${C.centre==="all"?"all-centres":C.centre?C.centre.replace(/\W+/g,"-"):"no-centre"}-${todayISO()}.csv`,[["student","parent","phone","centre","last_attended","reasons","next_step","last_outcome","next_action","next_action_date"],
+  ...L.map(a=>{const f=a.f,cur=f.cur||{};return[f.student,f.parent,phoneDisp(f.phone),f.centre,f.last,reasonsText(a),suggest(a),cur.outcome||"",cur.next||"",cur.nd||""]})])};
+$("new-term").onclick=()=>{if(!S.families.length){$("term-msg").textContent="No families yet.";return}
+ if(!confirm("Start a new term? This term's outcomes and next actions are cleared so every flagged family is looked at again. Families, notes and history are kept."))return;
+ let n=0;for(const f of S.families)if(f.cur){f.cur=null;n++}
+ C.termEnd="";saveC();
+ addLog("New term started",`Family follow-up: cleared this term's follow-up status for ${fams(n)}. History kept.`);save();render();
+ $("term-msg").textContent="New term started. Re-import your latest attendance so the flags are up to date, and set the new term end date at the top."};
+
+// ---------- settings ----------
+const SET=[["s-absent","absentDays",1],["s-drop","dropPct",1],["s-complaint","complaintDays",0]];
+function syncSettings(){for(const[id,k]of SET)$(id).value=String(C[k])}
+for(const[id,k,min]of SET)$(id).onchange=e=>{const n=Math.round(Number(e.target.value));const m=$("set-msg");
+ if(!Number.isFinite(n)||n<min||(k==="dropPct"&&n>100)){m.className="msg warn";m.textContent="Enter a whole number"+(k==="dropPct"?" from 1 to 100.":` of ${min} or more.`);syncSettings();return}
+ C[k]=n;saveC();syncSettings();render();m.className="msg";m.textContent="Saved."};
+$("set-form").onsubmit=e=>e.preventDefault();
+$("s-reset").onclick=()=>{Object.assign(C,DEF);saveC();syncSettings();render();$("set-msg").className="msg";$("set-msg").textContent="Back to defaults: 14 days, 50%, 7 days."};
+// ---------- used by "Drop in notes" ----------
+const famCopy=f=>({id:f.id,student:f.student,centre:f.centre||"",parent:f.parent||"",phone:f.phone||""});
+const nameWords=s=>String(s||"").toLowerCase().replace(/[^a-z\s'-]/g," ").split(/\s+/).filter(w=>w.length>1);
+function famMatch(o){const P=normPhone(o.phone);let h;
+ if(P){h=S.families.filter(f=>f.phone===P);if(h.length===1)return{...famCopy(h[0]),how:"parent phone"}}
+ for(const nm of[o.student,o.name]){const w=nameWords(nm);if(w.length<2)continue;
+  h=S.families.filter(f=>{const pw=nameWords(f.parent),sw=nameWords(f.student);return w.filter(x=>pw.includes(x)).length>=2||w.filter(x=>sw.includes(x)).length>=2});
+  if(h.length===1)return{...famCopy(h[0]),how:"name"}}
+ return null}
+function ensureFamily(o){const student=String(o.student||"").trim().slice(0,80),centre=String(o.centre||"").trim().slice(0,40);if(!student)return null;
+ let f=S.families.find(x=>fkey(x.student,x.centre)===fkey(student,centre))||(centre?S.families.find(x=>!x.centre&&norm(x.student)===norm(student)):null);
+ if(f){if(!f.centre&&centre)f.centre=centre;if(!f.parent&&o.parent)f.parent=String(o.parent).trim().slice(0,80);if(!f.phone&&o.phone)f.phone=normPhone(o.phone);save();return f.id}
+ f={id:rid(),student,centre,parent:String(o.parent||"").trim().slice(0,80),phone:normPhone(o.phone),last:"",s4:null,usual:null,complaint:"",cdate:"",resolved:"",cur:null,history:[],added:new Date().toISOString()};
+ S.families.push(f);addLog("Family added",o.how||"Added to Family follow-up from Drop in notes.",f);save();render();return f.id}
+const famById=id=>S.families.find(x=>x.id===id);
+function openComplaint(id,text,urgent){const f=famById(id);if(!f)return false;
+ f.complaint=String(text).trim().slice(0,300);f.cdate=todayISO();f.resolved="";f.urgent=!!urgent;f.cur=null;
+ addLog("Complaint opened",(urgent?"Urgent. ":"")+f.complaint,f);save();render();return true}
+function reportAbsence(id,text){const f=famById(id);if(!f)return false;
+ f.gapDate=todayISO();f.gapNote=String(text).trim().slice(0,300);f.cur=null;
+ addLog("Attendance gap added",f.gapNote,f);save();render();return true}
+function setFollowUp(id,date,note){const f=famById(id),d=parseDate(date);if(!f||!d)return false;const at=new Date().toISOString(),n=String(note||"").trim().slice(0,200);
+ if(!Array.isArray(f.history))f.history=[];f.history.push({at,outcome:FUDATE,note:n,next:"",nd:d});
+ f.cur={outcome:FUDATE,at,note:n,next:"",nd:d,done:""};
+ addLog("Follow-up date set",`${fmtDate(d)}.${n?" "+n:""}`,f);save();render();return true}
+E.followUp={families:()=>S.families.map(famCopy),match:famMatch,ensureFamily,openComplaint,reportAbsence,setFollowUp,render};
+document.addEventListener("elimu:tabshown",e=>{if(e.detail==="follow-up")render()});
+syncSettings();render();
+})();
+</script>
+<script>
+/* Termly fee tracker */
+"use strict";
+(()=>{
+const E=window.Elimu,KEY="elimu.fees.v1",$=id=>document.getElementById(id);
+const act=(action,detail,s)=>E.activity.log({action,detail,family:s?s.student:"",centre:s?s.centre:"",src:"fees"});
+const el=(t,a={},...k)=>{const e=document.createElement(t);for(const[x,y]of Object.entries(a))if(y!==null)e.setAttribute(x,y);e.append(...k);return e};
+const kes=x=>"KES "+new Intl.NumberFormat("en-KE",{maximumFractionDigits:0}).format(Math.round(x));
+const COLS=["student","student_id","centre","parent","phone","term_fee","paid"];
+const blank=()=>({term:{name:"",due:"",paybill:""},students:[],payments:[],unmatched:[]});
+let S=blank();try{const v=JSON.parse(localStorage.getItem(KEY));if(v&&Array.isArray(v.students))S={...blank(),...v}}catch{}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch{}};
+const rid=()=>Math.random().toString(36).slice(2,10);
+const normPhone=s=>{const d=String(s||"").replace(/\D/g,"");if(/^254\d{9}$/.test(d))return d;if(/^0\d{9}$/.test(d))return"254"+d.slice(1);if(/^[17]\d{8}$/.test(d))return"254"+d;return d||""};
+const words=s=>String(s||"").toLowerCase().replace(/[^a-z\s'-]/g," ").split(/\s+/).filter(w=>w.length>1);
+const today=()=>{const d=new Date();d.setHours(0,0,0,0);return d};
+const paidOf=s=>s.opening+S.payments.filter(p=>p.sid===s.id).reduce((a,p)=>a+p.amount,0);
+function status(s){const paid=paidOf(s),bal=s.fee-paid,over=S.term.due&&new Date(S.term.due+"T00:00:00")<today();
+ if(bal<=0)return{k:"paid",c:"green",t:paid>s.fee?"Paid (credit "+kes(paid-s.fee)+")":"Paid",paid,bal};
+ if(over)return{k:"overdue",c:"red",t:paid>0?"Overdue, part-paid":"Overdue",paid,bal};
+ return{k:"owing",c:"amber",t:paid>0?"Part-paid":"Unpaid",paid,bal}}
+function reminder(s,st){const first=(s.parent||"").trim().split(/\s+/)[0];const due=S.term.due?new Date(S.term.due+"T00:00:00").toLocaleDateString("en-KE",{day:"numeric",month:"short"}):"";
+ return `Hello${first?" "+first:""}, this is Elimu Plus${s.centre?" "+s.centre:""}. ${s.student}'s ${S.term.name||"term"} fee balance is ${kes(st.bal)}${st.k==="overdue"?` (was due ${due})`:due?`, due ${due}`:""}.${S.term.paybill?` Pay via Paybill/Till ${S.term.paybill}${s.sid_ref?`, account ${s.sid_ref}`:""}.`:""} Thank you.`}
+
+// ---------- payment parsing and matching ----------
+function parsePay(line){const o={raw:line.slice(0,300)};let m;
+ if(m=line.match(/(?:ksh\.?|kes)\s?([\d,]+(?:\.\d{1,2})?)/i))o.amount=Number(m[1].replace(/,/g,""));
+ else if(m=line.match(/\b([\d,]{3,}(?:\.\d{1,2})?)\b/))o.amount=Number(m[1].replace(/,/g,""));
+ if(m=line.match(/\b(?=[A-Z0-9]*\d)(?=[A-Z0-9]*[A-Z])([A-Z0-9]{10})\b/))o.ref=m[1];
+ if(m=line.match(/(?:\+?254|\b0)\s?([17]\d{2})\s?(\d{3})\s?(\d{3})\b/))o.phone="254"+m[1]+m[2]+m[3];
+ if(m=line.match(/(?:account(?:\s*(?:no\.?|number))?|acc(?:\.|t)?(?:\s*no\.?)?|a\/c)\s*[:#.]?\s*([A-Za-z0-9-]{2,})/i))o.acct=m[1];
+ if(m=line.match(/\bfrom\s+([A-Za-z][A-Za-z'.-]+(?:\s+[A-Za-z][A-Za-z'.-]+){0,3}?)(?=\s+(?:\+?254|0[17])|\s+on\b|[,.]|\s*$)/i))o.name=m[1];
+ return o}
+function match(p){const c=S.students;let hits;
+ if(p.acct){hits=c.filter(s=>s.sid_ref&&s.sid_ref.toLowerCase()===p.acct.toLowerCase());if(hits.length===1)return{s:hits[0],how:"account number"}}
+ if(p.phone){hits=c.filter(s=>s.phone&&s.phone===p.phone);if(hits.length===1)return{s:hits[0],how:"parent phone"};if(hits.length>1)return{amb:hits,why:"this phone belongs to more than one student's parent"}}
+ if(p.name){const w=words(p.name);if(w.length>=2){hits=c.filter(s=>{const pw=words(s.parent),sw=words(s.student);return w.filter(x=>pw.includes(x)).length>=2||w.filter(x=>sw.includes(x)).length>=2});
+  if(hits.length===1)return{s:hits[0],how:"name"};if(hits.length>1)return{amb:hits,why:"the name matches more than one student"}}}
+ return{amb:[],why:"no student matched the account number, phone or name"}}
+$("fee-pay-form").onsubmit=e=>{e.preventDefault();const m=$("fee-pay-msg");m.className="msg";
+ const lines=$("fee-pay-in").value.split(/\r?\n/).map(s=>s.trim()).filter(Boolean);if(!lines.length){m.textContent="Paste at least one payment.";return}
+ // No student list yet: hand the notes to "Drop in notes" at the top, which works without one, instead of stopping here.
+ if(!S.students.length&&E.intake){E.intake.prefill(lines.join("\n"));$("fee-pay-in").value="";
+  m.textContent="No student list yet, so these were moved to “Drop in notes” at the top of the page. Press “Read notes” there to see what each one is and the next step. Loading the student list below lets payments match automatically.";return}
+ let ok=0,dup=0,bad=0,un=0;
+ for(const line of lines){const p=parsePay(line);
+  if(!(p.amount>0)){bad++;S.unmatched.push({id:rid(),...p,why:"no amount found"});continue}
+  if(p.ref&&(S.payments.some(x=>x.ref===p.ref)||S.unmatched.some(x=>x.ref===p.ref))){dup++;continue}
+  const r=match(p);if(r.s){S.payments.push({id:rid(),sid:r.s.id,amount:p.amount,ref:p.ref||"",raw:p.raw,how:r.how,at:new Date().toISOString()});ok++;act("Payment recorded",`${kes(p.amount)}${p.ref?", receipt "+p.ref:""}, matched by ${r.how}.`,r.s)}
+  else{S.unmatched.push({id:rid(),...p,why:r.why,cands:(r.amb||[]).map(s=>s.id)});un++}}
+ if(un||bad||dup)act("Payments pasted",`${lines.length} lines: ${ok} matched, ${un} need a student, ${dup} already counted, ${bad} with no amount.`);
+ save();render();$("fee-pay-in").value="";
+ m.textContent=`${ok} matched${un?`, ${un} need you to pick the student`:""}${dup?`, ${dup} skipped (receipt already counted)`:""}${bad?`, ${bad} with no amount`:""}.`};
+function renderUnmatched(){const box=$("fee-unmatched");
+ if(!S.unmatched.length){box.replaceChildren();return}
+ box.replaceChildren(el("div",{style:"font-weight:600;margin-bottom:6px"},`Needs a decision (${S.unmatched.length})`),...S.unmatched.map(u=>{
+  const sel=el("select",{"aria-label":"Assign payment to student",style:"width:auto;max-width:260px"},el("option",{value:""},"Choose student…"),
+   ...[...S.students].sort((a,b)=>(u.cands||[]).includes(b.id)-(u.cands||[]).includes(a.id)||a.student.localeCompare(b.student)).map(s=>el("option",{value:s.id},`${(u.cands||[]).includes(s.id)?"★ ":""}${s.student} (${s.centre})`)));
+  const amt=el("input",{type:"number",min:"0",step:"1",value:u.amount>0?String(u.amount):"","aria-label":"Amount in KES",style:"width:110px"});
+  const go=el("button",{type:"button",class:"btn"},"Assign"),drop=el("button",{type:"button",class:"ghost"},"Discard");
+  go.onclick=()=>{const a=Number(amt.value);if(!sel.value||!(a>0))return;S.payments.push({id:rid(),sid:sel.value,amount:a,ref:u.ref||"",raw:u.raw,how:"assigned by hand",at:new Date().toISOString()});S.unmatched=S.unmatched.filter(x=>x.id!==u.id);
+   const s=S.students.find(x=>x.id===sel.value);act("Matched to family","Payment assigned by hand: "+u.raw,s);act("Payment recorded",`${kes(a)}${u.ref?", receipt "+u.ref:""}, assigned by hand.`,s);save();render()};
+  drop.onclick=()=>{S.unmatched=S.unmatched.filter(x=>x.id!==u.id);act("Item dismissed","Unmatched payment discarded: "+u.raw);save();render()};
+  return el("div",{class:"panel",style:"padding:10px;background:var(--bg);margin-bottom:6px"},el("div",{class:"num",style:"font-size:13px;word-break:break-word"},u.raw),
+   el("div",{class:"hint",style:"margin:4px 0 6px"},"Not matched: "+u.why+"."),el("div",{class:"row"},sel,amt,go,drop))}))}
+
+// ---------- student list ----------
+function parseTable(text){const d=(text.split(/\r?\n/,1)[0]||"").includes("\t")?"\t":",";const out=[];let row=[],cur="",q=false;
+ for(let i=0;i<text.length;i++){const ch=text[i];
+  if(q){if(ch==='"'&&text[i+1]==='"'){cur+='"';i++}else if(ch==='"')q=false;else cur+=ch}
+  else if(ch==='"')q=true;else if(ch===d){row.push(cur);cur=""}
+  else if(ch==="\n"||ch==="\r"){if(ch==="\r"&&text[i+1]==="\n")i++;row.push(cur);cur="";if(row.some(x=>x.trim()))out.push(row);row=[]}else cur+=ch}
+ row.push(cur);if(row.some(x=>x.trim()))out.push(row);return out}
+$("fee-reg-form").onsubmit=e=>{e.preventDefault();const m=$("fee-reg-msg");m.className="msg warn";
+ const t=parseTable($("fee-reg-in").value);if(t.length<2){m.textContent="Paste a header row plus at least one student.";return}
+ const h=t[0].map(x=>x.trim().toLowerCase().replace(/[\s-]+/g,"_")),need=["student","centre","term_fee"].filter(k=>!h.includes(k));
+ if(need.length){m.textContent="Missing columns: "+need.join(", ")+". Use “Copy header row” for the exact names.";return}
+ const add=[];
+ for(let i=1;i<t.length;i++){const o={};h.forEach((k,j)=>o[k]=(t[i][j]??"").trim());
+  const fee=Number(String(o.term_fee).replace(/[^\d.]/g,"")),paid=o.paid?Number(String(o.paid).replace(/[^\d.]/g,"")):0;
+  if(!o.student||!o.centre){m.textContent=`Row ${i+1}: student and centre are required.`;return}
+  if(!(fee>0)){m.textContent=`Row ${i+1} (${o.student}): term_fee must be a number above 0.`;return}
+  if(!Number.isFinite(paid)||paid<0){m.textContent=`Row ${i+1} (${o.student}): paid must be 0 or more.`;return}
+  add.push({student:o.student.slice(0,80),sid_ref:(o.student_id||"").slice(0,30),centre:o.centre.slice(0,40),parent:(o.parent||"").slice(0,80),phone:normPhone(o.phone),fee,opening:paid})}
+ let upd=0;for(const a of add){const ex=S.students.find(s=>(a.sid_ref&&s.sid_ref===a.sid_ref)||(!a.sid_ref&&s.student.toLowerCase()===a.student.toLowerCase()&&s.centre.toLowerCase()===a.centre.toLowerCase()));
+  if(ex){Object.assign(ex,a);upd++}else S.students.push({id:rid(),...a})}
+ act("Students imported",`Imported ${add.length} student${add.length===1?"":"s"}${upd?` (${upd} updated)`:""}.`);
+ save();render();if(E.intake)E.intake.refresh();$("fee-reg-in").value="";m.className="msg";m.textContent=`Imported ${add.length} student${add.length===1?"":"s"}${upd?` (${upd} updated)`:""}.`};
+$("fee-hdr").onclick=async()=>{const h=COLS.join("\t");try{await navigator.clipboard.writeText(h);$("fee-reg-msg").className="msg";$("fee-reg-msg").textContent="Header row copied."}catch{$("fee-reg-in").value=h}};
+$("fee-export").onclick=()=>{if(!S.students.length)return;const q=v=>/[",\n]/.test(String(v))?'"'+String(v).replace(/"/g,'""')+'"':String(v);
+ const csv=["student,student_id,centre,parent,phone,term_fee,paid,balance,status",...S.students.map(s=>{const st=status(s);return[s.student,s.sid_ref,s.centre,s.parent,s.phone,s.fee,st.paid,Math.max(0,st.bal),st.t].map(q).join(",")})].join("\n");
+ const a=el("a",{href:URL.createObjectURL(new Blob([csv],{type:"text/csv"})),download:`elimu-fees-${(S.term.name||"term").replace(/\W+/g,"-")}.csv`});a.click();URL.revokeObjectURL(a.href)};
+$("fee-new-term").onclick=()=>{for(const s of S.students)s.opening=0;S.payments=[];S.unmatched=[];S.term={...S.term,name:"",due:""};act("New term started","Fees: payments cleared, students kept.");save();syncTerm();render();$("fee-reg-msg").className="msg";$("fee-reg-msg").textContent="New term started: payments cleared, students kept. Re-import to update fees."};
+
+// ---------- render ----------
+function render(){
+ const has=S.students.length>0,R=S.students.map(s=>({s,st:status(s)}));
+ $("fee-tiles").hidden=!has;$("fee-centres-panel").hidden=!has;$("fee-stu-empty").hidden=has;
+ const exp=R.reduce((a,x)=>a+x.s.fee,0),col=R.reduce((a,x)=>a+Math.min(x.st.paid,x.s.fee),0),out=exp-col,od=R.filter(x=>x.st.k==="overdue");
+ const tile=(c,l,v,n)=>{const d=el("div",{class:"tile "+c},el("div",{class:"tile-label"},l),el("div",{class:"tile-value"},v));if(n)d.append(el("div",{class:"hint"},n));return d};
+ $("fee-tiles").replaceChildren(tile("main","Expected this term",kes(exp),`${R.length} students`),tile("green","Collected",kes(col),exp?Math.round(col/exp*100)+"% of expected":""),
+  tile("","Outstanding",kes(out),`${R.filter(x=>x.st.k!=="paid").length} students owing`),tile(od.length?"red":"","Overdue",String(od.length),od.length?kes(od.reduce((a,x)=>a+x.st.bal,0))+" overdue":S.term.due?"None overdue":"Set a due date to track overdue"));
+ const cens=[...new Set(S.students.map(s=>s.centre))].sort();
+ $("fee-cen-body").replaceChildren(...cens.map(c=>{const g=R.filter(x=>x.s.centre===c),e=g.reduce((a,x)=>a+x.s.fee,0),k=g.reduce((a,x)=>a+Math.min(x.st.paid,x.s.fee),0),o=g.filter(x=>x.st.k==="overdue").length;
+  return el("tr",{},el("th",{scope:"row",style:"font-weight:500"},c),el("td",{class:"num"},String(g.length)),el("td",{class:"num"},kes(e)),el("td",{class:"num"},kes(k)),el("td",{class:"num"},kes(e-k)),el("td",{class:"num"},e?Math.round(k/e*100)+"%":"-"),el("td",{class:"num"},String(o)))}));
+ const fc=$("fee-f-centre"),cur=fc.value||"all";fc.replaceChildren(el("option",{value:"all"},"All centres"),...cens.map(c=>el("option",{value:c},c)));fc.value=cens.includes(cur)?cur:"all";
+ const V=visible(R);
+ $("fee-stu-body").replaceChildren(...V.sort((a,b)=>({overdue:0,owing:1,paid:2}[a.st.k]-{overdue:0,owing:1,paid:2}[b.st.k])||b.st.bal-a.st.bal).map(({s,st})=>{
+  const cp=el("button",{type:"button",class:"btn"},"Copy");cp.onclick=async()=>{const t=reminder(s,st);try{await navigator.clipboard.writeText(t);cp.textContent="Copied";act("Reminder copied",t,s)}catch{cp.textContent="Copy failed"}};
+  const del=el("button",{type:"button",class:"ghost","aria-label":"Remove "+s.student},"Remove");del.onclick=()=>{S.students=S.students.filter(x=>x.id!==s.id);S.payments=S.payments.filter(p=>p.sid!==s.id);act("Student removed","Removed from the fee list with their payments.",s);save();render()};
+  const pays=S.payments.filter(p=>p.sid===s.id);
+  const recent=E.activity.forFamily(s.student,s.centre,3);
+  return el("tr",{},el("th",{scope:"row",style:"font-weight:500"},s.student,s.sid_ref?el("div",{class:"hint"},"ID "+s.sid_ref):"",recent.length?el("ul",{class:"recent","aria-label":"Recent activity"},...recent.map(x=>el("li",{},E.fmtStamp(x.at)+" "+x.action))):""),el("td",{},s.centre),
+   el("td",{},s.parent||el("span",{class:"muted"},"-"),s.phone?el("div",{class:"hint num"},"+"+s.phone):""),
+   el("td",{class:"num"},kes(s.fee)),el("td",{class:"num",title:pays.map(p=>`${kes(p.amount)} ${p.ref} (matched by ${p.how})`).join("\n")},kes(st.paid),pays.length?el("div",{class:"hint"},`${pays.length} payment${pays.length===1?"":"s"}`):""),
+   el("td",{class:"num"},kes(Math.max(0,st.bal))),el("td",{},el("span",{class:"st "+st.c},st.t)),el("td",{},st.k==="paid"?el("span",{class:"muted"},"-"):cp),el("td",{},del))}));
+ renderUnmatched()}
+function visible(R){const c=$("fee-f-centre").value||"all",f=$("fee-f-status").value;return R.filter(x=>(c==="all"||x.s.centre===c)&&(f==="all"||(f==="owing"?x.st.k!=="paid":x.st.k===f)))}
+$("fee-f-centre").onchange=render;$("fee-f-status").onchange=render;
+$("fee-copy-rem").onclick=async()=>{const V=visible(S.students.map(s=>({s,st:status(s)}))).filter(x=>x.st.k!=="paid"),m=$("fee-rem-msg");
+ if(!V.length){m.textContent="Nobody in this list owes anything.";return}
+ const txt=V.map(x=>`${x.s.phone?"+"+x.s.phone:"(no phone)"}\t${reminder(x.s,x.st)}`).join("\n");
+ try{await navigator.clipboard.writeText(txt);m.textContent=`Copied ${V.length} reminder${V.length===1?"":"s"}, one per line with the phone number first, ready for a bulk SMS tool.`;act("Reminders copied",`${V.length} reminder${V.length===1?"":"s"} copied for a bulk SMS tool.`)}catch{m.textContent="Couldn't copy to the clipboard."}};
+function syncTerm(){$("fee-t-name").value=S.term.name||"";$("fee-t-due").value=S.term.due||"";$("fee-t-paybill").value=S.term.paybill||""}
+for(const[id,k]of[["fee-t-name","name"],["fee-t-due","due"],["fee-t-paybill","paybill"]])$(id).oninput=e=>{S.term[k]=e.target.value;save();render()};
+// ---------- used by "Drop in notes" ----------
+const stuCopy=s=>({id:s.id,student:s.student,centre:s.centre,parent:s.parent||"",phone:s.phone||"",sid_ref:s.sid_ref||""});
+function recordPayment(o){const s=S.students.find(x=>x.id===o.sid),a=Number(o.amount);if(!s||!(a>0))return{err:"no student or amount"};
+ if(o.ref&&S.payments.some(x=>x.ref===o.ref))return{dup:true};
+ if(o.ref)S.unmatched=S.unmatched.filter(x=>x.ref!==o.ref);
+ S.payments.push({id:rid(),sid:s.id,amount:a,ref:o.ref||"",raw:String(o.raw||"").slice(0,300),how:o.how||"Drop in notes",at:new Date().toISOString()});
+ act("Payment recorded",`${kes(a)}${o.ref?", receipt "+o.ref:""}, from Drop in notes (${o.how||"matched"}).`,s);save();render();return{ok:true}}
+function addStudent(o){const a={student:String(o.student||"").trim().slice(0,80),sid_ref:String(o.sid_ref||"").trim().slice(0,30),centre:String(o.centre||"").trim().slice(0,40),parent:String(o.parent||"").trim().slice(0,80),phone:normPhone(o.phone),fee:Number(o.fee)};
+ if(!a.student||!a.centre||!(a.fee>0))return null;
+ const ex=S.students.find(s=>(a.sid_ref&&s.sid_ref===a.sid_ref)||(!a.sid_ref&&s.student.toLowerCase()===a.student.toLowerCase()&&s.centre.toLowerCase()===a.centre.toLowerCase()));
+ if(ex){for(const k of["sid_ref","parent","phone"])if(!ex[k]&&a[k])ex[k]=a[k];save();render();return ex.id}
+ const s={id:rid(),...a,opening:0};S.students.push(s);act("Family added",`Added to the fee list from Drop in notes, term fee ${kes(a.fee)}.`,s);save();render();return s.id}
+function reminderFor(sid){const s=S.students.find(x=>x.id===sid);return s?reminder(s,status(s)):""}
+// A draft for a family not in the fee list yet, in the same words as the fee tracker's reminders.
+function reminderDraft(o){const s={parent:o.parent||"",centre:o.centre||"",student:o.student||"Your child",sid_ref:o.sid_ref||""},a=Number(o.amount)||0;
+ if(a>0)return reminder(s,{bal:a,k:o.overdue&&S.term.due?"overdue":"owing"});
+ const first=s.parent.trim().split(/\s+/)[0];
+ return `Hello${first?" "+first:""}, this is Elimu Plus${s.centre?" "+s.centre:""}. ${s.student}'s ${S.term.name||"term"} fee${o.invoice?` (invoice ${o.invoice})`:""} is overdue.${S.term.paybill?` Pay via Paybill/Till ${S.term.paybill}${s.sid_ref?`, account ${s.sid_ref}`:""}.`:""} Thank you.`}
+E.fees={count:()=>S.students.length,students:()=>S.students.map(stuCopy),match:p=>{const r=match(p);return r.s?{s:stuCopy(r.s),how:r.how}:{amb:(r.amb||[]).map(stuCopy),why:r.why}},
+ recordPayment,addStudent,reminderFor,reminderDraft,render,termName:()=>S.term.name||""};
+syncTerm();render();
+})();
+</script>
+<script>
+/* Drop in notes: classify pasted notes, suggest one next step, keep an inbox (elimu.inbox.v1) */
+"use strict";
+(()=>{
+const E=window.Elimu,KEY="elimu.inbox.v1",API="/api/elimu-intake",$=id=>document.getElementById(id);
+const el=(t,a={},...k)=>{const e=document.createElement(t);for(const[x,y]of Object.entries(a))if(y!==null)e.setAttribute(x,y);e.append(...k);return e};
+const kes=x=>"KES "+new Intl.NumberFormat("en-KE",{maximumFractionDigits:0}).format(Math.round(x));
+const KIND={payment:"Payment",overdue:"Overdue fee",complaint:"Complaint",absence:"Absence",other:"Other note"};
+const rid=()=>Math.random().toString(36).slice(2,10);
+const pad=n=>String(n).padStart(2,"0"),iso=d=>d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate()),todayISO=()=>iso(new Date());
+const addDays=(s,n)=>{const d=new Date(s+"T00:00:00");d.setDate(d.getDate()+n);return iso(d)};
+const MON={jan:1,feb:2,mar:3,apr:4,may:5,jun:6,jul:7,aug:8,sep:9,oct:10,nov:11,dec:12};
+function parseDate(s){s=String(s||"").trim();if(!s)return"";let m,y,mo,d;
+ if(m=s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/)){y=+m[1];mo=+m[2];d=+m[3]}
+ else if(m=s.match(/^(\d{1,2})[\/.\-](\d{1,2})[\/.\-](\d{2}|\d{4})$/)){d=+m[1];mo=+m[2];y=+m[3];if(y<100)y+=2000}
+ else if(m=s.match(/^(\d{1,2})\s+([A-Za-z]{3,9})\.?,?\s+(\d{4})$/)){d=+m[1];mo=MON[m[2].slice(0,3).toLowerCase()];y=+m[3]}
+ else return null;
+ if(!mo)return null;const t=new Date(y,mo-1,d);if(t.getFullYear()!==y||t.getMonth()!==mo-1||t.getDate()!==d)return null;return iso(t)}
+const fmtDate=s=>s?new Date(s+"T00:00:00").toLocaleDateString("en-KE",{day:"numeric",month:"short",year:"numeric"}):"";
+const normPhone=s=>{const d=String(s||"").replace(/\D/g,"");if(/^254\d{9}$/.test(d))return d;if(/^0\d{9}$/.test(d))return"254"+d.slice(1);if(/^[17]\d{8}$/.test(d))return"254"+d;return d||""};
+const titleCase=s=>s===s.toUpperCase()?s.toLowerCase().replace(/(^|[\s'-])([a-z])/g,(_,a,b)=>a+b.toUpperCase()):s;
+
+let S={items:[]};try{const v=JSON.parse(localStorage.getItem(KEY));if(v&&Array.isArray(v.items))S={items:v.items.filter(x=>x&&x.id&&x.text)}}catch{}
+function save(){const open=S.items.filter(i=>i.status==="open"),rest=S.items.filter(i=>i.status!=="open");if(S.items.length>500)S.items=[...rest.slice(-Math.max(0,500-open.length)),...open].sort((a,b)=>a.at<b.at?-1:a.at>b.at?1:0);
+ try{localStorage.setItem(KEY,JSON.stringify(S))}catch{const m=$("in-msg");m.className="msg warn";m.textContent="This browser would not save the inbox (storage is full or blocked, for example in a private window)."}}
+const act=(action,detail,it)=>E.activity.log({action,detail,family:it&&it.match?it.match.student:"",centre:it&&it.match?it.match.centre:"",src:"inbox"});
+
+// ---------- reading notes ----------
+// One note per line, or blank-line separated blocks (each block is one note).
+function splitNotes(text){const t=String(text||"").replace(/\r\n?/g,"\n").trim();if(!t)return[];
+ const parts=/\n[ \t]*\n/.test(t)?t.split(/\n[ \t]*\n+/).map(p=>p.replace(/\s*\n\s*/g," ")):t.split("\n");
+ return parts.map(s=>s.trim()).filter(Boolean).map(s=>s.slice(0,500))}
+const PAY=/\b[A-Z0-9]{8,12}\s+confirmed\b|\breceived\s+(?:from\b|(?:ksh|kes)\b)|\byou\s+have\s+received\b|\bpayment\s+(?:of\s+)?(?:ksh|kes)\.?\s?[\d,]+(?:\.\d+)?\s+(?:has\s+been\s+)?received|\bhas\s+paid\b|\bpaid\s+(?:ksh|kes)\b|\bm-?pesa\b.*\b(?:ksh|kes)\b/i;
+const OVERDUE=/\boverdue\b|\bunpaid\b|\barrears?\b|\bINV[-\s#]?\d|\binvoice\b|\boutstanding\b|\bnot\s+(?:yet\s+)?paid\b|\bfee\s+balance\b|\bbalance\s+(?:due|of|owing|remaining|outstanding)\b|\bwill\s+pay\b|\bpay\s+(?:later|next\s+week|by)\b/i;
+const COMPLAINT=/complain|unhappy|not\s+happy|disappoint|upset|angry|frustrat|concern|not\s+improv|getting\s+worse|\brude\b|poor\s+(?:teaching|service|results)|moving\s+(?:him|her|them)\b|move\s+(?:him|her|them)\b|another\s+cent(?:re|er)|\brefund\b/i;
+const ABSENCE=/\babsent\b|\babsence\b|\bhas\s*n[o']t\s+(?:come|attended|been)|\bhasn't\s+(?:come|attended|been)|\bnot\s+(?:come|attended|been\s+coming)\b|\bmissed\s+(?:\w+\s+){0,2}(?:sessions?|class(?:es)?|lessons?)\b|\bstopped\s+(?:coming|attending)\b|\bsick\b|\bunwell\b|\bwithdraw|\bpausing\b|\bwon'?t\s+be\s+(?:coming|attending)\b|\bleaving\b/i;
+function ruleKind(t){const pay=PAY.test(t);
+ if(pay&&!/\b(?:overdue|unpaid|arrears)\b/i.test(t))return"payment";
+ if(OVERDUE.test(t))return"overdue";
+ if(pay)return"payment";
+ if(COMPLAINT.test(t))return"complaint";
+ if(ABSENCE.test(t))return"absence";
+ return null}
+const ruleUrgent=t=>/\burgent|\btoday\b|immediately|\basap\b|moving\s+(?:him|her|them)\b|another\s+cent(?:re|er)|withdraw|pull(?:ing)?\s+(?:him|her|them)\s+out|very\s+(?:unhappy|disappointed|upset)|\bangry\b/i.test(t)?.7:.2;
+const STOP=new Set(["term","form","grade","class","fees","fee","the","elimu","plus","saturday","sunday","monday","tuesday","wednesday","thursday","friday","january","february","march","april","may","june","july","august","september","october","november","december","ksh","kes","invoice","account","mpesa","m-pesa","new","balance","confirmed","dear","hello","hi","sir","madam","teacher"]);
+const cleanName=s=>{const w=String(s||"").trim().split(/\s+/);while(w.length&&STOP.has(w[w.length-1].toLowerCase()))w.pop();while(w.length&&STOP.has(w[0].toLowerCase()))w.shift();return w.length?titleCase(w.join(" ")):""};
+const NM="([A-Z][A-Za-z'-]+(?:\\s+[A-Z][A-Za-z'-]+){0,2})";
+function extract(t){const x={};let m;
+ if(m=t.match(/(?:ksh\.?|kes|sh\.)\s?([\d,]+(?:\.\d{1,2})?)/i)){const n=Number(m[1].replace(/,/g,""));if(n>0)x.amount=n}
+ if(m=t.match(/\b(?:receipt|ref(?:erence)?|transaction(?:\s+(?:id|code))?)\s*(?:no\.?|number|code)?\s*[:#]?\s*((?=[A-Z0-9]*\d)[A-Z0-9]{6,12})\b/i))x.receipt=m[1].toUpperCase();
+ else if(m=t.match(/\b(?=[A-Z0-9]*\d)(?=[A-Z0-9]*[A-Z])([A-Z0-9]{10})\b/))x.receipt=m[1];
+ if(m=t.match(/\b(INV[-\s#]?\d[\w-]*)/i))x.invoice=m[1].toUpperCase().replace(/[\s#]/,"-");
+ else if(m=t.match(/\binvoice\s*(?:no\.?|number|#)?\s*[:#]?\s*((?=[A-Z0-9-]*\d)[A-Z0-9-]{3,})/i))x.invoice=m[1].toUpperCase();
+ if(m=t.match(/(?:\+?254|\b0)\s?([17]\d{2})\s?(\d{3})\s?(\d{3})\b/))x.phone="254"+m[1]+m[2]+m[3];
+ if(m=t.match(/(?:\baccount(?:\s*(?:no\.?|number))?|\bacc(?:\.|t)?(?:\s*no\.?)?|\ba\/c)\s*[:#.]?\s*((?=[A-Za-z0-9-]*\d)[A-Za-z0-9-]{2,})/i))x.acct=m[1];
+ if(m=t.match(/\bfrom\s+([A-Za-z][A-Za-z'.-]+(?:\s+[A-Za-z][A-Za-z'.-]+){0,3}?)(?=\s+(?:\+?254|0[17])|\s+on\b|\s+for\b|[,.]|\s*$)/i))x.name=cleanName(m[1]);
+ if(!x.name&&(m=t.match(new RegExp("\\b(?:Mrs?|Ms|Dr)\\.?\\s+"+NM))))x.name=cleanName(m[0].replace(/^(Mrs?|Ms|Dr)\.?\s+/,"$1 "));
+ if(!x.name&&(m=t.match(new RegExp("^"+NM+"\\s*[:\\-–]\\s"))))x.name=cleanName(m[1]);
+ for(const re of[new RegExp("\\b(?:mum|mother|dad|father|parent|guardian)\\s+(?:of|to)\\s+"+NM),new RegExp("\\bmy\\s+(?:son|daughter|child)\\s+"+NM),new RegExp("\\bINV[-\\s#]?\\d[\\w-]*\\s*[-–:,]?\\s*"+NM),
+  new RegExp("^"+NM+"\\s+(?:has|is|was|hasn'?t|did|didn'?t|will|won'?t|missed)\\b"),new RegExp("\\b(?:for|student:?)\\s+"+NM)]){
+  if(x.student)break;if(m=t.match(re)){const n=cleanName(m[1]);if(n&&n!==x.name)x.student=n}}
+ if(m=t.match(/\b(\d{4}-\d{1,2}-\d{1,2}|\d{1,2}[\/.-]\d{1,2}[\/.-](?:\d{4}|\d{2})|\d{1,2}\s+(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\.?,?\s+\d{4})\b/i)){const d=parseDate(m[1]);if(d)x.date=d}
+ return x}
+function describe(it){const x=it.x||{},k=it.check?null:it.kind;
+ if(k==="payment")return`Payment received: ${x.amount?kes(x.amount):"amount not found"}${x.name?" from "+x.name:""}${x.receipt?", receipt "+x.receipt:""}`;
+ if(k==="overdue")return`Overdue fee: ${x.amount?kes(x.amount):"amount not given"}${x.invoice?", invoice "+x.invoice:""}${x.student?" for "+x.student:x.name?" for "+x.name:""}`;
+ if(k==="complaint")return`Complaint${x.name?" from "+x.name:x.phone?" from +"+x.phone:""}${x.student?" about "+x.student:""}`;
+ if(k==="absence")return`Absence${x.student?": "+x.student:""}${x.name?" (from "+x.name+")":""}`;
+ if(k==="other")return"Note";
+ return"Note to check"}
+
+// ---------- classify: Cortex API plus local rules ----------
+async function classify(items){let all=true;
+ for(let i=0;i<items.length;i+=30){const chunk=items.slice(i,i+30);
+  try{const ctl=typeof AbortController==="function"?new AbortController():null,tm=ctl?setTimeout(()=>ctl.abort(),15000):0;
+   const r=await fetch(API,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({notes:chunk.map(x=>x.text)}),signal:ctl?ctl.signal:undefined});clearTimeout(tm);
+   const j=r.ok?await r.json():null,res=j&&Array.isArray(j.results)&&j.results.length===chunk.length?j.results:null;
+   if(!res)throw new Error("bad response");
+   chunk.forEach((it,k)=>{const a=res[k]||{};if(KIND[a.kind]){it.apiKind=a.kind;it.apiConf=typeof a.confidence==="number"?a.confidence:null;it.urgent=typeof a.urgent==="number"?a.urgent:null;it.apiStatus="ok"}else{it.apiStatus="failed";all=false}})}
+  catch{for(const it of chunk)it.apiStatus="failed";all=false}}
+ return all}
+// Rules and Cortex agree, or only one has an answer: use it. They disagree: "Check type", never a guess.
+function decide(it){const r=it.ruleKind,a=it.apiStatus==="ok"?it.apiKind:null;
+ if(a&&r&&a!==r){it.kind=a;it.check=true}
+ else if(a){it.kind=a;it.check=!r&&it.apiConf!=null&&it.apiConf<.5}
+ else{it.kind=r||"other";it.check=false}
+ if(it.urgent==null)it.urgent=it.ruleUrgent}
+function findMatch(it){const x=it.x||{};
+ if(E.fees.count())for(const p of[{acct:x.acct,phone:x.phone,name:x.name||x.student},{name:x.student}]){if(!p.acct&&!p.phone&&!p.name)continue;const r=E.fees.match(p);
+  if(r.s)return{type:"fee",id:r.s.id,student:r.s.student,centre:r.s.centre,parent:r.s.parent,phone:r.s.phone,sid_ref:r.s.sid_ref,how:r.how}}
+ const f=E.followUp.match({phone:x.phone,name:x.name,student:x.student});return f?{type:"fam",...f}:null}
+const needsFamily=it=>it.kind==="payment"?!(it.match&&it.match.type==="fee"):it.kind!=="other"&&!it.match;
+function finalize(it){if(it.apiStatus==="pending")it.apiStatus="failed";decide(it);it.match=findMatch(it);
+ const how=it.check?`Check type (built-in rules: ${KIND[it.ruleKind]}, Cortex: ${KIND[it.apiKind]})`:KIND[it.kind]+(it.apiStatus==="ok"?"":" (built-in rules)");
+ act("Note dropped in",`Detected: ${how}.${it.check?"":" "+describe(it)+"."} Note: “${it.text.slice(0,240)}”`,it);
+ if(it.match)act("Matched to family",`Automatically, by ${it.match.how}.`,it)}
+
+// ---------- next steps ----------
+const ui={};
+function resolve(it,text,status="done"){it.status=status;it.done={at:new Date().toISOString(),text};delete ui[it.id];save();render()}
+const famIdOf=m=>m.type==="fam"?m.id:E.followUp.ensureFamily({student:m.student,centre:m.centre,parent:m.parent,phone:m.phone});
+function run(it,what){const m=it.match;if(!m){ui[it.id]={mode:"family",then:what};render();return}
+ if(what==="complaint"){const u=(it.urgent||0)>=.5;if(E.followUp.openComplaint(famIdOf(m),it.text,u))resolve(it,`On the Family follow-up list as an open complaint dated today${u?", marked urgent: call today":""}.`)}
+ else if(what==="absence"){if(E.followUp.reportAbsence(famIdOf(m),it.text))resolve(it,"On the Family follow-up list as an attendance gap: call the parent.")}
+ else if(what==="followup"){ui[it.id]={mode:"date"};render()}}
+const fld=(l,i)=>el("label",{class:"field"},l,i);
+const inp=(type,v,extra={})=>el("input",{type,value:v||"",...extra});
+function familyChooser(it,then){const x=it.x||{},box=el("div",{class:"sub-form"}),msg=el("p",{class:"msg",role:"status","aria-live":"polite"});
+ const pay=it.kind==="payment";
+ // Pick an existing family
+ const fams=pay?[]:E.followUp.families(),stu=E.fees.students(),seen=new Set(fams.map(f=>(f.student+"|"+f.centre).toLowerCase()));
+ const opts=[...fams.map(f=>({v:"fam:"+f.id,l:f.student+(f.centre?` (${f.centre})`:""),o:{type:"fam",...f}})),...stu.filter(s=>!seen.has((s.student+"|"+s.centre).toLowerCase())).map(s=>({v:"fee:"+s.id,l:`${s.student} (${s.centre})${pay?"":" · fee list"}`,o:{type:"fee",...s}}))].sort((a,b)=>a.l.localeCompare(b.l));
+ if(opts.length){const sel=el("select",{"aria-label":"Choose the family",style:"width:auto;max-width:280px"},el("option",{value:""},"Choose family…"),...opts.map(o=>el("option",{value:o.v},o.l)));
+  const use=el("button",{type:"button",class:"btn"},"Use this family");
+  use.onclick=()=>{const o=opts.find(z=>z.v===sel.value);if(!o){msg.className="msg warn";msg.textContent="Choose a family first.";return}
+   it.match={...o.o,how:"picked by hand"};act("Matched to family","Picked by hand.",it);save();delete ui[it.id];if(then)run(it,then);else render()};
+  box.append(el("div",{class:"hint",style:"margin-bottom:4px"},"Match to a family"),el("div",{class:"row"},sel,use))}
+ else if(pay)box.append(el("p",{class:"hint",style:"margin:0 0 4px"},"No fee list in this browser yet, so add the family below. Loading the student list in Fees lets payments match automatically."));
+ // Or add a new one, prefilled from the note
+ const m=it.match||{},ph=x.phone||m.phone;
+ const f={student:inp("text",x.student||m.student,{maxlength:"80"}),centre:inp("text",m.centre,{maxlength:"40"}),parent:inp("text",x.name||m.parent,{maxlength:"80"}),phone:inp("tel",ph?"+"+ph:"",{maxlength:"20"})};
+ if(pay){f.sid=inp("text",x.acct,{maxlength:"30"});f.fee=inp("number","",{min:"1",step:"1"})}
+ const add=el("button",{type:"submit",class:"primary"},"Add as new family");
+ const form=el("form",{class:"grid",style:"margin-top:8px"},fld("Student (required)",f.student),fld(pay?"Centre (required)":"Centre",f.centre),fld("Parent",f.parent),fld("Phone",f.phone),
+  ...(pay?[fld("Student ID / account",f.sid),fld("Term fee in KES (required)",f.fee)]:[]),el("div",{class:"row",style:"align-self:end"},add));
+ form.onsubmit=e=>{e.preventDefault();msg.className="msg warn";const o={student:f.student.value.trim(),centre:f.centre.value.trim(),parent:f.parent.value.trim(),phone:f.phone.value.trim()};
+  if(!o.student){msg.textContent="Enter the student's name.";return}
+  if(pay){const fee=Number(String(f.fee.value).replace(/[^\d.]/g,""));if(!o.centre){msg.textContent="Enter the centre.";return}if(!(fee>0)){msg.textContent="Enter the term fee in KES.";return}
+   const id=E.fees.addStudent({...o,sid_ref:f.sid.value.trim(),fee});if(!id){msg.textContent="Couldn't add this family.";return}
+   const s=E.fees.students().find(z=>z.id===id);it.match={type:"fee",...s,how:"added as a new family"}}
+  else{const id=E.followUp.ensureFamily({...o,how:"Added to Family follow-up from Drop in notes."});if(!id){msg.textContent="Couldn't add this family.";return}
+   const fm=E.followUp.families().find(z=>z.id===id);it.match={type:"fam",...fm,how:"added as a new family"}}
+  act("Matched to family","Added as a new family from the note.",it);save();delete ui[it.id];if(then)run(it,then);else render()};
+ box.append(el("div",{class:"hint",style:"margin-top:8px"},"Add as new family"),form,msg);return box}
+function steps(it){const x=it.x||{},m=it.match,k=it.kind,u=ui[it.id]||{},wrap=el("div",{style:"display:grid;gap:6px"}),acts=el("div",{class:"acts"}),msg=el("p",{class:"msg",role:"status","aria-live":"polite"});
+ const btn=(t,f,cls="primary")=>{const b=el("button",{type:"button",class:cls},t);b.onclick=f;return b};
+ const toggle=mode=>()=>{ui[it.id]=u.mode===mode?{}:{mode};render()};
+ wrap.append(acts);
+ if(k==="payment"){
+  if(m&&m.type==="fee"){const amt=inp("number",x.amount?String(x.amount):"",{min:"1",step:"1","aria-label":"Amount in KES",style:"width:120px"});
+   acts.append(el("strong",{},"Next step:"),amt,btn("Record payment",()=>{const a=Number(amt.value);if(!(a>0)){msg.className="msg warn";msg.textContent="Enter the amount in KES.";return}
+    const r=E.fees.recordPayment({sid:m.id,amount:a,ref:x.receipt||"",raw:it.text,how:m.how});
+    if(r.dup){act("Item dismissed",`Receipt ${x.receipt} was already counted in the fee tracker.`,it);resolve(it,`Receipt ${x.receipt} was already counted, nothing added.`,"dismissed")}
+    else if(r.ok)resolve(it,`Payment of ${kes(a)} recorded for ${m.student} in the fee tracker.`);else{msg.className="msg warn";msg.textContent="Couldn't record this payment."}}))}
+  else{acts.append(el("strong",{},"Next step:"));
+   if(E.fees.count())acts.append(btn("Match to a family",toggle("pick"),u.mode==="pick"?"primary":"btn"));
+   acts.append(btn("Add as new family",toggle("add"),u.mode==="add"||!E.fees.count()?"primary":"btn"));
+   if(u.mode==="pick"||u.mode==="add")wrap.append(familyChooser(it,null))}}
+ else if(k==="overdue"){acts.append(el("strong",{},"Next step:"),btn("Send reminder",()=>{if(u.mode!=="reminder"){ui[it.id]={mode:"reminder"};act("Reminder drafted",draft(it),it);it.reminded=true;save()}else ui[it.id]={};render()},u.mode==="reminder"?"primary":"btn"),
+   btn("Set follow-up date",()=>run(it,"followup"),u.mode==="date"?"primary":"btn"));
+  if(u.mode==="reminder"){const d=draft(it),ta=el("textarea",{readonly:"","aria-label":"Reminder text"},d),cp=btn("Copy",async()=>{try{await navigator.clipboard.writeText(d);cp.textContent="Copied";act("Reminder copied",d,it)}catch{ta.select();cp.textContent="Select and copy"}},"btn");
+   wrap.append(el("div",{class:"sub-form"},el("div",{class:"hint",style:"margin-bottom:4px"},`Reminder to send${m&&m.phone?" to +"+m.phone:x.phone?" to +"+x.phone:""}`),ta,el("div",{class:"row",style:"margin-top:6px"},cp)))}
+  if(u.mode==="date"&&m){const d=inp("date",addDays(todayISO(),3),{"aria-label":"Follow-up date"}),note=inp("text",describe(it),{maxlength:"200","aria-label":"Note"});
+   const sv=btn("Save",()=>{const v=parseDate(d.value);if(!v){msg.className="msg warn";msg.textContent="Choose a date.";return}
+    if(E.followUp.setFollowUp(famIdOf(m),v,note.value))resolve(it,`Follow-up date set for ${fmtDate(v)} on the Family follow-up list${it.reminded?", reminder drafted":""}.`)});
+   wrap.append(el("div",{class:"sub-form grid"},fld("Follow up on",d),fld("Note",note),el("div",{class:"row",style:"align-self:end"},sv)))}}
+ else if(k==="complaint"){const urgent=(it.urgent||0)>=.5;acts.append(el("strong",{},"Next step:"),btn(urgent?"Call parent today":"Call this week",()=>run(it,"complaint")))}
+ else if(k==="absence")acts.append(el("strong",{},"Next step:"),btn("Call parent",()=>run(it,"absence")));
+ else{acts.append(el("strong",{},"Next step:"),btn("Dismiss",()=>{act("Item dismissed","Note dismissed: "+it.text.slice(0,200),it);resolve(it,"Dismissed.","dismissed")},"btn"),
+  btn("Keep as note",()=>{act("Kept as note",it.text.slice(0,400),it);resolve(it,"Kept as a note.","kept")},"btn"))}
+ if(u.mode==="family")wrap.append(el("p",{class:"hint",style:"margin:0"},"Which family is this? Pick one or add them, then the step runs."),familyChooser(it,u.then));
+ if(k!=="other")acts.append(btn("Dismiss",()=>{act("Item dismissed",`${describe(it)}. Note: “${it.text.slice(0,200)}”`,it);resolve(it,"Dismissed.","dismissed")},"ghost"));
+ wrap.append(msg);return wrap}
+function draft(it){const x=it.x||{},m=it.match;
+ if(m&&m.type==="fee")return E.fees.reminderFor(m.id);
+ return E.fees.reminderDraft({parent:x.name||(m?m.parent:""),student:x.student||(m?m.student:""),centre:m?m.centre:"",amount:x.amount,invoice:x.invoice,sid_ref:x.acct||(m&&m.sid_ref)||"",overdue:true})}
+function card(it){const x=it.x||{},m=it.match,pending=it.apiStatus==="pending",urgent=(it.urgent||0)>=.5;
+ const chips=el("div",{class:"chips"});
+ if(pending)chips.append(el("span",{class:"st blue"},"Reading…"));
+ else if(it.check)chips.append(el("span",{class:"st amber"},"Check type"));
+ else chips.append(el("span",{class:"st "+(it.kind==="payment"?"green":it.kind==="other"?"blue":"red")},KIND[it.kind]));
+ if(!pending&&urgent&&(it.kind==="complaint"||it.kind==="absence"||it.check))chips.append(el("span",{class:"st red"},"Urgent"));
+ if(!pending&&needsFamily(it))chips.append(el("span",{class:"st amber"},"Needs a family"));
+ const extra=[x.date&&"Dated "+fmtDate(x.date),x.phone&&"Phone +"+x.phone,x.acct&&"Account "+x.acct,x.invoice&&it.kind!=="overdue"&&"Invoice "+x.invoice].filter(Boolean);
+ const parts=[el("div",{class:"who"},pending?"Reading this note…":describe(it)),chips,el("div",{class:"quote num",style:"font-size:13px"},it.text)];
+ if(extra.length)parts.push(el("div",{class:"hint"},extra.join(" · ")));
+ parts.push(m?el("div",{style:"font-size:14px"},"Family: ",el("strong",{},m.student),m.centre?` (${m.centre})`:"",el("span",{class:"hint"},` · matched by ${m.how}${m.type==="fam"&&it.kind==="payment"?" · not in the fee list yet":""}`))
+  :el("div",{class:"hint"},it.kind==="other"?"":"No family matched yet."));
+ if(!pending){const sel=el("select",{"aria-label":"Type of note",style:"width:auto"},...(it.check?[el("option",{value:""},"Check type…")]:[]),...Object.entries(KIND).map(([v,l])=>el("option",{value:v},l)));sel.value=it.check?"":it.kind;
+  sel.onchange=()=>{if(!KIND[sel.value])return;const old=it.check?"Check type":KIND[it.kind];it.kind=sel.value;it.check=false;delete ui[it.id];act("Type corrected",`${old} → ${KIND[it.kind]}.`,it);if(!it.match)it.match=findMatch(it);save();render()};
+  parts.push(el("div",{class:"row"},el("label",{class:"field",style:"grid-auto-flow:column;align-items:center;gap:8px"},it.check?"What is this?":"Type",sel),
+   it.check?el("span",{class:"hint"},`Built-in rules say ${KIND[it.ruleKind]}, Cortex says ${KIND[it.apiKind]}. Pick the right type to see the next step.`):""));
+  if(!it.check)parts.push(steps(it))}
+ const color=pending?"":it.check||needsFamily(it)?"amber":it.kind==="complaint"&&urgent?"red":it.kind==="payment"?"green":"amber";
+ return el("article",{class:"card "+color,"aria-label":describe(it)},...parts)}
+function render(){let changed=false;const open=S.items.filter(i=>i.status==="open");
+ // Re-try matching when a student or family list has arrived since.
+ for(const it of open)if(it.apiStatus!=="pending"&&!it.check&&needsFamily(it)){const m=findMatch(it);if(m&&(!it.match||(m.type==="fee"&&it.match.type!=="fee"))){it.match=m;changed=true;act("Matched to family",`Automatically, by ${m.how}.`,it)}}
+ if(changed)save();
+ const needs=open.filter(i=>i.apiStatus!=="pending"&&needsFamily(i)),ready=open.filter(i=>!needs.includes(i));
+ $("in-needs-wrap").hidden=!needs.length;$("h-in-needs").textContent=`Inbox: needs a family (${needs.length})`;$("in-needs").replaceChildren(...needs.map(card));
+ $("in-ready-wrap").hidden=!ready.length;$("h-in-ready").textContent=`Ready for the next step (${ready.length})`;$("in-ready").replaceChildren(...ready.map(card));
+ const done=S.items.filter(i=>i.status!=="open");$("in-done-wrap").hidden=!done.length;$("in-done-sum").textContent=`Handled (${done.length})`;
+ $("in-done").replaceChildren(...done.slice(-50).reverse().map(i=>el("li",{},`${E.fmtStamp(i.done?i.done.at:i.at)}: ${describe(i)}. ${i.done?i.done.text:""}`)));
+ $("in-hint").hidden=E.fees.count()>0||!open.some(i=>i.kind==="payment"||i.kind==="overdue")}
+$("in-form").onsubmit=async e=>{e.preventDefault();const msg=$("in-msg");msg.className="msg";
+ const notes=splitNotes($("in-text").value);if(!notes.length){msg.className="msg warn";msg.textContent="Paste at least one note.";return}
+ const now=new Date().toISOString(),items=notes.slice(0,100).map(t=>({id:rid(),text:t,at:now,ruleKind:ruleKind(t),ruleUrgent:ruleUrgent(t),apiKind:null,apiConf:null,urgent:null,apiStatus:"pending",kind:"other",check:false,x:extract(t),match:null,status:"open"}));
+ S.items.push(...items);$("in-text").value="";save();render();msg.textContent=`Reading ${items.length} note${items.length===1?"":"s"}…`;
+ const ok=await classify(items);for(const it of items)finalize(it);save();render();
+ const n=items.filter(needsFamily).length;
+ msg.textContent=`${items.length} note${items.length===1?"":"s"} read${ok?"":" with the built-in rules (Cortex could not be reached)"}${notes.length>100?"; only the first 100, paste the rest again":""}. ${n?`${n} need${n===1?"s":""} a family. `:""}Each one has a next step below.`};
+// Notes left half-read (page closed mid-request) are finished with the built-in rules.
+for(const it of S.items)if(it.status==="open"&&it.apiStatus==="pending")finalize(it);
+E.intake={prefill(text){const t=$("in-text");t.value=t.value.trim()?t.value.trim()+"\n"+text:text;try{t.scrollIntoView({block:"center"})}catch{}t.focus()},refresh:render};
+save();render();
+})();
+</script>
+<script>
+"use strict";
+// Tabs with hash routing: #follow-up (default) and #fees. Every tab change is a history entry, so back/forward works.
+(()=>{
+const TABS=["follow-up","fees"],tab=n=>document.getElementById("tab-"+n),panel=n=>document.getElementById("panel-"+n);
+// Unknown hashes: the default tab on load, and ignored afterwards (so they never switch tabs by surprise).
+const hashTab=()=>{let h=location.hash.slice(1);try{h=decodeURIComponent(h)}catch{}return TABS.includes(h)?h:h?null:TABS[0]};
+const fromHash=()=>hashTab()||TABS[0];
+let cur=null;
+function show(n){if(n===cur)return;const first=cur===null;cur=n;
+ for(const t of TABS){const on=t===n;tab(t).setAttribute("aria-selected",String(on));tab(t).tabIndex=on?0:-1;panel(t).hidden=!on}
+ if(!first)document.dispatchEvent(new CustomEvent("elimu:tabshown",{detail:n}))}
+function go(n){if(n!==cur||location.hash.slice(1)!==n)location.hash=n;show(n)}
+for(const t of TABS)tab(t).addEventListener("click",()=>go(t));
+document.querySelector('[role="tablist"]').addEventListener("keydown",e=>{const i=TABS.indexOf(cur),L=TABS.length;
+ const j=e.key==="ArrowRight"?(i+1)%L:e.key==="ArrowLeft"?(i-1+L)%L:e.key==="Home"?0:e.key==="End"?L-1:-1;
+ if(j<0)return;e.preventDefault();go(TABS[j]);tab(TABS[j]).focus()});
+addEventListener("hashchange",()=>{const n=hashTab();if(!n)return;const changed=n!==cur;show(n);
+ const a=document.activeElement;if(changed&&!(a&&a.getAttribute("role")==="tab"))tab(n).focus()});
+show(fromHash());
+})();
+</script>
+</body>
+</html>
