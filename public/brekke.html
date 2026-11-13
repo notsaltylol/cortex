@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Job Pricing Check | Cortex for Brekke Brothers</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f5f6f8;--surface:#fff;--ink:#1b2230;--muted:#5d6879;--line:#dde2ea;--accent:#2b4fd8;--accent-ink:#fff;
+ --red:#b3261e;--red-bg:#fde8e6;--amber:#8a5a00;--amber-bg:#fff1d6;--green:#1d7a46;--green-bg:#e0f4e8;
+ --font-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;--font-num:"IBM Plex Mono",ui-monospace,Menlo,monospace}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#12151c;--surface:#1a1f29;--ink:#e8ecf3;--muted:#9aa5b8;--line:#2b3342;--accent:#7f9bff;--accent-ink:#0b1020;
+ --red:#ff8a80;--red-bg:#3d1c1a;--amber:#f2c261;--amber-bg:#3a2d12;--green:#6fd09a;--green-bg:#16301f}}
+*{box-sizing:border-box}html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:15px/1.5 var(--font-body)}
+.wrap{max-width:980px;margin:0 auto;padding:20px 16px 32px;display:grid;gap:16px}
+a{color:var(--accent)}h1{margin:0;font-size:26px;letter-spacing:-.01em}
+h2{margin:0 0 10px;font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600}
+.back{font-size:13px}.sub,.muted{color:var(--muted)}.sub{margin:4px 0 0}
+.num{font-family:var(--font-num);font-variant-numeric:tabular-nums}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px}
+[hidden]{display:none!important}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+label.field{display:grid;gap:4px;font-size:13px;color:var(--muted)}
+input,button{font:inherit}
+input[type=text],input[type=number]{padding:7px 9px;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:8px;width:100%}
+.scroll{overflow-x:auto}table{width:100%;border-collapse:collapse;min-width:640px}
+th,td{text-align:left;padding:6px 6px;border-top:1px solid var(--line);vertical-align:middle}
+thead th{border-top:0;font-size:12px;color:var(--muted);font-weight:600}td.num,th.num{text-align:right}
+tr.grp th{font-size:12px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);background:var(--bg);border-top:1px solid var(--line)}
+td input[type=number]{width:96px;text-align:right}
+tr.miss{background:var(--red-bg)}tr.miss td:first-child{box-shadow:inset 3px 0 0 var(--red)}
+.chip{display:inline-block;font-size:11px;font-weight:600;padding:1px 8px;border-radius:999px;text-transform:uppercase;letter-spacing:.04em}
+.chip.red{background:var(--red-bg);color:var(--red)}.chip.green{background:var(--green-bg);color:var(--green)}.chip.na{background:var(--bg);color:var(--muted);border:1px solid var(--line)}
+.hint{font-size:12px;color:var(--muted)}
+#status{border-radius:10px;padding:12px 14px;font-weight:600;border:1px solid}
+#status.bad{background:var(--red-bg);color:var(--red);border-color:var(--red)}
+#status.ok{background:var(--green-bg);color:var(--green);border-color:var(--green)}
+#warns{display:grid;gap:8px}.warn{background:var(--amber-bg);color:var(--amber);border:1px solid var(--amber);border-radius:10px;padding:9px 14px;font-size:14px}
+#tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.tile{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--line);border-radius:10px;padding:10px 14px}
+.tile.main{border-left-color:var(--accent)}.tile-label{color:var(--muted);font-size:13px}.tile-value{font:500 22px var(--font-num)}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+button.primary{padding:9px 14px;background:var(--accent);color:var(--accent-ink);border:0;border-radius:8px;font-weight:600;cursor:pointer}
+button.btn{font-size:13px;padding:6px 12px;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:999px;cursor:pointer}
+.msg{font-size:13px;color:var(--muted)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+footer{text-align:center;color:var(--muted);font-size:13px;padding:4px 16px 24px}footer a{color:var(--muted)}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <a class="back" href="/">&larr; Back to Cortex</a>
+  <header>
+    <h1>Job pricing check</h1>
+    <p class="sub">Price the job. Every cost you haven't priced stays flagged until you do. No login. Nothing leaves this browser.</p>
+  </header>
+
+  <section class="panel" aria-labelledby="h-job">
+    <h2 id="h-job">The job</h2>
+    <div class="grid" id="job-grid"></div>
+    <details style="margin-top:10px"><summary class="muted" style="cursor:pointer;font-size:14px">Conversion assumptions (change if yours differ)</summary>
+      <div class="grid" id="asm-grid" style="margin-top:8px"></div></details>
+  </section>
+
+  <div id="status" role="status" aria-live="polite"></div>
+  <div id="warns" aria-live="polite"></div>
+
+  <section class="panel" aria-labelledby="h-cost">
+    <h2 id="h-cost">Costs</h2>
+    <p class="hint" style="margin:0 0 8px">Quantities fill in from the job above when they can; type over one to change it. Leave a cost blank and it shows as <strong>not priced</strong>. If a cost truly doesn't apply, tick N/A.</p>
+    <div class="scroll"><table>
+      <thead><tr><th scope="col">Cost</th><th class="num" scope="col">Qty</th><th scope="col">Unit</th><th class="num" scope="col">$ per unit</th><th class="num" scope="col">Total</th><th scope="col">N/A</th></tr></thead>
+      <tbody id="lines"></tbody></table></div>
+  </section>
+
+  <section class="panel" aria-labelledby="h-price">
+    <h2 id="h-price">Price</h2>
+    <div class="grid" style="margin-bottom:12px">
+      <label class="field">Overhead (% on cost)<input id="oh" type="number" min="0" step="0.5" inputmode="decimal"></label>
+      <label class="field">Target margin (% of price)<input id="mg" type="number" min="0" max="95" step="0.5" inputmode="decimal"></label>
+    </div>
+    <div id="tiles"></div>
+    <div class="row" style="margin-top:12px">
+      <button type="button" class="primary" id="copy">Copy cost summary</button>
+      <button type="button" class="btn" id="reset">New job</button>
+      <span id="cmsg" class="msg" role="status" aria-live="polite"></span>
+    </div>
+  </section>
+</main>
+<footer>Cortex by Pitch, Pray, Ship. Typesafe.</footer>
+<script>
+"use strict";
+(()=>{
+const KEY="brekke.job.v1",$=id=>document.getElementById(id);
+const el=(t,a={},...k)=>{const e=document.createElement(t);for(const[x,y]of Object.entries(a))e.setAttribute(x,y);e.append(...k);return e};
+const usd=x=>new Intl.NumberFormat("en-US",{style:"currency",currency:"USD",maximumFractionDigits:2}).format(x);
+const nf=new Intl.NumberFormat("en-US",{maximumFractionDigits:2});
+const JOB=[["name","Job / customer","text"],["sqft","Area (sq ft)","n"],["perim","Perimeter / edge (lin ft)","n"],["excavIn","Excavation depth (in)","n"],["baseIn","Base gravel depth (in)","n"],["bedIn","Bedding sand depth (in)","n"],["waste","Material waste (%)","n"],["crew","Crew size (people)","n"],["hrs","Hours per day","n"],["days","Days on site","n"]];
+const ASM=[["tpcy","Gravel / sand, tons per cu yd","n",1.4],["comp","Base compaction allowance (%)","n",15],["loadCy","Truck load size (cu yd)","n",10]];
+const G=(s,k)=>Number(s.job[k])||0;
+// qty suggestions come from the job numbers; null = nothing to suggest
+const LINES=[
+ ["Materials","pavers","Pavers / surface material","sq ft",s=>G(s,"sqft")>0?G(s,"sqft")*(1+G(s,"waste")/100):null],
+ ["Materials","gravel","Base gravel","tons",s=>G(s,"sqft")>0&&G(s,"baseIn")>0?G(s,"sqft")*G(s,"baseIn")/12/27*s.asm.tpcy*(1+s.asm.comp/100):null],
+ ["Materials","sand","Bedding sand","tons",s=>G(s,"sqft")>0&&G(s,"bedIn")>0?G(s,"sqft")*G(s,"bedIn")/12/27*s.asm.tpcy:null],
+ ["Materials","edge","Edge restraint","lin ft",s=>G(s,"perim")>0?G(s,"perim"):null],
+ ["Materials","small","Fabric, polymeric sand, adhesive, fasteners","lump",()=>null],
+ ["Materials","freight","Delivery / freight on materials","loads",()=>null],
+ ["Labour","labour","Crew labour (loaded rate)","labour hrs",s=>G(s,"crew")*G(s,"hrs")*G(s,"days")||null],
+ ["Equipment","skid","Skid steer","days",s=>G(s,"days")||null],
+ ["Equipment","compactor","Plate compactor","days",s=>G(s,"days")||null],
+ ["Equipment","rental","Saw, rentals and other equipment","lump",()=>null],
+ ["Equipment","trailer","Hauling equipment to site (trailer, fuel, travel)","trips",()=>null],
+ ["Disposal","spoil","Haul away excavated spoil","loads",s=>G(s,"sqft")>0&&G(s,"excavIn")>0&&s.asm.loadCy>0?Math.ceil(G(s,"sqft")*G(s,"excavIn")/12/27/s.asm.loadCy):null],
+ ["Disposal","tip","Dump / tipping fees and old material removal","lump",()=>null],
+ ["Other","permit","Permits and utility locates","lump",()=>null],
+ ["Other","subs","Subcontractors (irrigation, electrical, etc.)","lump",()=>null],
+ ["Other","clean","Site protection and cleanup","lump",()=>null],
+ ["Other","callback","Callback / warranty allowance","lump",()=>null]];
+const blank=()=>({job:{},asm:Object.fromEntries(ASM.map(a=>[a[0],a[3]])),oh:"",mg:"",lines:{}});
+let S=blank();try{const v=JSON.parse(localStorage.getItem(KEY));if(v&&v.job&&v.lines)S={...blank(),...v,asm:{...blank().asm,...v.asm}}}catch{}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch{}};
+const L=id=>S.lines[id]||(S.lines[id]={qty:"",rate:"",na:false});
+const sugg=l=>{const v=l[4](S);return v==null?null:v};
+const qtyOf=(l,st)=>st.qty!==""&&st.qty!=null?Number(st.qty):(sugg(l)??0);
+
+function calc(){
+ let cost=0;const missing=[],lines=[];
+ for(const l of LINES){const st=L(l[1]),q=qtyOf(l,st),r=Number(st.rate)||0,tot=st.na?0:q*r;
+  const priced=st.na||(q>0&&r>0);if(!priced)missing.push(l[2]);cost+=tot;lines.push({l,st,q,r,tot,priced})}
+ return{cost,missing,lines}}
+function update(){
+ const c=calc();
+ // row states and placeholders
+ for(const x of c.lines){const o=refs[x.l[1]];
+  o.tr.className=x.priced?"":"miss";
+  o.chip.className="chip "+(x.st.na?"na":x.priced?"green":"red");o.chip.textContent=x.st.na?"N/A":x.priced?"Priced":"Not priced";
+  const sg=sugg(x.l);o.qty.placeholder=sg==null?"":nf.format(sg);o.qty.disabled=x.st.na;o.rate.disabled=x.st.na;
+  o.tot.textContent=x.st.na?"-":usd(x.tot)}
+ const s=$("status");
+ if(c.missing.length){s.className="bad";s.textContent=`${c.missing.length} cost${c.missing.length===1?"":"s"} not priced: ${c.missing.join(", ")}.`}
+ else{s.className="ok";s.textContent="Every cost is priced or marked N/A."}
+ // cross-checks
+ const w=[],ski=L("skid"),skiQ=qtyOf(LINES.find(l=>l[1]==="skid"),ski),days=G(S,"days");
+ if(!ski.na&&days>1&&skiQ>0&&skiQ<days)w.push(`Skid steer is priced for ${nf.format(skiQ)} day${skiQ===1?"":"s"} but the crew is on site ${nf.format(days)} days. Second day?`);
+ const exc=G(S,"excavIn")*G(S,"sqft")/12/27;
+ if(exc>0&&(L("spoil").na||L("tip").na))w.push(`You marked disposal N/A but the job digs out about ${nf.format(exc)} cu yd of spoil.`);
+ if(G(S,"sqft")>0&&G(S,"excavIn")===0)w.push("Excavation depth is blank, so spoil and disposal can't be worked out.");
+ if(G(S,"days")>1&&!L("trailer").na&&!(Number(L("trailer").rate)>0))w.push("Multi-day job: have you priced moving the equipment to site and back?");
+ $("warns").replaceChildren(...w.map(t=>el("div",{class:"warn"},t)));
+ // price
+ const oh=Number(S.oh)||0,mg=Number(S.mg)||0,ohAmt=c.cost*oh/100,base=c.cost+ohAmt,price=mg<100?base/(1-mg/100):base,sq=G(S,"sqft");
+ const tile=(cls,l,v,n)=>{const d=el("div",{class:"tile "+cls},el("div",{class:"tile-label"},l),el("div",{class:"tile-value"},v));if(n)d.append(el("div",{class:"hint"},n));return d};
+ const setOk=S.oh!==""&&S.mg!=="";
+ $("tiles").replaceChildren(tile("","Direct cost",usd(c.cost)),tile("","Overhead",usd(ohAmt),S.oh===""?"Not set":oh+"% of cost"),tile("","Margin",usd(price-base),S.mg===""?"Not set":mg+"% of price"),
+  tile("main","Quote price",usd(price),!setOk?"Set overhead and margin":c.missing.length?"Incomplete: costs not priced":""),sq>0?tile("","Per sq ft",usd(price/sq)):"");
+ return{c,price,ohAmt,base}}
+const refs={};
+function build(){
+ const jg=$("job-grid"),ag=$("asm-grid");
+ jg.replaceChildren(...JOB.map(([k,l,t])=>{const i=el("input",{type:t==="n"?"number":"text",...(t==="n"?{min:"0",step:"any",inputmode:"decimal"}:{maxlength:"80"}),value:S.job[k]??"",id:"j-"+k});
+  i.oninput=()=>{S.job[k]=i.value;save();update()};return el("label",{class:"field",for:"j-"+k},l,i)}));
+ ag.replaceChildren(...ASM.map(([k,l])=>{const i=el("input",{type:"number",min:"0",step:"any",value:S.asm[k]??"",id:"a-"+k});
+  i.oninput=()=>{S.asm[k]=Number(i.value)||0;save();update()};return el("label",{class:"field",for:"a-"+k},l,i)}));
+ const tb=$("lines");tb.replaceChildren();let grp="";
+ for(const l of LINES){
+  if(l[0]!==grp){grp=l[0];tb.append(el("tr",{class:"grp"},el("th",{colspan:"6",scope:"colgroup"},grp)))}
+  const st=L(l[1]),qty=el("input",{type:"number",min:"0",step:"any",inputmode:"decimal",value:st.qty,"aria-label":l[2]+": quantity"}),
+   rate=el("input",{type:"number",min:"0",step:"any",inputmode:"decimal",value:st.rate,"aria-label":l[2]+": $ per "+l[3]}),
+   na=el("input",{type:"checkbox",checked:st.na?"":null,"aria-label":l[2]+": not applicable"}),chip=el("span",{class:"chip red"},"Not priced"),tot=el("td",{class:"num"},"-");
+  if(!st.na)na.removeAttribute("checked");
+  na.checked=!!st.na;
+  qty.oninput=()=>{st.qty=qty.value;save();update()};rate.oninput=()=>{st.rate=rate.value;save();update()};na.onchange=()=>{st.na=na.checked;save();update()};
+  const tr=el("tr",{},el("td",{},l[2]," ",chip),el("td",{class:"num"},qty),el("td",{class:"hint"},l[3]),el("td",{class:"num"},rate),tot,el("td",{},na));
+  tb.append(tr);refs[l[1]]={tr,chip,qty,rate,tot}}
+ $("oh").value=S.oh;$("mg").value=S.mg;
+}
+$("oh").oninput=e=>{S.oh=e.target.value;save();update()};$("mg").oninput=e=>{S.mg=e.target.value;save();update()};
+$("reset").onclick=()=>{S=blank();save();build();update();$("cmsg").textContent="Cleared. Ready for the next job."};
+$("copy").onclick=async()=>{const{c,price,ohAmt}=update(),n=S.job.name||"Job",rows=c.lines.filter(x=>!x.st.na&&x.tot>0).map(x=>`${x.l[2]}: ${nf.format(x.q)} ${x.l[3]} x ${usd(x.r)} = ${usd(x.tot)}`);
+ const txt=[`${n}`,...rows,`Direct cost: ${usd(c.cost)}`,`Overhead: ${usd(ohAmt)}`,`Quote price: ${usd(price)}`,c.missing.length?`NOT PRICED: ${c.missing.join(", ")}`:"All costs priced or marked N/A"].join("\n");
+ try{await navigator.clipboard.writeText(txt);$("cmsg").textContent="Copied."}catch{$("cmsg").textContent="Couldn't copy. Select the numbers by hand."}};
+build();update();
+})();
+</script>
+</body>
+</html>

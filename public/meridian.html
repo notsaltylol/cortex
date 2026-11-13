@@ -34,7 +34,7 @@ th,td{text-align:left;padding:8px;border-top:1px solid var(--line);vertical-alig
 thead th{border-top:0;font-size:12px;color:var(--muted);font-weight:600}td.num,th.num{text-align:right}
 .rag{display:inline-flex;align-items:center;gap:6px;font-weight:600;font-size:12px;padding:2px 10px;border-radius:999px;text-transform:uppercase;letter-spacing:.04em}
 .rag::before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor}
-.rag.red{background:var(--red-bg);color:var(--red)}.rag.amber{background:var(--amber-bg);color:var(--amber)}.rag.green{background:var(--green-bg);color:var(--green)}
+.rag.red{background:var(--red-bg);color:var(--red)}.rag.amber{background:var(--amber-bg);color:var(--amber)}.rag.green{background:var(--green-bg);color:var(--green)}.rag.grey{background:var(--bg);color:var(--muted);border:1px solid var(--line)}
 .acts{margin:0;padding-left:16px;font-size:13px}.neg{color:var(--red)}
 form{display:grid;gap:10px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
 label.field{display:grid;gap:4px;font-size:13px;color:var(--muted)}
@@ -287,6 +287,20 @@ function parse(line){
  if(m=line.match(/(\d[\d,]*)\s*(?:units?\s*)?(?:inbound|incoming|on[\s-]*order)/i))o.inbound=num(m[1]);
  else if(m=line.match(/(?:inbound|incoming|on[\s-]*order)\s*(?:of|:|=)?\s*(\d[\d,]*)/i))o.inbound=num(m[1]);
  if(m=line.match(/(?:inbound|incoming|on[\s-]*order|arriv\w*|lands?)[^.;]*?\bin\s*(\d+)\s*(d(?:ays?)?|w(?:k|ks|eeks?)?)\b/i))o.inboundIn=Number(m[1])*(/^w/i.test(m[2])?7:1);
+
+ if(o.perWeek===undefined){
+  if(m=line.match(/(?:weekly|wkly)\s*(?:sales|demand|usage|forecast|run[\s-]*rate|units)\s*(?:of|is|=|:|~|about|approx\.?)?\s*(\d[\d,]*(?:\.\d+)?)/i))o.perWeek=num(m[1]);
+  else if(m=line.match(/(?:avg|average)\s*(daily|weekly)\s*(?:sales|demand|usage|units)?\s*(?:of|is|=|:|~)?\s*(\d[\d,]*(?:\.\d+)?)/i))o.perWeek=num(m[2])*(/daily/i.test(m[1])?7:1);
+  else if(m=line.match(/\b(ads|aws)\b\s*(?:of|is|=|:)?\s*(\d[\d,]*(?:\.\d+)?)/i))o.perWeek=num(m[2])*(/ads/i.test(m[1])?7:1);
+  else if(m=line.match(/daily\s*(?:sales|demand|usage|units)\s*(?:of|is|=|:|~)?\s*(\d[\d,]*(?:\.\d+)?)/i))o.perWeek=num(m[1])*7;
+  else if(m=line.match(/(?:sold|selling|sells|sales of|sales)\s*(\d[\d,]*)\s*(?:units?\s*)?(?:last|this|per|a|each|\/)\s*(week|wk|day|month|mo)\b/i))o.perWeek=num(m[1])*(/^d/i.test(m[2])?7:/^mo/i.test(m[2])?7/30.4:1);
+  else if(m=line.match(/(\d[\d,]*)\s*(?:units?\s*)?(?:sold\s*)?(?:\/|per|a|each|last)\s*(?:month|mo)\b/i))o.perWeek=num(m[1])*7/30.4;
+  else if(m=line.match(/forecast(?:ed)?\s*(?:of|is|=|:)?\s*(\d[\d,]*)\s*(?:units?\s*)?(?:over|for|in)?\s*(?:the\s*)?(?:next\s*)?(\d+)\s*(weeks?|wks?|days?)/i))o.perWeek=num(m[1])/Number(m[2])*(/^d/i.test(m[3])?7:1);
+ }
+ if(m=line.match(/(\d+(?:\.\d+)?)\s*(weeks?|wks?|days?)\s*(?:of\s*)?(?:supply|cover(?:age)?|stock|inventory)\b/i))o.coverDays=Number(m[1])*(/^w/i.test(m[2])?7:1);
+ else if(m=line.match(/\b(wos|dos|weeks of supply|days of supply|weeks of cover|days of cover)\b\s*(?:of|is|=|:)?\s*(\d+(?:\.\d+)?)/i))o.coverDays=Number(m[2])*(/^w/i.test(m[1])?7:1);
+ if(m=line.match(/(?:target|max(?:imum)?)\s*(?:stock|level|qty|inventory)?\s*(?:of|is|=|:)?\s*(\d[\d,]*)/i))o.target=num(m[1]);
+ o.healthyWord=/\b(?:plenty|healthy|ample|well[\s-]stocked|overstock(?:ed)?|excess|surplus|fully stocked|good stock)\b/i.test(line);
  o.lowWord=/\b(?:low|running low|almost out|nearly out|critical|below (?:min|minimum|reorder|par))\b/i.test(line);
  return o}
 function parseInvoice(line){
@@ -312,34 +326,46 @@ function assessStock(p,row){
  const notes=[];
  if(row){if(p.perWeek===undefined){p.perWeek=rowDemand(row);notes.push(`Demand taken from your watch list for ${row.sku}: about ${f0(p.perWeek)} a week.`)}
   if(p.onHand===undefined)p.onHand=row.stores_on_hand+row.dc_on_hand;if(p.lead===undefined)p.lead=row.lead_time_days}
- const acts=[];let rag="green",head="Covered";
- const up=r=>{if(r==="red")rag="red";else if(rag!=="red")rag="amber"};
- if(p.onHand===undefined)return{rag:"amber",head:"No stock level found",acts:["Add units on hand, for example “12 on hand”, and I'll check it. Demand per week and lead time make the answer exact."],notes};
- if(p.onHand<=0){return{rag:"red",head:"Out of stock",acts:["Raise a reorder now."+(p.lead!==undefined?` A new order takes ${f0(p.lead)} days, so expect to be without stock until then. Look for an expedite option or stock in another location.`:" Check whether stock can be moved from another location while it is on order."),],notes}}
- if(p.rop!==undefined&&p.onHand<=p.rop){up("red");acts.push(`On hand (${f0(p.onHand)}) is at or below the reorder point (${f0(p.rop)}). Reorder now.`)}
- if(p.perWeek!==undefined&&p.perWeek>0){
-  const daily=p.perWeek/7,cover=p.onHand/daily;let runOut=cover,gap=0;
-  if(p.inbound>0&&p.inboundIn!==undefined){if(p.inboundIn<=cover)runOut=(p.onHand+p.inbound)/daily;else gap=p.inboundIn-cover}
+ const acts=[];let rag="green";
+ const ORD={grey:-1,green:0,amber:1,red:2},lv=r=>{if(ORD[r]>ORD[rag])rag=r};
+ const HEAD={red:"At risk: reorder now",amber:"Watch: order soon",green:"Healthy: no action needed",grey:"Can't judge yet"};
+ const out=()=>{if(rag==="red"&&p.perWeek>0&&p.onHand!==undefined){const target=(p.perWeek/7)*((p.lead??14)+14),qty=Math.ceil(Math.max(0,target-p.onHand-(p.inboundIn!==undefined?(p.inbound||0):0)));if(qty>0)acts.push(`Suggested order: about ${f0(qty)} units, enough for the lead time plus 14 days at the current rate.`)}
+  return{rag,head:HEAD[rag],acts,notes}};
+ if(p.onHand===undefined&&p.coverDays===undefined){rag="grey";acts.push("No stock level found. Add units on hand (“120 on hand”) or cover (“6 weeks of supply”).");return out()}
+ if(p.onHand!==undefined&&p.onHand<=0){rag="red";acts.push("Out of stock. Raise a reorder now"+(p.lead!==undefined?`; a new order takes ${f0(p.lead)} days, so look for stock in another location or an expedite.`:", and check whether stock can be moved from another location."));return out()}
+ // days of cover: from demand, else as stated in the line
+ let cover=null;
+ if(p.perWeek>0&&p.onHand!==undefined)cover=p.onHand/(p.perWeek/7);
+ else if(p.coverDays!==undefined)cover=p.coverDays;
+ else if(p.perWeek===0&&p.onHand!==undefined){acts.push("Demand is zero, so stock can't run short.");return out()}
+ if(p.rop!==undefined&&p.onHand!==undefined){
+  if(p.onHand<=p.rop){lv("red");acts.push(`On hand (${f0(p.onHand)}) is at or below the reorder point (${f0(p.rop)}). Reorder now.`)}
+  else if(p.onHand<p.rop*1.25){lv("amber");acts.push(`On hand (${f0(p.onHand)}) is within 25% of the reorder point (${f0(p.rop)}).`)}
+  else acts.push(`On hand (${f0(p.onHand)}) is ${Math.round((p.onHand/p.rop-1)*100)}% above the reorder point (${f0(p.rop)}).`)}
+ if(cover!==null){
+  let runOut=cover,gap=0;
+  if(p.inbound>0&&p.inboundIn!==undefined&&p.perWeek>0){if(p.inboundIn<=cover)runOut=cover+p.inbound/(p.perWeek/7);else gap=p.inboundIn-cover}
   else if(p.inbound>0)notes.push(`${f0(p.inbound)} inbound not counted: no arrival time given (add “arriving in N days”).`);
-  const lead=p.lead,runTxt=runOut<1?"under a day":f0(runOut)+" days";
-  if(gap>0){up("red");acts.push(`Stock runs out in about ${f0(cover)} days, ${Math.ceil(gap)} days before the inbound delivery lands. Expedite it or move stock in.`)}
-  if(lead!==undefined){
-   if(runOut<lead){up("red");acts.push(`Stock-out risk: ${runTxt} of stock against a ${f0(lead)}-day lead time. A reorder placed today lands about ${Math.ceil(lead-runOut)} days after you run out.`)}
-   else if(runOut-lead<=7){up("amber");acts.push(`Reorder risk: order within ${Math.max(0,Math.floor(runOut-lead))} days or you will run out before it arrives.`)}
-  }else{acts.push("No lead time given, so cover is compared against 14 days.");if(runOut<7)up("red");else if(runOut<14)up("amber")}
-  if(rag!=="green"){const target=daily*((lead??14)+14),qty=Math.ceil(Math.max(0,target-p.onHand-(gap>0?0:(p.inbound||0))));if(qty>0)acts.push(`Suggested order: about ${f0(qty)} units, enough to cover the lead time plus 14 days at the current rate.`)}
-  if(rag==="green")acts.push(`Covered: ${runTxt} of stock${lead!==undefined?` against a ${f0(lead)}-day lead time`:""}.`);
- }else{
-  // on hand known, demand not stated: still warn, with the break-even rate
-  const horizon=p.lead??14,perWk=p.onHand/horizon*7;
-  up(p.lowWord||p.onHand<=0?"red":"amber");
-  acts.push(`${f0(p.onHand)} units on hand. Demand wasn't stated, so exact cover is unknown, but this item will run out before a new order lands${p.lead!==undefined?` (${f0(p.lead)} days)`:" (14 days assumed)"} if it sells more than ${f0(perWk)} a week (${(perWk/7).toFixed(perWk/7<10?1:0)} a day).`);
-  acts.push("Check recent weekly sales against that rate. If it is higher, reorder now. Add “"+"N/wk” to this line for a firm answer.");
-  if(p.lowWord)acts.unshift("The line says stock is low. Treat as a reorder risk until demand is confirmed.");
+  const rt=runOut<1?"under a day":f0(runOut)+" days",src=p.perWeek>0&&p.onHand!==undefined?`${f0(p.onHand)} on hand at ${f0(p.perWeek)} a week`:"cover stated in the line";
+  if(gap>0){lv("red");acts.push(`Runs out in about ${f0(cover)} days, ${Math.ceil(gap)} days before the inbound delivery lands. Expedite it or move stock in.`)}
+  if(p.lead!==undefined){const spare=runOut-p.lead;
+   if(spare<0){lv("red");acts.push(`${rt} of stock (${src}) against a ${f0(p.lead)}-day lead time. A reorder placed today lands about ${Math.ceil(-spare)} days after you run out.`)}
+   else if(spare<14){lv("amber");acts.push(`${rt} of stock (${src}) against a ${f0(p.lead)}-day lead time. Order within ${Math.floor(spare)} days.`)}
+   else acts.push(`${rt} of stock (${src}) against a ${f0(p.lead)}-day lead time: ${f0(spare)} days to spare.`)}
+  else{
+   if(runOut<7){lv("red");acts.push(`Only ${rt} of stock (${src}). No lead time given; almost any reorder lands after you run out.`)}
+   else if(runOut<21){lv("amber");acts.push(`${rt} of stock (${src}). Add the supplier lead time to confirm whether that's enough.`)}
+   else acts.push(`${rt} of stock (${src}). Healthy unless your supplier takes longer than ${f0(runOut-14)} days (no lead time given).`)}
+  if(p.lowWord&&rag==="green")notes.push("The line calls this stock low, but the figures show it covering demand.");
+ }else if(p.rop===undefined){
+  // on hand only: no rate, no cover, no reorder point. Only call it when the line itself says so.
+  const be=(p.onHand/(p.lead??14))*7;
+  if(p.lowWord){lv("amber");acts.push(`The line says stock is low (${f0(p.onHand)} on hand), but there is no sales rate to size the risk. Add weekly sales to confirm.`)}
+  else if(p.healthyWord||(p.target!==undefined&&p.onHand>=p.target)){acts.push(p.target!==undefined?`On hand (${f0(p.onHand)}) is at or above the target level (${f0(p.target)}).`:`The line describes this stock as healthy (${f0(p.onHand)} on hand).`);notes.push("No sales rate given, so this is not a cover calculation.")}
+  else{rag="grey";acts.push(`${f0(p.onHand)} on hand, but no sales rate, cover or reorder point, so there's nothing to judge the risk against. Add one of: weekly sales (“40/wk”), weeks of supply (“6 weeks of supply”) or a reorder point (“ROP 200”).`);
+   notes.push(`For reference: it runs short before a ${p.lead!==undefined?f0(p.lead)+"-day":"14-day"} reorder only if it sells more than ${f0(be)} a week.`)}
  }
- if(!acts.length)acts.push("Stock on hand covers demand beyond the lead time.");
- head=rag==="red"?"Stock-out risk. Reorder.":rag==="amber"?"Reorder risk. Watch closely.":"Covered";
- return{rag,head,acts,notes}}
+ return out()}
 
 function assessInvoice(p,dirAI){
  const guessed=!p.dir&&(dirAI==="We owe it"||dirAI==="Owed to us"),dir=p.dir||(dirAI==="We owe it"?"payable":dirAI==="Owed to us"?"receivable":"unclear");
@@ -372,7 +398,7 @@ $("try-form").onsubmit=async e=>{e.preventDefault();
  const btn=$("try-go");btn.disabled=true;m.textContent="Reading your lines…";
  let ai=null;
  try{const r=await fetch("/api/classify-stock",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({lines})});if(r.ok)ai=(await r.json()).results}catch{}
- const cards=[];
+ const cards=[],rags=[];
  lines.forEach((line,i)=>{
   const x=ai&&ai[i],inv=isInvoice(line)||(x&&x.kind==="Invoice or payment"&&!parse(line).onHand&&!parse(line).perWeek);
   let res,label,known;
@@ -390,11 +416,11 @@ $("try-form").onsubmit=async e=>{e.preventDefault();
   if(res.notes&&res.notes.length)card.append(el("div",{class:"muted",style:"font-size:12px;margin-top:4px"},res.notes.join(" ")));
   if(res.draft){const dd=el("details",{style:"margin-top:6px"},el("summary",{},"Draft message"),el("pre",{style:"white-space:pre-wrap;font:13px var(--font-num);margin:6px 0 0"},res.draft));card.append(dd)}
   card.append(el("div",{class:"muted",style:"font-size:12px;margin-top:6px"},"Read from the line: "+(known.length?known.map(k=>`${k[0]} ${k[1]}`).join(", "):"nothing numeric found")));
-  cards.push(card);
+  cards.push(card);rags.push(res.rag);
   log(inv?"Invoice check":"Stock check",line,res.head+(label?" ("+label+")":""),res.rag,res.acts,x?"rules + TypeSafe":"rules");
  });
  out.replaceChildren(...cards);
- m.textContent=`Processed ${lines.length} line${lines.length===1?"":"s"} and added to the activity log below${ai?"":" (item identification unavailable right now)"}.`;
+ const cnt=k=>rags.filter(r=>r===k).length;m.textContent=`${lines.length} line${lines.length===1?"":"s"}: ${cnt("red")} at risk, ${cnt("amber")} to watch, ${cnt("green")} healthy${cnt("grey")?`, ${cnt("grey")} can't judge`:""}. Added to the activity log below${ai?"":" (item identification unavailable right now)"}.`;
  btn.disabled=false};
 renderLog();
 })();
