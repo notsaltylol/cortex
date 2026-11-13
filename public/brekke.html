@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Patio &amp; Wall Quotes | QuoteCraft for Brekke Brothers</title>
+<title>Patio &amp; Wall Quotes | Cortex for Brekke Brothers</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -76,8 +76,9 @@ textarea.plain{font:inherit;min-height:80px}
 </head>
 <body>
 <main class="wrap">
+  <a class="back" href="/">&larr; Back to Cortex</a>
   <header>
-    <p class="eyebrow">QuoteCraft &middot; Quotes &amp; proposals for Brekke Brothers Landscape &amp; Stone</p>
+    <p class="eyebrow">Cortex for Brekke Brothers Landscape &amp; Stone &middot; Quotes &amp; proposals</p>
     <h1>Patio &amp; wall quotes</h1>
     <p class="sub">Build an itemized quote from your own rates, with disposal and equipment filled in so nothing gets left off, add any discount and sales tax, then hand the customer a clean proposal. No login. Nothing leaves this browser.</p>
   </header>
@@ -140,7 +141,7 @@ textarea.plain{font:inherit;min-height:80px}
 
   <section class="panel" aria-labelledby="h-chk">
     <h2 id="h-chk">4. Already priced it in your spreadsheet? Check it</h2>
-    <p class="hint" style="margin:0 0 8px">Paste an estimate you built elsewhere and QuoteCraft shows which costs are missing (disposal, equipment, a second skid steer day) and what they do to your profit, before the quote goes out.</p>
+    <p class="hint" style="margin:0 0 8px">Paste an estimate you built elsewhere and Cortex shows which costs are missing (disposal, equipment, a second skid steer day) and what they do to your profit, before the quote goes out.</p>
     <div class="row" style="margin-bottom:10px"><span class="muted" style="font-size:14px">Job type</span>
       <div class="seg" role="group" aria-label="Job type for the check"><button type="button" id="ck-patio" aria-pressed="true">Patio</button><button type="button" id="ck-wall" aria-pressed="false">Retaining wall</button></div></div>
     <label class="field" for="ck-text">Select the cost rows in your spreadsheet, copy, and paste here. Any layout works: each row needs a description and a dollar amount.<textarea id="ck-text" spellcheck="false" placeholder="Paste your estimate rows here"></textarea></label>
@@ -157,7 +158,7 @@ textarea.plain{font:inherit;min-height:80px}
   </section>
 
 </main>
-<footer>QuoteCraft by Pitch, Pray, Ship. Typesafe.</footer>
+<footer>Cortex by Pitch, Pray, Ship. Typesafe.</footer>
 <script>
 "use strict";
 (()=>{
@@ -170,9 +171,10 @@ const RATES=[["labour_hr","Crew labor (what an hour of crew time costs you)","$ 
  ["trailer_trip","Trailering equipment to site and back","$ / round trip"],["haul_load","Hauling dirt away (truck + driver)","$ / load"],["dump_load","Dump / tipping fee","$ / load"],["delivery_load","Material delivery","$ / load"],
  ["pavers_sqft","Pavers","$ / sq ft"],["base_ton","Base gravel","$ / ton"],["sand_ton","Bedding sand","$ / ton"],["edge_lf","Edge restraint","$ / lin ft"],
  ["wallblock_sqft","Wall block","$ / face sq ft"],["cap_lf","Wall caps","$ / lin ft"],["drainrock_ton","Drain rock","$ / ton"],["drainpipe_lf","Drain pipe","$ / lin ft"]];
+const QD={disc:"",discType:"pct",tax:"",taxOn:"all",biz:"Brekke Brothers Landscape & Stone",contact:"",addr:"",qno:"",valid:"30",deposit:"",show:"groups",scope:"",notes:""};
 const blank=()=>({rates:{},asm:{tpcy:1.4,comp:15,loadCy:10},ck:{type:"patio",text:"",days:"",area:"",depth:"",len:"",height:"",quote:""},
- jt:"patio",job:{patio:{},wall:{}},lines:{patio:{},wall:{}},oh:"",mg:""});
-let S=blank();try{const v=JSON.parse(localStorage.getItem(KEY));if(v&&v.job){const b=blank();S={...b,...v,asm:{...b.asm,...v.asm},ck:{...b.ck,...v.ck},job:{...b.job,...v.job},lines:{...b.lines,...v.lines}}}}catch{}
+ jt:"patio",job:{patio:{},wall:{}},lines:{patio:{},wall:{}},oh:"",mg:"",q:{...QD}});
+let S=blank();try{const v=JSON.parse(localStorage.getItem(KEY));if(v&&v.job){const b=blank();S={...b,...v,asm:{...b.asm,...v.asm},ck:{...b.ck,...v.ck},job:{...b.job,...v.job},lines:{...b.lines,...v.lines},q:{...b.q,...v.q}}}}catch{}
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch{}};
 const R=k=>Number(S.rates[k])||0;
 
@@ -384,13 +386,75 @@ function update(){
  if(!skid.na&&days>1&&skQ>0&&skQ<days)w.push(`Skid steer is priced for ${nf.format(skQ)} day${skQ===1?"":"s"} but the crew is on site ${nf.format(days)} days. Second day?`);
  if(spoilLoads()===null)w.push(S.jt==="wall"?"Enter wall length and dig depth so disposal loads can be worked out.":"Enter area and excavation depth so disposal loads can be worked out.");
  if(often.length)w.push(`Often missed: ${often.join(", ")}. Price them or tick N/A.`);
- $("warns").replaceChildren(...w.map(t=>el("div",{class:"warn"},t)));
  const oh=Number(S.oh)||0,mg=Number(S.mg)||0,ohAmt=cost*oh/100,base=cost+ohAmt,price=mg<100?base/(1-mg/100):base;
+ const Q=calcQuote(cost,price,base,rows);
+ if(Q.disc>0)w.push(Q.marginAfter<0?`The ${usd2(Q.disc)} discount puts this job ${usd2(-Q.marginAfter)} below cost plus overhead. This job would lose money.`:`The ${usd2(Q.disc)} discount cuts your margin from ${usd2(price-base)} to ${usd2(Q.marginAfter)}.`);
+ $("warns").replaceChildren(...w.map(t=>el("div",{class:"warn"},t)));
  const size=S.jt==="wall"?J("len")*J("height"):J("sqft");
  const tile=(cls,l,v,n)=>{const d=el("div",{class:"tile "+cls},el("div",{class:"tile-label"},l),el("div",{class:"tile-value"},v));if(n)d.append(el("div",{class:"hint"},n));return d};
- $("tiles").replaceChildren(tile("","Direct cost",usd(cost)),tile("","Overhead",usd(ohAmt),S.oh===""?"Not set":oh+"% of cost"),tile("","Margin",usd(price-base),S.mg===""?"Not set":mg+"% of price"),
-  tile("main","Quote price",usd(price),S.oh===""||S.mg===""?"Set overhead and margin":must.length?"Incomplete: costs not priced":""),size>0?tile("",S.jt==="wall"?"Per face sq ft":"Per sq ft",usd2(price/size)):"");
- return{cost,price,ohAmt,must,rows}}
+ $("tiles").replaceChildren(tile("","Direct cost",usd(cost)),tile("","Overhead",usd(ohAmt),S.oh===""?"Not set":oh+"% of cost"),
+  tile("","Margin"+(Q.disc>0?" after discount":""),usd(Q.marginAfter),S.mg===""?"Not set":Q.sub>0?Math.round(Q.marginAfter/Q.sub*100)+"% of price"+(Q.disc>0?` (target ${mg}%)`:""):""),
+  tile("main","Customer total",usd2(Q.total),S.oh===""||S.mg===""?"Set overhead and margin":must.length?"Incomplete: costs not priced":[Q.disc>0?`${usd(Q.disc)} discount`:"",Q.tax>0?`incl. ${usd2(Q.tax)} tax`:""].filter(Boolean).join(", ")),
+  size>0?tile("",S.jt==="wall"?"Per face sq ft":"Per sq ft",usd2(Q.sub/size),"before tax"):"");
+ renderProposal(Q,must,rows);
+ return{cost,price,ohAmt,must,rows,Q}}
+// ================= quote maths =================
+const r2=x=>Math.round(x*100)/100;
+const GROUP={Materials:"Materials",Labor:"Installation labor",Labour:"Installation labor",Equipment:"Equipment and trailering",Disposal:"Disposal: spoil haul-off and dump fees",Other:"Permits, cleanup and other items"};
+function calcQuote(cost,price,base,rows){const q=S.q,p=r2(price),d=Math.max(0,Number(q.disc)||0);
+ const disc=r2(q.discType==="amt"?Math.min(d,p):p*Math.min(d,100)/100),sub=r2(p-disc);
+ const mat=rows.filter(x=>x.l[0]==="Materials"&&!x.st.na).reduce((a,x)=>a+x.tot,0),tr=Math.max(0,Number(q.tax)||0);
+ const taxable=r2(q.taxOn==="materials"?(cost>0?sub*mat/cost:0):sub),tax=r2(taxable*tr/100),total=r2(sub+tax);
+ const f=cost>0?price/cost:0,priced=rows.filter(x=>!x.st.na&&x.tot>0);
+ let items=q.show==="lines"?priced.map(x=>({d:x.l[2],u:x.l[3]==="lump"?"":`${nf.format(Math.round(x.q*100)/100)} ${Math.round(x.q*100)/100===1?x.l[3].replace(/s$/,""):x.l[3]}`,v:x.tot*f}))
+  :[...new Set(priced.map(x=>x.l[0]))].map(g=>({d:GROUP[g]||g,u:"",v:priced.filter(x=>x.l[0]===g).reduce((a,x)=>a+x.tot*f,0)}));
+ items=items.map(i=>({...i,v:r2(i.v)}));const drift=r2(p-items.reduce((a,i)=>a+i.v,0));
+ if(items.length&&drift){const big=items.reduce((a,b)=>b.v>a.v?b:a);big.v=r2(big.v+drift)}
+ const dep=Math.min(100,Math.max(0,Number(q.deposit)||0));
+ return{price:p,disc,sub,tr,taxable,tax,total,items,marginAfter:r2(sub-base),dep,depAmt:r2(total*dep/100),pricedIds:new Set(priced.map(x=>x.l[1]))}}
+function suggestScope(Q){const n=k=>nf.format(J(k)),has=id=>Q.pricedIds.has(id),list=a=>a.length>1?a.slice(0,-1).join(", ")+" and "+a[a.length-1]:a[0]||"";
+ if(S.jt==="wall"){if(!J("len"))return"";
+  const inc=[...(has("haul")||has("dump")?["excavation and haul-away of spoil"]:["excavation"]),...(has("base")?["compacted gravel base"]:[]),...(has("wallblock")?["wall block"+(has("caps")?" and caps":"")]:[]),...(has("drainrock")?["drain rock behind the wall"]:[]),...(has("drainpipe")?["drain pipe"]:[]),...(has("geogrid")?["geogrid reinforcement"]:[]),...(has("fabric")?["filter fabric"]:[]),...(has("clean")?["cleanup and site protection"]:[])];
+  return`Build a ${n("len")} ft retaining wall${J("height")?`, ${n("height")} ft exposed height`:""}. Includes ${list(inc)}.`}
+ if(!J("sqft"))return"";
+ const inc=[...(has("haul")||has("dump")?[`excavation${J("excavIn")?` to ${n("excavIn")} in`:""} and haul-away of spoil`]:["excavation"]),...(has("base")?["compacted gravel base"]:[]),...(has("sand")?["bedding sand"]:[]),...(has("pavers")?["pavers"]:[]),...(has("edge")?["edge restraint"]:[]),...(has("poly")?["polymeric joint sand"]:[]),...(has("clean")?["cleanup and site protection"]:[])];
+ return`Supply and install a ${n("sqft")} sq ft paver patio. Includes ${list(inc)}.`}
+const fmtDay=d=>d.toLocaleDateString("en-US",{month:"long",day:"numeric",year:"numeric"});
+function proposalData(Q){const q=S.q,today=new Date(),vd=Math.max(0,Math.round(Number(q.valid)||0)),until=new Date(today);until.setDate(until.getDate()+vd);
+ return{biz:q.biz.trim(),contact:q.contact.trim(),cust:(S.job[S.jt].name||"").trim(),addr:q.addr.trim(),qno:q.qno.trim(),date:fmtDay(today),until:vd?fmtDay(until):"",scope:q.scope.trim()||suggestScope(Q),notes:q.notes.trim()}}
+function renderProposal(Q,must,rows){const P=proposalData(Q),probs=[];
+ if(!(Q.price>0))probs.push("Nothing priced yet. Fill in the job and your rates above.");
+ else{if(must.length)probs.push(`Not ready to send: ${must.length} essential cost${must.length===1?" isn't":"s aren't"} priced (${must.join(", ")}). Price ${must.length===1?"it":"them"} or tick N/A.`);
+  if(S.oh===""||S.mg==="")probs.push("Overhead and margin aren't set, so this price is your bare cost.");
+  if(Q.marginAfter<0)probs.push("The discount puts this job below cost plus overhead.");
+  if(!P.cust)probs.push("Add the customer's name in step 2 (Job / customer).")}
+ $("prop-warn").replaceChildren(...probs.map(t=>el("div",{class:"warn"},t)));
+ $("q-scope").placeholder=suggestScope(Q)||"Describe the work";
+ const kv=(l,...v)=>el("div",{},el("p",{class:"lbl"},l),...v);
+ const head=el("div",{class:"pt-head"},el("div",{},el("div",{class:"biz"},P.biz||"Your business name"),P.contact?el("div",{class:"muted"},P.contact):""),
+  el("div",{style:"text-align:right"},el("div",{class:"doc"},"PROPOSAL"),P.qno?el("div",{class:"muted"},"Quote "+P.qno):"",el("div",{class:"muted"},P.date),P.until?el("div",{class:"hint"},"Valid until "+P.until):""));
+ const who=kv("Prepared for",el("div",{style:"font-weight:500"},P.cust||el("span",{class:"muted"},"Customer name")),P.addr?el("div",{},P.addr):"");
+ const tb=el("tbody",{},...Q.items.map(i=>el("tr",{},el("td",{},i.d,i.u?el("div",{class:"hint"},i.u):""),el("td",{class:"num"},usd2(i.v)))));
+ const sum=(l,v,cls="sum")=>el("tr",{class:cls},el("td",{style:"text-align:right"},l),el("td",{class:"num"},v));
+ if(Q.disc>0||Q.tax>0)tb.append(sum("Subtotal",usd2(Q.price),"sum first"));
+ if(Q.disc>0)tb.append(sum("Discount"+(S.q.discType==="pct"?` (${nf.format(Number(S.q.disc))}%)`:""),"-"+usd2(Q.disc)));
+ if(Q.tax>0)tb.append(sum(`Sales tax (${nf.format(Q.tr)}%${S.q.taxOn==="materials"?" on materials":""})`,usd2(Q.tax)));
+ tb.append(sum("Total",usd2(Q.total),"grand"));
+ const tbl=el("table",{},el("thead",{},el("tr",{},el("th",{scope:"col"},"Description"),el("th",{class:"num",scope:"col"},"Amount"))),tb);
+ const parts=[head,who];
+ if(P.scope)parts.push(kv("Scope of work",el("p",{class:"scope"},P.scope)));
+ parts.push(tbl);
+ if(Q.dep>0)parts.push(el("p",{style:"margin:0"},`Deposit to schedule the work: `,el("strong",{class:"num"},usd2(Q.depAmt)),` (${nf.format(Q.dep)}% of the total).`));
+ if(P.notes)parts.push(kv("Notes and exclusions",el("p",{class:"scope"},P.notes)));
+ parts.push(el("div",{class:"sig"},el("div",{},el("div",{class:"sigline"}),el("div",{class:"hint"},"Accepted by (signature)")),el("div",{},el("div",{class:"sigline"}),el("div",{class:"hint"},"Date"))));
+ $("proposal").replaceChildren(...parts)}
+function proposalText(Q){const P=proposalData(Q),L=[];
+ L.push(P.biz+(P.contact?" | "+P.contact:""),`PROPOSAL${P.qno?" "+P.qno:""} | ${P.date}${P.until?` | valid until ${P.until}`:""}`,"",`Prepared for: ${P.cust||"(customer name)"}${P.addr?", "+P.addr:""}`);
+ if(P.scope)L.push("","Scope of work:",P.scope);
+ L.push("",...Q.items.map(i=>`${i.d}${i.u?` (${i.u})`:""}: ${usd2(i.v)}`));
+ if(Q.disc>0||Q.tax>0)L.push(`Subtotal: ${usd2(Q.price)}`);if(Q.disc>0)L.push(`Discount: -${usd2(Q.disc)}`);if(Q.tax>0)L.push(`Sales tax (${nf.format(Q.tr)}%${S.q.taxOn==="materials"?" on materials":""}): ${usd2(Q.tax)}`);
+ L.push(`TOTAL: ${usd2(Q.total)}`);if(Q.dep>0)L.push(`Deposit to schedule the work: ${usd2(Q.depAmt)} (${nf.format(Q.dep)}% of the total)`);
+ if(P.notes)L.push("","Notes and exclusions:",P.notes);return L.join("\n")}
 function build(){
  $("jb-patio").setAttribute("aria-pressed",String(S.jt==="patio"));$("jb-wall").setAttribute("aria-pressed",String(S.jt==="wall"));
  $("job-grid").replaceChildren(...JOB[S.jt].map(([k,l,t])=>{const i=el("input",{type:t==="text"?"text":"number",...(t==="text"?{maxlength:"80"}:{min:"0",step:"any",inputmode:"decimal"}),value:S.job[S.jt][k]??""});
@@ -409,11 +473,15 @@ function build(){
  $("oh").value=S.oh;$("mg").value=S.mg}
 $("jb-patio").onclick=()=>{S.jt="patio";save();build();update()};$("jb-wall").onclick=()=>{S.jt="wall";save();build();update()};
 $("oh").oninput=e=>{S.oh=e.target.value;save();update()};$("mg").oninput=e=>{S.mg=e.target.value;save();update()};
-$("reset").onclick=()=>{S.job[S.jt]={};S.lines[S.jt]={};S.oh=S.oh;save();build();update();$("cmsg").textContent="Cleared. Your rates are kept."};
-$("copy").onclick=async()=>{const{cost,price,ohAmt,must,rows}=update(),n=S.job[S.jt].name||"Job",it=rows.filter(x=>!x.st.na&&x.tot>0).map(x=>`${x.l[2]}: ${nf.format(x.q)} ${x.l[3]} x ${usd2(x.r)} = ${usd2(x.tot)}`);
- const txt=[n,...it,`Direct cost: ${usd2(cost)}`,`Overhead: ${usd2(ohAmt)}`,`Quote price: ${usd2(price)}`,must.length?`NOT PRICED: ${must.join(", ")}`:"All essential costs priced"].join("\n");
+$("reset").onclick=()=>{S.job[S.jt]={};S.lines[S.jt]={};for(const k of["disc","addr","qno","scope"])S.q[k]="";save();syncQ();build();update();$("cmsg").textContent="Cleared. Your rates, tax rate and proposal details are kept."};
+function syncQ(){for(const k of Object.keys(QD))$("q-"+k).value=S.q[k]??QD[k]}
+for(const k of Object.keys(QD)){const i=$("q-"+k);i[i.tagName==="SELECT"?"onchange":"oninput"]=()=>{S.q[k]=i.value;save();update()}}
+$("print").onclick=()=>{const u=update();if(u.must.length)$("pmsg").textContent="Heads up: some essential costs aren't priced yet.";try{window.print()}catch{}};
+$("copy-prop").onclick=async()=>{const{Q}=update();try{await navigator.clipboard.writeText(proposalText(Q));$("pmsg").textContent="Proposal copied."}catch{$("pmsg").textContent="Couldn't copy."}};
+$("copy").onclick=async()=>{const{cost,price,ohAmt,must,rows,Q}=update(),n=S.job[S.jt].name||"Job",it=rows.filter(x=>!x.st.na&&x.tot>0).map(x=>`${x.l[2]}: ${nf.format(x.q)} ${x.l[3]} x ${usd2(x.r)} = ${usd2(x.tot)}`);
+ const txt=[n,...it,`Direct cost: ${usd2(cost)}`,`Overhead: ${usd2(ohAmt)}`,`Price before discount: ${usd2(price)}`,...(Q.disc>0?[`Discount: -${usd2(Q.disc)}`,`Margin after discount: ${usd2(Q.marginAfter)}`]:[]),...(Q.tax>0?[`Sales tax: ${usd2(Q.tax)}`]:[]),`Customer total: ${usd2(Q.total)}`,must.length?`NOT PRICED: ${must.join(", ")}`:"All essential costs priced"].join("\n");
  try{await navigator.clipboard.writeText(txt);$("cmsg").textContent="Copied."}catch{$("cmsg").textContent="Couldn't copy."}};
-buildCk();build();update();
+buildCk();syncQ();build();update();
 })();
 </script>
 </body>
