@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RO Approval Check | Cortex for Maumee Valley Auto Care</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f5f6f8;--surface:#fff;--ink:#1b2230;--muted:#5d6879;--line:#dde2ea;--accent:#2b4fd8;--accent-ink:#fff;
+ --red:#b3261e;--red-bg:#fde8e6;--amber:#8a5a00;--amber-bg:#fff1d6;--green:#1d7a46;--green-bg:#e0f4e8;
+ --font-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;--font-num:"IBM Plex Mono",ui-monospace,Menlo,monospace}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#12151c;--surface:#1a1f29;--ink:#e8ecf3;--muted:#9aa5b8;--line:#2b3342;--accent:#7f9bff;--accent-ink:#0b1020;
+ --red:#ff8a80;--red-bg:#3d1c1a;--amber:#f2c261;--amber-bg:#3a2d12;--green:#6fd09a;--green-bg:#16301f}}
+*{box-sizing:border-box}html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:15px/1.5 var(--font-body)}
+.wrap{max-width:1100px;margin:0 auto;padding:20px 16px 32px;display:grid;gap:16px}
+a{color:var(--accent)}h1{margin:0;font-size:26px;letter-spacing:-.01em;text-wrap:balance}
+h2{margin:0 0 10px;font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600}
+.back{font-size:13px}.sub,.muted{color:var(--muted)}.sub{margin:4px 0 0}
+.eyebrow{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600;margin-bottom:2px}
+.num{font-family:var(--font-num);font-variant-numeric:tabular-nums}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px}
+.panel p{margin:0 0 8px}
+[hidden]{display:none!important}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+label.field{display:grid;gap:4px;font-size:13px;color:var(--muted)}
+input,button,textarea,select{font:inherit}
+input[type=text],input[type=number],input[type=datetime-local],textarea,select{padding:7px 9px;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:8px;width:100%}
+textarea{font-family:var(--font-num);font-size:13px;min-height:100px;resize:vertical}
+#one-note{font-family:var(--font-body);font-size:16px;min-height:76px}
+.scroll{overflow-x:auto}table{width:100%;border-collapse:collapse;min-width:980px}
+th,td{text-align:left;padding:7px 8px;border-top:1px solid var(--line);vertical-align:top}
+thead th{border-top:0;font-size:12px;color:var(--muted);font-weight:600}td.num,th.num{text-align:right}
+.st{display:inline-block;font-size:11px;font-weight:600;padding:1px 9px;border-radius:999px;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap}
+.st.red{background:var(--red-bg);color:var(--red)}.st.amber{background:var(--amber-bg);color:var(--amber)}.st.green{background:var(--green-bg);color:var(--green)}.st.grey{background:var(--bg);color:var(--muted);border:1px solid var(--line)}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px}
+.tile{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--line);border-radius:10px;padding:10px 14px}
+.tile.red{border-left-color:var(--red)}.tile.green{border-left-color:var(--green)}.tile.amber{border-left-color:var(--amber)}.tile.main{border-left-color:var(--accent)}
+.tile-label{color:var(--muted);font-size:13px}.tile-value{font:500 21px var(--font-num)}.hint{font-size:12px;color:var(--muted)}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+button.primary{padding:8px 14px;background:var(--accent);color:var(--accent-ink);border:0;border-radius:8px;font-weight:600;cursor:pointer}
+button.primary:disabled{opacity:.6;cursor:progress}
+button.btn{font-size:13px;padding:5px 12px;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:999px;cursor:pointer}
+button.ghost{background:none;border:0;color:var(--muted);cursor:pointer;padding:2px 6px;border-radius:6px}button.ghost:hover{color:var(--red)}
+.msg{font-size:13px;color:var(--muted);margin:0;min-height:1.3em}.msg.warn{color:var(--red)}
+code{font-family:var(--font-num);font-size:12.5px;background:var(--bg);padding:1px 5px;border-radius:4px;border:1px solid var(--line)}
+details summary{cursor:pointer;color:var(--muted);font-size:14px}
+ul.plain{margin:6px 0 0;padding-left:18px;font-size:14px;display:grid;gap:3px}
+.verdict{border:1px solid var(--line);border-left:6px solid var(--line);border-radius:10px;padding:12px 14px;background:var(--bg);display:grid;gap:6px;margin-top:12px}
+.verdict.green{border-left-color:var(--green)}.verdict.red{border-left-color:var(--red)}.verdict.grey{border-left-color:var(--muted)}
+.v-head{font-weight:600;font-size:20px;letter-spacing:.01em}.verdict.green .v-head{color:var(--green)}.verdict.red .v-head{color:var(--red)}
+.draft{font-size:13.5px;background:var(--surface);border:1px dashed var(--line);border-radius:8px;padding:8px 10px;white-space:pre-wrap}
+.cell-note{font-size:13px;word-break:break-word;max-width:300px}
+.markbox{display:grid;gap:8px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));align-items:end;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px;margin-top:6px}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+footer{text-align:center;color:var(--muted);font-size:13px;padding:4px 16px 24px}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <a class="back" href="/">&larr; Back to Cortex</a>
+  <header>
+    <div class="eyebrow">Cortex for Maumee Valley Auto Care</div>
+    <h1>RO approval check</h1>
+    <p class="sub">Cortex doesn't replace your shop system. Paste or type RO notes; it tells you which ones can go to a tech and which need written approval first.</p>
+  </header>
+
+  <section class="panel" aria-labelledby="h-one">
+    <h2 id="h-one">Check one RO note</h2>
+    <form id="one-form">
+      <label class="field" for="one-note">RO note, as the service writer wrote it<textarea id="one-note" spellcheck="true" maxlength="2000" placeholder="Type or paste the approval note from the RO"></textarea></label>
+      <div class="grid" style="margin-top:8px">
+        <label class="field">RO # (optional)<input id="one-ro" type="text" maxlength="30" autocomplete="off"></label>
+        <label class="field">Shop (optional)<select id="one-shop"><option value="">-</option><option>Toledo</option><option>Maumee</option><option>Perrysburg</option><option>Sylvania</option></select></label>
+        <label class="field">Estimate total $ (optional)<input id="one-est" type="text" inputmode="decimal" maxlength="14" autocomplete="off"></label>
+        <label class="field">Approved in writing $ (optional)<input id="one-appr" type="text" inputmode="decimal" maxlength="14" autocomplete="off"></label>
+      </div>
+      <div class="row" style="margin-top:10px"><button class="primary" type="submit" id="one-go">Check this note</button><span class="hint">Enter checks it. Shift+Enter for a new line.</span><span id="one-msg" class="msg" role="status" aria-live="polite"></span></div>
+    </form>
+    <div id="one-out" aria-live="polite"></div>
+  </section>
+
+  <section class="panel" aria-labelledby="h-batch">
+    <h2 id="h-batch">Check a batch of ROs</h2>
+    <p class="muted" style="font-size:14px">Copy ROs out of your shop system and paste them here: rows with a header line (tab or comma separated), or just one RO note per line. Each RO is checked the same way as above and added to the log.</p>
+    <form id="batch-form">
+      <label class="field" for="batch-in">ROs to check<textarea id="batch-in" spellcheck="false" placeholder="Header row: ro, shop, customer, phone, estimate_total, approved_amount, note   (approved_amount is optional)&#10;Or one RO note per line, nothing else"></textarea></label>
+      <div class="row" style="margin-top:8px"><button class="primary" type="submit" id="batch-go">Check these ROs</button><button type="button" class="btn" id="hdr">Copy header row</button><button type="button" class="btn" id="batch-clear">Clear results</button><span id="batch-msg" class="msg" role="status" aria-live="polite"></span></div>
+    </form>
+    <details style="margin-top:8px"><summary>Columns</summary><ul class="plain muted">
+      <li><code>ro</code> RO number</li><li><code>shop</code> Toledo, Maumee, Perrysburg or Sylvania</li><li><code>customer</code> and <code>phone</code>, used in the text draft</li>
+      <li><code>estimate_total</code> the estimate in dollars</li><li><code>approved_amount</code> optional: how much the customer approved in writing, if it's less than the estimate</li>
+      <li><code>note</code> the approval note from the RO (required). Only this column is sent for the second read; names and phone numbers stay in this browser.</li></ul></details>
+    <div id="batch-out" hidden style="margin-top:14px;display:grid;gap:12px">
+      <div class="tiles" id="tiles"></div>
+      <div><div class="hint" style="margin-bottom:6px">By shop</div><div class="tiles" id="shop-tiles"></div></div>
+      <div class="scroll"><table><thead><tr><th scope="col">RO</th><th scope="col">Shop</th><th scope="col">Customer</th><th class="num" scope="col">Estimate</th><th scope="col">Result</th><th scope="col">Why</th><th scope="col">Next step</th><th scope="col">Source</th></tr></thead><tbody id="batch-body"></tbody></table></div>
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="h-log">
+    <div class="row" style="justify-content:space-between"><h2 id="h-log" style="margin:0">Check log <span id="log-count" class="muted" style="text-transform:none;letter-spacing:0;font-weight:400"></span></h2>
+      <div class="row"><button type="button" class="btn" id="log-csv">Download CSV</button><button type="button" class="btn" id="log-clear">Clear log</button></div></div>
+    <p class="muted" style="font-size:13px;margin:8px 0">Every check is listed with the time, RO, note, decision, reason and source. When written approval comes in on a held RO, mark it here with your name and the time; it moves to released. The log is kept in this browser only. Download the CSV to keep it.</p>
+    <p id="log-empty" class="muted">Nothing checked yet.</p>
+    <div class="scroll" id="log-wrap" hidden><table><thead><tr><th scope="col">Time</th><th scope="col">RO</th><th scope="col">Note</th><th scope="col">Decision</th><th scope="col">Reason</th><th scope="col">Source</th><th scope="col"></th></tr></thead><tbody id="log-body"></tbody></table></div>
+  </section>
+
+  <section class="panel" aria-labelledby="h-how">
+    <h2 id="h-how">How it decides</h2>
+    <ul class="plain">
+      <li><strong>Released to tech</strong> only when the note shows written approval: signed or e-signed estimate, signed authorization on file, or approved by text or email with the reply saved.</li>
+      <li><strong>Held: verbal only</strong> when the customer said yes, OK'd or approved it on the phone, by voicemail or in person, and nothing was signed. Same if someone else (a spouse, say) approved by phone.</li>
+      <li><strong>Held: no approval recorded</strong> when the estimate went out but there's no yes, or the plan is to sign at pickup.</li>
+      <li><strong>Held: approval doesn't cover the full estimate</strong> when part is signed and part isn't, or the approved amount is less than the estimate.</li>
+      <li><strong>Held: check the note</strong> when the note is unclear, e.g. "approved" with no word on how, or a text approval with no saved reply.</li>
+      <li><strong>Do not start: declined</strong> when the customer said no.</li>
+    </ul>
+    <p class="muted" style="font-size:14px;margin-top:10px">Two reads per note. First, fixed rules that catch wording like "did not sign", "will sign at pickup" and "signed for the brakes but verbal on the rotors". Second, TypeSafe reads the note on its own. An RO is released only when both see written approval. If they disagree, or TypeSafe isn't sure, it's held and both answers are shown. If TypeSafe can't be reached, the rules decide alone and still hold anything that isn't plainly written.</p>
+    <details><summary>What it doesn't do</summary><ul class="plain muted">
+      <li>It doesn't listen to or record phone calls. It only reads the notes you paste or type.</li>
+      <li>It doesn't connect to or change your shop system. Nothing is written back to the RO.</li>
+      <li>It doesn't send texts. The text drafts are for your writers to copy and send themselves.</li>
+      <li>It's a check before the tech starts, not a legal guarantee. Written approval gives you something to show at pickup; it can't promise a bill won't be disputed.</li>
+    </ul></details>
+  </section>
+</main>
+<footer>Cortex by Pitch, Pray, Ship. Typesafe.</footer>
+<script>
+"use strict";
+(()=>{
+const KEY="maumee.ro.v1",$=id=>document.getElementById(id);
+const el=(t,a={},...k)=>{const e=document.createElement(t);for(const[x,y]of Object.entries(a))if(y!==null&&y!==undefined)e.setAttribute(x,y);e.append(...k);return e};
+const usd=x=>"$"+Number(x).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
+const money=s=>{const t=String(s??"").replace(/[$,\s]/g,"");if(!t)return null;const n=Number(t);return Number.isFinite(n)&&n>=0?n:NaN};
+const rid=()=>Math.random().toString(36).slice(2,10);
+const blank=()=>({log:[],batch:""});
+let S=blank();try{const v=JSON.parse(localStorage.getItem(KEY));if(v&&Array.isArray(v.log))S={...blank(),...v}}catch{}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch{}};
+const fmtTime=iso=>{const d=new Date(iso);return isNaN(d)?String(iso||""):d.toLocaleString("en-US",{month:"short",day:"numeric",year:"numeric",hour:"numeric",minute:"2-digit",second:"2-digit",timeZoneName:"short"})};
+
+// ---------- rules: read one RO note ----------
+const CUT=/[.;!?,:()\/]|\bbut\b|\bhowever\b|\bthough\b|\balthough\b|\bexcept\b|\bthen\b|\s-\s/;
+const NEG_PRE=/(?:\b(?:not|no|never|nothing|none|without|yet to|will|would|to be|needs?|need to|has to|have to|going to|gonna|once|when|if|until|before|should|must|awaiting|pending|waiting(?: for| on)?|wants? to|asked(?: \w+)? to|ask(?:ed)? for|get|getting|got to|obtain|request(?:ed|ing)?|send(?:ing)? for|sent for|missing|refused to|didnt|hasnt|havent|doesnt|wasnt|isnt|wont|cant|couldnt|wouldnt|dont)|n't)\s+(?:[\w'$.-]+\s+){0,2}$/;
+const NEG_POST=/^\s*(?:[\w'$.-]+\s+){0,3}?(?:needed|required|pending|missing|later|tomorrow|yet|at pick-?\s?up|on pick-?\s?up|when (?:he|she|they|customer)\b)/;
+const before=(t,i)=>{const p=t.slice(Math.max(0,i-60),i).split(CUT);return p[p.length-1]};
+const after=(t,i)=>t.slice(i,i+50).split(CUT)[0];
+function hits(t,re){const out=[];for(const m of t.matchAll(re)){const pre=before(t,m.index),post=after(t,m.index+m[0].length);
+ if(pre&&NEG_PRE.test(pre))continue;if(NEG_POST.test(post))continue;out.push({i:m.index,s:m[0]})}return out}
+const R={
+ signed:/\b(?:e-?|docu-?)?signed\b(?!\s+(?:off|in|up|out)\b)/g,
+ sigOk:/\b(?:e-?)?signatures?\s+(?:is\s+|was\s+)?(?:on file|captured|received|obtained|in hand|done|completed|attached|saved|back)\b|\b(?:got|have|has|received|obtained|captured)\s+(?:the\s+|his\s+|her\s+|their\s+|customer'?s?\s+|a\s+)?(?:e-?)?signature\b|\bsigned\s+electronically\b|\be-?sign(?:ing)?\s+(?:completed|done|received|back)\b/g,
+ writtenAuth:/\b(?:written|signed)\s+(?:approval|authori[sz]ation|auth|consent|ok)\b|\bin\s+writing\b/g,
+ textAppr:/\b(?:approv\w*|ok'?d|okay(?:ed)?|ok|authori[sz]\w*|confirm\w*|agreed|said yes|says yes|replied(?: with)? "?yes|yes)"?[^.;,]{0,30}?\b(?:by|via|over|through|in)\s+(?:an?\s+)?(?:text(?: message)?|txt|sms|e-?mail|reply)\b|\b(?:text|txt|sms|e-?mail)(?:ed)?\s+(?:back\s+)?(?:reply|response|approval)?\s*[:\-]?\s*"?(?:yes|approved?|ok|okay|go ahead)\b|\brepl(?:y|ied)\s*(?:with\s+)?[:\-]?\s*"?(?:yes|approved?|ok|okay)\b/g,
+ saved:/\b(?:saved|screenshot(?:ted|s)?|attached|on file|filed|uploaded|printed|stored|kept|logged|in (?:the )?ro|to (?:the )?ro|on (?:the )?ro)\b/g,
+ verbalWord:/\bverbal(?:ly)?\b/g,
+ phone:/\b(?:on|over|by|via)\s+(?:the\s+)?phone\b|\bphone(?:d)?\s+(?:approval|ok|okay|auth\w*|call)\b|\bphoned\b|\bcalled\s+(?:back\s+)?(?:and|to)\s+(?:said|say|approv\w*|ok\w*|authori\w*|gave)\b|\bvoice ?mail\b|\bvm\b|\bin person\b|\bat the counter\b|\bface to face\b|\bat drop-?\s?off\b/g,
+ appr:/\b(?:approv(?:ed|es|al|ing)|approve|ok'?d|okay(?:ed)?|ok|authori[sz](?:ed|ation)|agreed|consented|go[- ]ahead|green light|yes)\b/g,
+ said:/\b(?:said|says|say)\s+(?:yes|ok|okay|fine|sure|go ahead|to go ahead|do it|go for it)\b/g,
+ declined:/\b(?:declined?|declines|refused|denied|said no|says no|turned (?:it |us )?down|(?:doesn'?t|does not|didn'?t|did not|don'?t|do not) want(?:s)?|cancel(?:l?ed)?|passed on)\b/g,
+ undecided:/\b(?:think(?:ing)? (?:about|it over)|wants? to wait|hold(?:ing)? off|get(?:ting)? back to (?:us|me)|call(?:ing)? (?:us )?back|shopping around|checking (?:prices?|with)|not sure|undecided)\b/,
+ notSigned:/\b(?:unsigned|nothing (?:was )?signed|not (?:yet )?signed|(?:has|have|had|did|does|was)(?: not|n'?t)(?: yet)? sign(?:ed)?|didn'?t sign|never signed|no (?:e-?)?signature|without (?:a )?(?:e-?)?signature)\b/,
+ pickup:/\bsign(?:ing|s)?\s+(?:it\s+|the estimate\s+|the ro\s+)?(?:at|on|when|after)\s+(?:\w+\s+){0,2}?pick(?:s|ing)?[- ]?up\b|\bsigned\s+at\s+pick-?\s?up\b/,
+ toSign:/\b(?:will|to|going to|gonna|'d|would|needs? to)\s+sign\b|\b(?:needs?|awaiting|waiting (?:for|on)|pending|request(?:ed)?)\s+(?:a |the |his |her |customer'?s? )?(?:e-?)?signature\b|\bsignature (?:needed|required|pending)\b|\be-?sign link\b|\bsent (?:the )?(?:estimate )?(?:for|to) (?:e-?)?sign(?:ature)?\b/g,
+ pending:/\b(?:no answer|no response|no reply|not (?:yet )?approved|no approval|left (?:a |him |her |them )?(?:voice ?mail|vm|message|msg)|lvm|waiting (?:for|on) (?:the )?(?:customer|approval|reply|response|him|her|them|call ?back|ok)|awaiting (?:approval|reply|response|customer)|pending approval|approval pending|needs? (?:written )?approval|estimate (?:sent|texted|emailed)|sent (?:the )?estimate|texted (?:the )?estimate|emailed (?:the )?estimate|no auth\w*)\b/,
+ third:/\b(wife|husband|spouse|partner|son|daughter|mom|mother|dad|father|parent|boyfriend|girlfriend|fianc[eé]e?|friend|roommate|brother|sister|boss|neighbor|grandson|granddaughter|grandma|grandpa|office manager|fleet manager)\b/,
+ contrast:/\b(?:but|except|however|though|although|only|other than)\b/,
+ addon:/\b(?:add-?ons?|additional|extra|also|more work|supplement)\b/,
+ scope:/\bsigned\s+(?:only\s+)?(?:for|on)\s+(?:the\s+)?([a-z][\w-]*)/,
+};
+const GENERIC=new Set(["estimate","repair","repairs","work","job","everything","all","total","whole","full","ro","authorization","it","this","that","the","approval","quote","entire"]);
+const CAT_LABEL={written:"written approval",verbal:"verbal only",none:"no approval",declined:"declined",partial:"partial",check:"unclear"};
+
+function rules(raw){
+ const t=String(raw||"").toLowerCase().replace(/[‘’`]/g,"'").replace(/[“”]/g,'"').replace(/\s+/g," ").trim();
+ if(!t)return{cat:"none",why:"No approval note on the RO."};
+ const has=re=>t.search(re)!==-1,pos=re=>hits(t,re);
+ const sig=[...pos(R.signed),...pos(R.sigOk),...pos(R.writtenAuth)];
+ const ta=pos(R.textAppr),saved=pos(R.saved).length>0;
+ const textW=ta.length>0&&saved,textUnsaved=ta.length>0&&!saved;
+ const wHits=[...sig,...(textW?ta:[])],W=wHits.length>0;
+ const chan=has(R.phone),appr=pos(R.appr),said=pos(R.said),vw=pos(R.verbalWord);
+ const vHits=[...vw,...(chan?appr:[]),...(ta.length&&!chan?[]:said)],V=vHits.length>0;
+ const D=pos(R.declined).length>0,U=has(R.undecided),NS=has(R.notSigned),PU=has(R.pickup),TS=[...t.matchAll(R.toSign)].map(m=>m.index),P=has(R.pending);
+ const thirdM=t.match(R.third),third=thirdM?thirdM[1]:"";
+ const who=third?` Approval came from the ${third}; make sure they're allowed to approve on this RO.`:"";
+ const chanWord=/voice ?mail|\bvm\b/.test(t)?"by voicemail":/in person|at the counter|face to face|drop-?\s?off/.test(t)?"in person":/phone|called/.test(t)?"on the phone":"verbally";
+ if(W){
+  const wLast=Math.max(...wHits.map(h=>h.i)),vLast=V?Math.max(...vHits.map(h=>h.i)):-1;
+  if(D)return{cat:"partial",why:"Part of the job is signed and the customer declined the rest. The RO should list only the signed work."+who};
+  if(NS||PU)return{cat:"partial",why:"Part of the job is signed, but the note also says something wasn't signed"+(PU?" (or will be signed at pickup, after the work)":"")+"."+who};
+  if(TS.length&&Math.max(...TS)>wLast)return{cat:"partial",why:"Something is signed, but the note says more is still out for signature."+who};
+  if(V&&(has(R.contrast)||has(R.addon)||vLast>wLast))return{cat:"partial",why:`Part is in writing, part was only approved ${chanWord}.`+who};
+  const sc=t.match(R.scope);
+  if(sc&&!GENERIC.has(sc[1]))return{cat:"check",why:`The signature mentions the ${sc[1]} only. Confirm it covers everything on the estimate.`+who};
+  const how=sig.length?(/e-?sign|docu-?sign|electronic/.test(t)?"E-signed.":/on file/.test(t)?"Signed authorization on file.":/in writing|written/.test(t)&&!/\bsigned\b/.test(t)?"Written approval noted.":"Signed by the customer."):"Approved by "+(/e-?mail/.test(t)?"email":"text")+" and the reply is saved.";
+  return{cat:"written",why:how+who};
+ }
+ if(textUnsaved)return{cat:"check",why:"Approved by "+(/e-?mail/.test(t)?"email":"text")+", but the note doesn't say the reply was saved. Save it with the RO first."+who};
+ if(D)return V||appr.length?{cat:"check",why:"The note says both yes and no. Check with the customer."+who}:{cat:"declined",why:"Customer declined the work."};
+ if(V)return{cat:"verbal",why:`Approved ${chanWord} only. Nothing signed or saved in writing`+(PU?"; the plan is to sign at pickup, which is after the work":TS.length?"; the estimate is out for signature but not signed yet":"")+"."+who};
+ if(U)return{cat:"none",why:"Customer hasn't decided yet."+who};
+ if(PU)return{cat:"none",why:"Plan is to sign at pickup. That's after the work, so it doesn't cover it."+who};
+ if(NS)return{cat:"none",why:"Note says the customer hasn't signed."+who};
+ if(TS.length)return{cat:"none",why:"Estimate is out for signature; not signed yet."+who};
+ if(P)return{cat:"none",why:"No approval yet: estimate sent or message left, no yes recorded."+who};
+ if(appr.length||/\bok'?d\b|\bgave (?:the |us |me )?(?:ok|okay|go-?ahead)\b/.test(t))return{cat:"check",why:"Note says approved, but not how. If it wasn't signed or saved in writing, treat it as verbal."+who};
+ return{cat:"none",why:"Nothing in the note shows the customer approved."+who};
+}
+
+// ---------- combine rules with TypeSafe, fail safe ----------
+const BUCKET={released:{dec:"RELEASED",label:"Released to tech",c:"green"},verbal:{dec:"HELD",label:"Held: verbal only",c:"red"},none:{dec:"HELD",label:"Held: no approval recorded",c:"red"},
+ short:{dec:"HELD",label:"Held: approval doesn't cover the full estimate",c:"red"},check:{dec:"HELD",label:"Held: check the note",c:"amber"},declined:{dec:"DO NOT START",label:"Do not start: declined",c:"grey"}};
+function decide(x,ts){ // x:{note,est,appr}; ts: {state:"ok",choice,confidence} | {state:"none"} | {state:"off"}
+ const r=rules(x.note);
+ let bucket=r.cat==="written"?"released":r.cat==="partial"?"short":r.cat,why=r.why,source,tsLabel="";
+ const rMap=r.cat==="check"?null:r.cat;
+ if(!ts||ts.state==="off")source="Rules only (TypeSafe unavailable)";
+ else if(ts.state!=="ok"||!ts.choice){source="Rules; TypeSafe gave no answer";tsLabel="no answer";
+  if(bucket==="released"){bucket="check";why="Rules found written approval, but TypeSafe gave no answer for this note, so it's held to be safe."}}
+ else{source="Rules + TypeSafe";const pct=Math.round((ts.confidence??0)*100);tsLabel=`${CAT_LABEL[ts.choice]||ts.choice}${ts.confidence!=null?` (${pct}%)`:""}`;
+  if(bucket==="released"){
+   if(ts.choice!=="written"){bucket="check";why=`Rules found written approval, but TypeSafe reads it as ${CAT_LABEL[ts.choice]||ts.choice}. Held until someone checks the RO.`}
+   else if((ts.confidence??0)<0.6){bucket="check";why=`Rules found written approval, but TypeSafe is only ${pct}% sure. Held until someone checks the RO.`}}}
+ const disagree=!!(ts&&ts.state==="ok"&&ts.choice&&ts.choice!==rMap);
+ const est=Number.isFinite(x.est)?x.est:null,appr=Number.isFinite(x.appr)?x.appr:null;
+ let gap=null;
+ if(bucket!=="declined"&&est!==null&&appr!==null&&appr<est){gap=Math.round((est-appr)*100)/100;
+  if(bucket==="released"){bucket="short";why=`Written approval covers ${usd(appr)} of the ${usd(est)} estimate. ${usd(gap)} isn't approved in writing.`}
+  else if(bucket==="short")why+=` Approved in writing: ${usd(appr)} of ${usd(est)}; ${usd(gap)} not covered.`}
+ const uncovered=bucket==="released"||bucket==="declined"?0:est===null?null:bucket==="short"&&gap!==null?gap:est;
+ return{bucket,...BUCKET[bucket],why,source,rules:CAT_LABEL[r.cat],ts:tsLabel,disagree,gap,uncovered,next:nextStep(bucket,est,appr,gap)};
+}
+function nextStep(b,est,appr,gap){
+ if(b==="released")return"OK to give to a tech.";
+ if(b==="declined")return"Don't start. Note the decline on the RO. If they change their mind, get it in writing.";
+ if(b==="verbal")return"Don't start yet. Send the itemized estimate for a signature or a text reply, save it with the RO, then mark written approval received.";
+ if(b==="none")return"Don't start. Send the estimate and get it signed, or get a text/email reply and save it, before the tech starts.";
+ if(b==="short")return gap!==null?`Tech can do only the work covered by the ${usd(appr)} approved in writing. Get written approval for the other ${usd(gap)} before that work is done.`:"Tech can do only the work that's signed for. Get written approval for the rest before it's done.";
+ return"Read the RO and confirm how the customer approved. If it isn't signed or saved in writing, treat it as verbal and send the estimate.";
+}
+function draftText(x,d){
+ if(d.bucket==="released"||d.bucket==="declined")return"";
+ const first=String(x.customer||"").trim().split(/\s+/)[0]||"",hi=`Hi${first?" "+first:""}, this is Maumee Valley Auto Care${x.shop?" "+x.shop:""}.`;
+ const ro=x.ro?` for RO ${x.ro}`:"";
+ if(d.bucket==="short"&&d.gap!==null)return`${hi} Your written OK${ro} covers ${usd(x.appr)}. The full estimate is ${usd(x.est)}: [list the rest of the work and prices]. Reply YES to approve the other ${usd(d.gap)} in writing, or call us with questions. Until then we'll only do the approved work.`;
+ const tot=Number.isFinite(x.est)?`, total ${usd(x.est)}`:"";
+ return`${hi}${d.bucket==="verbal"?" Thanks for the OK on the phone.":""} Here's the itemized estimate${ro}${tot}: [list the work and prices]. Please reply YES to approve it in writing, or call us with any questions. We'll start as soon as we have your OK.`;
+}
+
+// ---------- TypeSafe second read (optional; page works without it) ----------
+async function askTypeSafe(notes){ // returns array of ts objects aligned with notes
+ const out=notes.map(n=>n.trim()?null:{state:"none"}),idx=notes.map((n,i)=>n.trim()?i:-1).filter(i=>i>=0);
+ const chunks=[];for(let i=0;i<idx.length;i+=30)chunks.push(idx.slice(i,i+30));
+ let off=0;
+ await Promise.all(chunks.map(async ch=>{
+  const ctl=new AbortController(),tm=setTimeout(()=>ctl.abort(),15000);
+  try{const r=await fetch("/api/ro-auth",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({notes:ch.map(i=>notes[i].trim().slice(0,400))}),signal:ctl.signal});
+   if(!r.ok)throw new Error("status "+r.status);const j=await r.json();if(!j||!Array.isArray(j.results))throw new Error("bad reply");
+   ch.forEach((i,k)=>{const a=j.results[k];out[i]=a&&typeof a.choice==="string"?{state:"ok",choice:a.choice,confidence:typeof a.confidence==="number"?a.confidence:null}:{state:"none"}})}
+  catch{off++;ch.forEach(i=>{out[i]={state:"off"}})}finally{clearTimeout(tm)}}));
+ return{ts:out,off:off>0};
+}
+function record(x,d,mode,batch){
+ const e={id:rid(),at:new Date().toISOString(),mode,batch:batch||"",ro:x.ro||"",shop:x.shop||"",customer:x.customer||"",phone:x.phone||"",est:Number.isFinite(x.est)?x.est:null,appr:Number.isFinite(x.appr)?x.appr:null,
+  note:String(x.note||"").slice(0,2000),bucket:d.bucket,decision:d.dec,result:d.label,why:d.why,next:d.next,source:d.source,rules:d.rules,ts:d.ts,disagree:d.disagree,gap:d.gap,uncovered:d.uncovered,draft:draftText(x,d),recv:null};
+ S.log.unshift(e);if(S.log.length>2000)S.log.length=2000;return e}
+const isReleased=e=>e.bucket==="released"||!!e.recv;
+const decisionOf=e=>e.recv?"RELEASED":e.decision;
+
+// ---------- single note ----------
+$("one-note").addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey&&!e.isComposing){e.preventDefault();$("one-form").requestSubmit()}});
+$("one-form").addEventListener("submit",async e=>{e.preventDefault();const m=$("one-msg");m.className="msg";
+ const note=$("one-note").value.trim();if(!note){m.className="msg warn";m.textContent="Type or paste an RO note first.";return}
+ const est=money($("one-est").value),appr=money($("one-appr").value);
+ if(Number.isNaN(est)||Number.isNaN(appr)){m.className="msg warn";m.textContent="Dollar amounts must be numbers, like 1240.50.";return}
+ const x={note,ro:$("one-ro").value.trim().slice(0,30),shop:$("one-shop").value,est:est??NaN,appr:appr??NaN};
+ $("one-go").disabled=true;m.textContent="Checking…";$("one-out").replaceChildren();
+ const{ts}=await askTypeSafe([note]);
+ const d=decide(x,ts[0]),e2=record(x,d,"single");save();renderLog();
+ $("one-go").disabled=false;m.textContent="";
+ $("one-out").replaceChildren(verdict(e2,d));
+});
+function copyBtn(text,label="Copy text"){const b=el("button",{type:"button",class:"btn"},label);b.onclick=async()=>{try{await navigator.clipboard.writeText(text);b.textContent="Copied"}catch{b.textContent="Select and copy it"}};return b}
+function verdict(e,d){
+ const head=d.dec==="RELEASED"?"RELEASED to tech":d.dec==="HELD"?"HELD: get written approval":"DO NOT START: customer declined";
+ const box=el("div",{class:"verdict "+(d.dec==="RELEASED"?"green":d.dec==="HELD"?"red":"grey")},
+  el("div",{class:"v-head"},head),
+  el("div",{},el("span",{class:"st "+d.c},d.label)),
+  el("div",{},d.why),
+  el("div",{},el("strong",{},"Next: "),d.next),
+  el("div",{class:"hint"},`rules: ${d.rules}${d.ts?` · TypeSafe: ${d.ts}`:""} · source: ${d.source}${d.disagree?" · they disagree, so it's held":""}`));
+ if(e.draft)box.append(el("div",{class:"hint",style:"margin-top:4px"},"Text draft for the writer to send (fill in the work; Cortex doesn't send it):"),el("div",{class:"draft"},e.draft),el("div",{class:"row"},copyBtn(e.draft)));
+ if(d.dec==="HELD")box.append(el("div",{class:"hint"},"When written approval comes in, mark it in the log below."));
+ return box}
+
+// ---------- batch ----------
+const COLS=["ro","shop","customer","phone","estimate_total","approved_amount","note"];
+const ALIAS={ro:"ro",ro_number:"ro",ro_no:"ro",repair_order:"ro",repair_order_number:"ro",order:"ro",shop:"shop",location:"shop",store:"shop",branch:"shop",
+ customer:"customer",customer_name:"customer",name:"customer",phone:"phone",customer_phone:"phone",cell:"phone",mobile:"phone",
+ estimate_total:"estimate_total",estimate:"estimate_total",total:"estimate_total",estimate_amount:"estimate_total",est:"estimate_total",
+ approved_amount:"approved_amount",approved:"approved_amount",approved_total:"approved_amount",authorized_amount:"approved_amount",
+ note:"note",notes:"note",ro_note:"note",approval_note:"note",comments:"note",comment:"note"};
+const normH=h=>h.toLowerCase().trim().replace(/#/g,"").replace(/[^a-z0-9]+/g,"_").replace(/^_+|_+$/g,"");
+function parseTable(text,d){const out=[];let row=[],cur="",q=false;
+ for(let i=0;i<text.length;i++){const ch=text[i];
+  if(q){if(ch==='"'&&text[i+1]==='"'){cur+='"';i++}else if(ch==='"')q=false;else cur+=ch}
+  else if(ch==='"'&&!cur.trim())q=true;else if(ch===d){row.push(cur);cur=""}
+  else if(ch==="\n"||ch==="\r"){if(ch==="\r"&&text[i+1]==="\n")i++;row.push(cur);cur="";if(row.some(x=>x.trim()))out.push(row);row=[]}else cur+=ch}
+ row.push(cur);if(row.some(x=>x.trim()))out.push(row);return out}
+function parseBatch(text){
+ const first=(text.split(/\r?\n/).find(l=>l.trim())||"");if(!first)return{rows:[],warn:[]};
+ const d=first.includes("\t")?"\t":",",hc=first.split(d).map(normH).map(h=>ALIAS[h]||"");
+ if(!hc.includes("note")){
+  if(hc.filter(Boolean).length>=2)return{error:"The header row needs a note column (the approval note from the RO)."};
+  return{rows:text.split(/\r?\n/).map(s=>s.trim()).filter(Boolean).map(note=>({note})),warn:[],mode:"lines"}}
+ const t=parseTable(text,d),h=t[0].map(normH).map(x=>ALIAS[x]||""),ni=h.indexOf("note"),warn=[],rows=[];
+ for(let r=1;r<t.length;r++){const c=t[r];
+  if(c.length>h.length&&ni===h.length-1)c.splice(ni,c.length-ni,c.slice(ni).join(d));
+  const o={};h.forEach((k,j)=>{if(k&&o[k]===undefined)o[k]=(c[j]??"").trim()});
+  const est=money(o.estimate_total),appr=money(o.approved_amount);
+  if(Number.isNaN(est))warn.push(`row ${r+1}: estimate_total "${o.estimate_total}" isn't a number`);
+  if(Number.isNaN(appr))warn.push(`row ${r+1}: approved_amount "${o.approved_amount}" isn't a number`);
+  rows.push({ro:(o.ro||"").slice(0,30),shop:(o.shop||"").slice(0,40),customer:(o.customer||"").slice(0,80),phone:(o.phone||"").slice(0,30),est:est??NaN,appr:appr??NaN,note:(o.note||"").slice(0,2000)})}
+ return{rows,warn,mode:"table"}}
+$("batch-form").addEventListener("submit",async e=>{e.preventDefault();const m=$("batch-msg");m.className="msg warn";
+ const p=parseBatch($("batch-in").value);if(p.error){m.textContent=p.error;return}
+ if(!p.rows.length){m.textContent="Paste at least one RO.";return}
+ if(p.rows.length>300){m.textContent=`That's ${p.rows.length} ROs. Paste 300 or fewer at a time.`;return}
+ m.className="msg";m.textContent=`Checking ${p.rows.length} RO${p.rows.length===1?"":"s"}…`;$("batch-go").disabled=true;
+ const{ts,off}=await askTypeSafe(p.rows.map(r=>r.note));
+ const b=rid();for(let i=p.rows.length-1;i>=0;i--)record(p.rows[i],decide(p.rows[i],ts[i]),"batch",b);
+ S.batch=b;save();$("batch-go").disabled=false;$("batch-in").value="";renderBatch();renderLog();
+ const held=S.log.filter(x=>x.batch===b&&!isReleased(x)&&x.bucket!=="declined").length;
+ m.textContent=`Checked ${p.rows.length}: ${held} held.`+(off?" TypeSafe couldn't be reached, so this used the rules alone (anything not plainly written is held).":"")+(p.warn.length?` Note: ${p.warn.slice(0,3).join("; ")}${p.warn.length>3?` and ${p.warn.length-3} more`:""}.`:"")});
+$("hdr").onclick=async()=>{const h=COLS.join("\t");try{await navigator.clipboard.writeText(h);$("batch-msg").className="msg";$("batch-msg").textContent="Header row copied."}catch{$("batch-in").value=h+"\n"}};
+$("batch-clear").onclick=()=>{S.batch="";save();renderBatch();$("batch-msg").textContent=""};
+function tile(c,l,v,n){const d=el("div",{class:"tile "+c},el("div",{class:"tile-label"},l),el("div",{class:"tile-value"},String(v)));if(n)d.append(el("div",{class:"hint"},n));return d}
+function heldDollars(list){let sum=0,unknown=0;for(const e of list){if(isReleased(e)||e.bucket==="declined")continue;if(e.uncovered==null)unknown++;else sum+=e.uncovered}return{sum,unknown}}
+function renderBatch(){
+ const B=S.log.filter(e=>S.batch&&e.batch===S.batch).reverse();$("batch-out").hidden=!B.length;if(!B.length)return;
+ const rel=B.filter(isReleased),dec=B.filter(e=>!e.recv&&e.bucket==="declined"),held=B.filter(e=>!isReleased(e)&&e.bucket!=="declined"),hd=heldDollars(B);
+ const by=k=>held.filter(e=>e.bucket===k).length;
+ $("tiles").replaceChildren(tile("green","Released to tech",rel.length,`of ${B.length} checked`+(B.some(e=>e.recv)?`, ${B.filter(e=>e.recv).length} after written approval came in`:"")),
+  tile(held.length?"red":"","Held",held.length,[["verbal","verbal only"],["none","no approval"],["short","doesn't cover estimate"],["check","check note"]].filter(([k])=>by(k)).map(([k,l])=>`${by(k)} ${l}`).join(", ")||"none"),
+  tile(hd.sum?"red":"","Dollars held",usd(hd.sum),"estimate dollars not yet approved in writing"+(hd.unknown?`; ${hd.unknown} held without an estimate amount`:"")),
+  tile("","Do not start",dec.length,"customer declined"));
+ const shops=[...new Set(B.map(e=>e.shop||"(no shop)"))].sort();
+ $("shop-tiles").replaceChildren(...shops.map(s=>{const g=B.filter(e=>(e.shop||"(no shop)")===s),h=g.filter(e=>!isReleased(e)&&e.bucket!=="declined"),hs=heldDollars(g);
+  return tile(h.length?"red":"green",s,`${h.length} held`,`${g.filter(isReleased).length} released of ${g.length}${hs.sum?`, ${usd(hs.sum)} held`:""}${g.some(e=>!e.recv&&e.bucket==="declined")?`, ${g.filter(e=>!e.recv&&e.bucket==="declined").length} declined`:""}`)}));
+ const order={verbal:0,none:1,short:2,check:3,declined:4,released:5};
+ $("batch-body").replaceChildren(...[...B].sort((a,b)=>(isReleased(a)-isReleased(b))||order[a.bucket]-order[b.bucket]).map(e=>{
+  const nextCell=el("td",{style:"font-size:13px;max-width:280px"},e.recv?recvText(e):e.next);
+  if(!isReleased(e)&&e.draft)nextCell.append(el("details",{style:"margin-top:4px"},el("summary",{},"Text draft"),el("div",{class:"draft",style:"margin:6px 0"},e.draft),copyBtn(e.draft)));
+  if(!isReleased(e)&&e.bucket!=="declined")nextCell.append(markUI(e));
+  return el("tr",{},el("th",{scope:"row",style:"font-weight:500"},e.ro||"-"),el("td",{},e.shop||"-"),el("td",{style:"font-size:13px"},e.customer||el("span",{class:"muted"},"-"),e.phone?el("div",{class:"hint num"},e.phone):""),
+   el("td",{class:"num"},e.est!=null?usd(e.est):"-",e.gap?el("div",{class:"hint"},usd(e.gap)+" not in writing"):""),
+   el("td",{},chip(e)),el("td",{class:"cell-note"},e.why,el("div",{class:"hint",style:"margin-top:3px"},"Note: "+(e.note||"(blank)"))),nextCell,
+   el("td",{class:"hint"},e.source,e.disagree||e.ts?el("div",{},`rules: ${e.rules}${e.ts?`, TypeSafe: ${e.ts}`:""}`):""))}));
+}
+function chip(e){return e.recv?el("span",{class:"st green"},"Released: written approval received"):el("span",{class:"st "+BUCKET[e.bucket].c},e.result)}
+function recvText(e){return el("span",{},`Written approval received (${e.recv.how}), marked by ${e.recv.by}, ${fmtTime(e.recv.when)}.`)}
+function markUI(e){
+ const open=el("button",{type:"button",class:"btn",style:"margin-top:6px"},"Written approval received");
+ const wrap=el("div",{},open);
+ open.onclick=()=>{const now=new Date(),loc=new Date(now.getTime()-now.getTimezoneOffset()*60000).toISOString().slice(0,16);
+  const by=el("input",{type:"text",maxlength:"60","aria-label":"Your name",placeholder:"Your name"}),when=el("input",{type:"datetime-local",value:loc,"aria-label":"When it came in"});
+  const how=el("select",{"aria-label":"How it came in"},...["Signed estimate","E-signed","Text reply saved","Email reply saved","Signed authorization on file"].map(o=>el("option",{},o)));
+  const ok=el("button",{type:"button",class:"primary"},"Save"),no=el("button",{type:"button",class:"ghost"},"Cancel"),msg=el("p",{class:"msg warn"});
+  ok.onclick=()=>{const name=by.value.trim(),w=new Date(when.value);if(!name){msg.textContent="Type your name.";return}if(isNaN(w)){msg.textContent="Enter when it came in.";return}
+   e.recv={by:name.slice(0,60),when:w.toISOString(),how:how.value||"Signed estimate",marked:new Date().toISOString()};save();renderBatch();renderLog()};
+  no.onclick=()=>wrap.replaceChildren(open);
+  wrap.replaceChildren(el("div",{class:"markbox"},el("label",{class:"field"},"Your name",by),el("label",{class:"field"},"When it came in",when),el("label",{class:"field"},"How",how),el("div",{class:"row"},ok,no)),msg);by.focus()};
+ return wrap}
+
+// ---------- log ----------
+function renderLog(){
+ const L=S.log;$("log-empty").hidden=L.length>0;$("log-wrap").hidden=!L.length;
+ $("log-count").textContent=L.length?`(${L.length} check${L.length===1?"":"s"}, ${L.filter(e=>!isReleased(e)&&e.bucket!=="declined").length} still held)`:"";
+ $("log-body").replaceChildren(...L.slice(0,500).map(e=>{
+  const act=el("td",{});if(!isReleased(e)&&e.bucket!=="declined")act.append(markUI(e));
+  return el("tr",{},el("td",{class:"num",style:"font-size:12px;white-space:nowrap"},fmtTime(e.at)),el("td",{},e.ro||"-",e.shop?el("div",{class:"hint"},e.shop):""),
+   el("td",{class:"cell-note"},e.note||el("span",{class:"muted"},"(blank)")),el("td",{},el("div",{style:"font-weight:600;font-size:13px"},decisionOf(e)),chip(e)),
+   el("td",{style:"font-size:13px;max-width:300px"},e.why,e.recv?el("div",{class:"hint",style:"margin-top:3px"},recvText(e)):""),
+   el("td",{class:"hint"},e.source,e.ts||e.disagree?el("div",{},`rules: ${e.rules}${e.ts?`, TypeSafe: ${e.ts}`:""}`):""),act)}));
+}
+$("log-csv").onclick=()=>{if(!S.log.length)return;const q=v=>{const s=v==null?"":String(v);return/[",\n\r]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s};
+ const head=["time","time_utc","ro","shop","customer","phone","estimate_total","approved_amount","note","decision","result","reason","next_step","source","rules","typesafe","written_approval_received_by","written_approval_received_at","written_approval_how","marked_at"];
+ const rows=S.log.map(e=>[fmtTime(e.at),e.at,e.ro,e.shop,e.customer,e.phone,e.est,e.appr,e.note,decisionOf(e),e.recv?"Released: written approval received":e.result,e.why,e.recv?"OK to give to a tech (written approval received).":e.next,e.source,e.rules,e.ts,e.recv?.by,e.recv?fmtTime(e.recv.when):"",e.recv?.how,e.recv?fmtTime(e.recv.marked):""].map(q).join(","));
+ const a=el("a",{href:URL.createObjectURL(new Blob([[head.join(","),...rows].join("\n")],{type:"text/csv"})),download:`ro-approval-log-${new Date().toISOString().slice(0,10)}.csv`});document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000)};
+$("log-clear").onclick=()=>{if(!S.log.length)return;if(!confirm("Clear the whole log from this browser? Download the CSV first if you want to keep it."))return;S.log=[];S.batch="";save();renderLog();renderBatch()};
+
+window.cortexRO={rules,decide,parseBatch,draftText};
+renderLog();renderBatch();
+})();
+</script>
+</body>
+</html>
