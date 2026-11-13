@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Termly Fee Tracker | Cortex for Elimu Plus</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f5f6f8;--surface:#fff;--ink:#1b2230;--muted:#5d6879;--line:#dde2ea;--accent:#2b4fd8;--accent-ink:#fff;
+ --red:#b3261e;--red-bg:#fde8e6;--amber:#8a5a00;--amber-bg:#fff1d6;--green:#1d7a46;--green-bg:#e0f4e8;
+ --font-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;--font-num:"IBM Plex Mono",ui-monospace,Menlo,monospace}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#12151c;--surface:#1a1f29;--ink:#e8ecf3;--muted:#9aa5b8;--line:#2b3342;--accent:#7f9bff;--accent-ink:#0b1020;
+ --red:#ff8a80;--red-bg:#3d1c1a;--amber:#f2c261;--amber-bg:#3a2d12;--green:#6fd09a;--green-bg:#16301f}}
+*{box-sizing:border-box}html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:15px/1.5 var(--font-body)}
+.wrap{max-width:1080px;margin:0 auto;padding:20px 16px 32px;display:grid;gap:16px}
+a{color:var(--accent)}h1{margin:0;font-size:26px;letter-spacing:-.01em}
+h2{margin:0 0 10px;font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600}
+.back{font-size:13px}.sub,.muted{color:var(--muted)}.sub{margin:4px 0 0}
+.num{font-family:var(--font-num);font-variant-numeric:tabular-nums}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px}
+[hidden]{display:none!important}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
+label.field{display:grid;gap:4px;font-size:13px;color:var(--muted)}
+input,button,textarea,select{font:inherit}
+input[type=text],input[type=number],input[type=date],textarea,select{padding:7px 9px;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:8px;width:100%}
+textarea{font-family:var(--font-num);font-size:13px;min-height:100px;resize:vertical}
+.scroll{overflow-x:auto}table{width:100%;border-collapse:collapse;min-width:820px}
+th,td{text-align:left;padding:7px 8px;border-top:1px solid var(--line);vertical-align:top}
+thead th{border-top:0;font-size:12px;color:var(--muted);font-weight:600}td.num,th.num{text-align:right}
+.st{display:inline-block;font-size:11px;font-weight:600;padding:1px 9px;border-radius:999px;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap}
+.st.red{background:var(--red-bg);color:var(--red)}.st.amber{background:var(--amber-bg);color:var(--amber)}.st.green{background:var(--green-bg);color:var(--green)}
+#tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px}
+.tile{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--line);border-radius:10px;padding:10px 14px}
+.tile.red{border-left-color:var(--red)}.tile.green{border-left-color:var(--green)}.tile.main{border-left-color:var(--accent)}
+.tile-label{color:var(--muted);font-size:13px}.tile-value{font:500 21px var(--font-num)}.hint{font-size:12px;color:var(--muted)}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+button.primary{padding:8px 14px;background:var(--accent);color:var(--accent-ink);border:0;border-radius:8px;font-weight:600;cursor:pointer}
+button.btn{font-size:13px;padding:5px 12px;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:999px;cursor:pointer}
+button.ghost{background:none;border:0;color:var(--muted);cursor:pointer;padding:2px 6px;border-radius:6px}button.ghost:hover{color:var(--red)}
+.msg{font-size:13px;color:var(--muted);margin:0;min-height:1.3em}.msg.warn{color:var(--red)}
+code{font-family:var(--font-num);font-size:12.5px;background:var(--bg);padding:1px 5px;border-radius:4px;border:1px solid var(--line)}
+details summary{cursor:pointer;color:var(--muted);font-size:14px}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+footer{text-align:center;color:var(--muted);font-size:13px;padding:4px 16px 24px}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <a class="back" href="/">&larr; Back to Cortex</a>
+  <header>
+    <h1>Termly fee tracker</h1>
+    <p class="sub">For the fee office at Elimu Plus. Load the student list once, paste M-Pesa or bank payment messages as they come in, and see who has paid, who is part-paid and who is overdue at each centre, with a reminder ready to send to each parent. No login. Nothing leaves this browser.</p>
+  </header>
+
+  <section class="panel" aria-labelledby="h-term">
+    <h2 id="h-term">This term</h2>
+    <div class="grid">
+      <label class="field">Term name<input id="t-name" type="text" maxlength="40" placeholder="Term 1"></label>
+      <label class="field">Fees due by<input id="t-due" type="date"></label>
+      <label class="field">Paybill / till number (for reminders, optional)<input id="t-paybill" type="text" maxlength="20"></label>
+    </div>
+  </section>
+
+  <section id="tiles" aria-label="Summary" hidden></section>
+
+  <section class="panel" aria-labelledby="h-pay">
+    <h2 id="h-pay">Paste payments</h2>
+    <p class="muted" style="margin:0 0 8px;font-size:14px">One payment message per line, copied from M-Pesa, the bank or your own notes. Cortex reads the amount, the receipt code, the phone number, the account number and the payer's name, then matches each payment to a student by account number (student ID), parent phone or name. A receipt code is only ever counted once.</p>
+    <form id="pay-form">
+      <textarea id="pay-in" spellcheck="false" aria-label="Payment messages, one per line" placeholder="Paste payment confirmations here, one per line"></textarea>
+      <div class="row" style="margin-top:8px"><button class="primary" type="submit">Match payments</button><span id="pay-msg" class="msg" role="status" aria-live="polite"></span></div>
+    </form>
+    <div id="unmatched" style="margin-top:10px"></div>
+  </section>
+
+  <section class="panel" aria-labelledby="h-cen" id="centres-panel" hidden>
+    <h2 id="h-cen">By centre</h2>
+    <div class="scroll"><table style="min-width:620px"><thead><tr><th scope="col">Centre</th><th class="num" scope="col">Students</th><th class="num" scope="col">Expected</th><th class="num" scope="col">Collected</th><th class="num" scope="col">Outstanding</th><th class="num" scope="col">Collected %</th><th class="num" scope="col">Overdue</th></tr></thead><tbody id="cen-body"></tbody></table></div>
+  </section>
+
+  <section class="panel" aria-labelledby="h-stu">
+    <div class="row" style="justify-content:space-between;margin-bottom:8px"><h2 id="h-stu" style="margin:0">Students</h2>
+      <div class="row"><select id="f-centre" aria-label="Filter by centre" style="width:auto"></select><select id="f-status" aria-label="Filter by status" style="width:auto">
+        <option value="all">All statuses</option><option value="owing">Owing (unpaid or part-paid)</option><option value="overdue">Overdue</option><option value="paid">Paid</option></select>
+        <button type="button" class="btn" id="copy-rem">Copy reminders for this list</button></div></div>
+    <p id="rem-msg" class="msg" role="status" aria-live="polite"></p>
+    <div class="scroll"><table><thead><tr><th scope="col">Student</th><th scope="col">Centre</th><th scope="col">Parent / phone</th><th class="num" scope="col">Fee</th><th class="num" scope="col">Paid</th><th class="num" scope="col">Balance</th><th scope="col">Status</th><th scope="col">Reminder</th><th></th></tr></thead><tbody id="stu-body"></tbody></table></div>
+    <p id="stu-empty" class="muted">No students yet. Add the student list below.</p>
+  </section>
+
+  <section class="panel" aria-labelledby="h-reg">
+    <h2 id="h-reg">Student list</h2>
+    <form id="reg-form">
+      <label class="field" for="reg-in">Paste from a spreadsheet (first row = column headers, tab or comma separated)<textarea id="reg-in" spellcheck="false" placeholder="student, student_id, centre, parent, phone, term_fee, paid"></textarea></label>
+      <div class="row" style="margin-top:8px"><button class="primary" type="submit">Import students</button><button type="button" class="btn" id="hdr">Copy header row</button><button type="button" class="btn" id="export">Download CSV with balances</button><button type="button" class="btn" id="new-term">Start a new term</button></div>
+      <p id="reg-msg" class="msg" role="status" aria-live="polite"></p>
+    </form>
+    <details><summary>Columns</summary><ul class="muted" style="font-size:14px;margin:8px 0 0">
+      <li><code>student</code> student's name (required)</li><li><code>student_id</code> the account number parents use when paying (recommended)</li>
+      <li><code>centre</code> which centre (required)</li><li><code>parent</code> parent or guardian name</li><li><code>phone</code> parent phone, e.g. 07XX XXX XXX</li>
+      <li><code>term_fee</code> fee for this term in KES (required)</li><li><code>paid</code> anything already paid this term (optional, default 0)</li></ul></details>
+  </section>
+</main>
+<footer>Cortex by Pitch, Pray, Ship. Typesafe.</footer>
+<script>
+"use strict";
+(()=>{
+const KEY="elimu.fees.v1",$=id=>document.getElementById(id);
+const el=(t,a={},...k)=>{const e=document.createElement(t);for(const[x,y]of Object.entries(a))if(y!==null)e.setAttribute(x,y);e.append(...k);return e};
+const kes=x=>"KES "+new Intl.NumberFormat("en-KE",{maximumFractionDigits:0}).format(Math.round(x));
+const COLS=["student","student_id","centre","parent","phone","term_fee","paid"];
+const blank=()=>({term:{name:"",due:"",paybill:""},students:[],payments:[],unmatched:[]});
+let S=blank();try{const v=JSON.parse(localStorage.getItem(KEY));if(v&&Array.isArray(v.students))S={...blank(),...v}}catch{}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch{}};
+const rid=()=>Math.random().toString(36).slice(2,10);
+const normPhone=s=>{const d=String(s||"").replace(/\D/g,"");if(/^254\d{9}$/.test(d))return d;if(/^0\d{9}$/.test(d))return"254"+d.slice(1);if(/^[17]\d{8}$/.test(d))return"254"+d;return d||""};
+const words=s=>String(s||"").toLowerCase().replace(/[^a-z\s'-]/g," ").split(/\s+/).filter(w=>w.length>1);
+const today=()=>{const d=new Date();d.setHours(0,0,0,0);return d};
+const paidOf=s=>s.opening+S.payments.filter(p=>p.sid===s.id).reduce((a,p)=>a+p.amount,0);
+function status(s){const paid=paidOf(s),bal=s.fee-paid,over=S.term.due&&new Date(S.term.due+"T00:00:00")<today();
+ if(bal<=0)return{k:"paid",c:"green",t:paid>s.fee?"Paid (credit "+kes(paid-s.fee)+")":"Paid",paid,bal};
+ if(over)return{k:"overdue",c:"red",t:paid>0?"Overdue, part-paid":"Overdue",paid,bal};
+ return{k:"owing",c:"amber",t:paid>0?"Part-paid":"Unpaid",paid,bal}}
+function reminder(s,st){const first=(s.parent||"").trim().split(/\s+/)[0];const due=S.term.due?new Date(S.term.due+"T00:00:00").toLocaleDateString("en-KE",{day:"numeric",month:"short"}):"";
+ return `Hello${first?" "+first:""}, this is Elimu Plus ${s.centre}. ${s.student}'s ${S.term.name||"term"} fee balance is ${kes(st.bal)}${st.k==="overdue"?` (was due ${due})`:due?`, due ${due}`:""}.${S.term.paybill?` Pay via Paybill/Till ${S.term.paybill}${s.sid_ref?`, account ${s.sid_ref}`:""}.`:""} Thank you.`}
+
+// ---------- payment parsing and matching ----------
+function parsePay(line){const o={raw:line.slice(0,300)};let m;
+ if(m=line.match(/(?:ksh\.?|kes)\s?([\d,]+(?:\.\d{1,2})?)/i))o.amount=Number(m[1].replace(/,/g,""));
+ else if(m=line.match(/\b([\d,]{3,}(?:\.\d{1,2})?)\b/))o.amount=Number(m[1].replace(/,/g,""));
+ if(m=line.match(/\b(?=[A-Z0-9]*\d)(?=[A-Z0-9]*[A-Z])([A-Z0-9]{10})\b/))o.ref=m[1];
+ if(m=line.match(/(?:\+?254|\b0)\s?([17]\d{2})\s?(\d{3})\s?(\d{3})\b/))o.phone="254"+m[1]+m[2]+m[3];
+ if(m=line.match(/(?:account(?:\s*(?:no\.?|number))?|acc(?:\.|t)?(?:\s*no\.?)?|a\/c)\s*[:#.]?\s*([A-Za-z0-9-]{2,})/i))o.acct=m[1];
+ if(m=line.match(/\bfrom\s+([A-Za-z][A-Za-z'.-]+(?:\s+[A-Za-z][A-Za-z'.-]+){0,3}?)(?=\s+(?:\+?254|0[17])|\s+on\b|[,.]|\s*$)/i))o.name=m[1];
+ return o}
+function match(p){const c=S.students;let hits;
+ if(p.acct){hits=c.filter(s=>s.sid_ref&&s.sid_ref.toLowerCase()===p.acct.toLowerCase());if(hits.length===1)return{s:hits[0],how:"account number"}}
+ if(p.phone){hits=c.filter(s=>s.phone&&s.phone===p.phone);if(hits.length===1)return{s:hits[0],how:"parent phone"};if(hits.length>1)return{amb:hits,why:"this phone belongs to more than one student's parent"}}
+ if(p.name){const w=words(p.name);if(w.length>=2){hits=c.filter(s=>{const pw=words(s.parent),sw=words(s.student);return w.filter(x=>pw.includes(x)).length>=2||w.filter(x=>sw.includes(x)).length>=2});
+  if(hits.length===1)return{s:hits[0],how:"name"};if(hits.length>1)return{amb:hits,why:"the name matches more than one student"}}}
+ return{amb:[],why:"no student matched the account number, phone or name"}}
+$("pay-form").onsubmit=e=>{e.preventDefault();const m=$("pay-msg");m.className="msg";
+ if(!S.students.length){m.className="msg warn";m.textContent="Add the student list first (bottom of the page).";return}
+ const lines=$("pay-in").value.split(/\r?\n/).map(s=>s.trim()).filter(Boolean);if(!lines.length){m.textContent="Paste at least one payment.";return}
+ let ok=0,dup=0,bad=0,un=0;
+ for(const line of lines){const p=parsePay(line);
+  if(!(p.amount>0)){bad++;S.unmatched.push({id:rid(),...p,why:"no amount found"});continue}
+  if(p.ref&&(S.payments.some(x=>x.ref===p.ref)||S.unmatched.some(x=>x.ref===p.ref))){dup++;continue}
+  const r=match(p);if(r.s){S.payments.push({id:rid(),sid:r.s.id,amount:p.amount,ref:p.ref||"",raw:p.raw,how:r.how,at:new Date().toISOString()});ok++}
+  else{S.unmatched.push({id:rid(),...p,why:r.why,cands:(r.amb||[]).map(s=>s.id)});un++}}
+ save();render();$("pay-in").value="";
+ m.textContent=`${ok} matched${un?`, ${un} need you to pick the student`:""}${dup?`, ${dup} skipped (receipt already counted)`:""}${bad?`, ${bad} with no amount`:""}.`};
+function renderUnmatched(){const box=$("unmatched");
+ if(!S.unmatched.length){box.replaceChildren();return}
+ box.replaceChildren(el("div",{style:"font-weight:600;margin-bottom:6px"},`Needs a decision (${S.unmatched.length})`),...S.unmatched.map(u=>{
+  const sel=el("select",{"aria-label":"Assign payment to student",style:"width:auto;max-width:260px"},el("option",{value:""},"Choose student…"),
+   ...[...S.students].sort((a,b)=>(u.cands||[]).includes(b.id)-(u.cands||[]).includes(a.id)||a.student.localeCompare(b.student)).map(s=>el("option",{value:s.id},`${(u.cands||[]).includes(s.id)?"★ ":""}${s.student} (${s.centre})`)));
+  const amt=el("input",{type:"number",min:"0",step:"1",value:u.amount>0?String(u.amount):"","aria-label":"Amount in KES",style:"width:110px"});
+  const go=el("button",{type:"button",class:"btn"},"Assign"),drop=el("button",{type:"button",class:"ghost"},"Discard");
+  go.onclick=()=>{const a=Number(amt.value);if(!sel.value||!(a>0))return;S.payments.push({id:rid(),sid:sel.value,amount:a,ref:u.ref||"",raw:u.raw,how:"assigned by hand",at:new Date().toISOString()});S.unmatched=S.unmatched.filter(x=>x.id!==u.id);save();render()};
+  drop.onclick=()=>{S.unmatched=S.unmatched.filter(x=>x.id!==u.id);save();render()};
+  return el("div",{class:"panel",style:"padding:10px;background:var(--bg);margin-bottom:6px"},el("div",{class:"num",style:"font-size:13px;word-break:break-word"},u.raw),
+   el("div",{class:"hint",style:"margin:4px 0 6px"},"Not matched: "+u.why+"."),el("div",{class:"row"},sel,amt,go,drop))}))}
+
+// ---------- student list ----------
+function parseTable(text){const d=(text.split(/\r?\n/,1)[0]||"").includes("\t")?"\t":",";const out=[];let row=[],cur="",q=false;
+ for(let i=0;i<text.length;i++){const ch=text[i];
+  if(q){if(ch==='"'&&text[i+1]==='"'){cur+='"';i++}else if(ch==='"')q=false;else cur+=ch}
+  else if(ch==='"')q=true;else if(ch===d){row.push(cur);cur=""}
+  else if(ch==="\n"||ch==="\r"){if(ch==="\r"&&text[i+1]==="\n")i++;row.push(cur);cur="";if(row.some(x=>x.trim()))out.push(row);row=[]}else cur+=ch}
+ row.push(cur);if(row.some(x=>x.trim()))out.push(row);return out}
+$("reg-form").onsubmit=e=>{e.preventDefault();const m=$("reg-msg");m.className="msg warn";
+ const t=parseTable($("reg-in").value);if(t.length<2){m.textContent="Paste a header row plus at least one student.";return}
+ const h=t[0].map(x=>x.trim().toLowerCase().replace(/[\s-]+/g,"_")),need=["student","centre","term_fee"].filter(k=>!h.includes(k));
+ if(need.length){m.textContent="Missing columns: "+need.join(", ")+". Use “Copy header row” for the exact names.";return}
+ const add=[];
+ for(let i=1;i<t.length;i++){const o={};h.forEach((k,j)=>o[k]=(t[i][j]??"").trim());
+  const fee=Number(String(o.term_fee).replace(/[^\d.]/g,"")),paid=o.paid?Number(String(o.paid).replace(/[^\d.]/g,"")):0;
+  if(!o.student||!o.centre){m.textContent=`Row ${i+1}: student and centre are required.`;return}
+  if(!(fee>0)){m.textContent=`Row ${i+1} (${o.student}): term_fee must be a number above 0.`;return}
+  if(!Number.isFinite(paid)||paid<0){m.textContent=`Row ${i+1} (${o.student}): paid must be 0 or more.`;return}
+  add.push({student:o.student.slice(0,80),sid_ref:(o.student_id||"").slice(0,30),centre:o.centre.slice(0,40),parent:(o.parent||"").slice(0,80),phone:normPhone(o.phone),fee,opening:paid})}
+ let upd=0;for(const a of add){const ex=S.students.find(s=>(a.sid_ref&&s.sid_ref===a.sid_ref)||(!a.sid_ref&&s.student.toLowerCase()===a.student.toLowerCase()&&s.centre.toLowerCase()===a.centre.toLowerCase()));
+  if(ex){Object.assign(ex,a);upd++}else S.students.push({id:rid(),...a})}
+ save();render();$("reg-in").value="";m.className="msg";m.textContent=`Imported ${add.length} student${add.length===1?"":"s"}${upd?` (${upd} updated)`:""}.`};
+$("hdr").onclick=async()=>{const h=COLS.join("\t");try{await navigator.clipboard.writeText(h);$("reg-msg").className="msg";$("reg-msg").textContent="Header row copied."}catch{$("reg-in").value=h}};
+$("export").onclick=()=>{if(!S.students.length)return;const q=v=>/[",\n]/.test(String(v))?'"'+String(v).replace(/"/g,'""')+'"':String(v);
+ const csv=["student,student_id,centre,parent,phone,term_fee,paid,balance,status",...S.students.map(s=>{const st=status(s);return[s.student,s.sid_ref,s.centre,s.parent,s.phone,s.fee,st.paid,Math.max(0,st.bal),st.t].map(q).join(",")})].join("\n");
+ const a=el("a",{href:URL.createObjectURL(new Blob([csv],{type:"text/csv"})),download:`elimu-fees-${(S.term.name||"term").replace(/\W+/g,"-")}.csv`});a.click();URL.revokeObjectURL(a.href)};
+$("new-term").onclick=()=>{for(const s of S.students)s.opening=0;S.payments=[];S.unmatched=[];S.term={...S.term,name:"",due:""};save();syncTerm();render();$("reg-msg").className="msg";$("reg-msg").textContent="New term started: payments cleared, students kept. Re-import to update fees."};
+
+// ---------- render ----------
+function render(){
+ const has=S.students.length>0,R=S.students.map(s=>({s,st:status(s)}));
+ $("tiles").hidden=!has;$("centres-panel").hidden=!has;$("stu-empty").hidden=has;
+ const exp=R.reduce((a,x)=>a+x.s.fee,0),col=R.reduce((a,x)=>a+Math.min(x.st.paid,x.s.fee),0),out=exp-col,od=R.filter(x=>x.st.k==="overdue");
+ const tile=(c,l,v,n)=>{const d=el("div",{class:"tile "+c},el("div",{class:"tile-label"},l),el("div",{class:"tile-value"},v));if(n)d.append(el("div",{class:"hint"},n));return d};
+ $("tiles").replaceChildren(tile("main","Expected this term",kes(exp),`${R.length} students`),tile("green","Collected",kes(col),exp?Math.round(col/exp*100)+"% of expected":""),
+  tile("","Outstanding",kes(out),`${R.filter(x=>x.st.k!=="paid").length} students owing`),tile(od.length?"red":"","Overdue",String(od.length),od.length?kes(od.reduce((a,x)=>a+x.st.bal,0))+" overdue":S.term.due?"None overdue":"Set a due date to track overdue"));
+ const cens=[...new Set(S.students.map(s=>s.centre))].sort();
+ $("cen-body").replaceChildren(...cens.map(c=>{const g=R.filter(x=>x.s.centre===c),e=g.reduce((a,x)=>a+x.s.fee,0),k=g.reduce((a,x)=>a+Math.min(x.st.paid,x.s.fee),0),o=g.filter(x=>x.st.k==="overdue").length;
+  return el("tr",{},el("th",{scope:"row",style:"font-weight:500"},c),el("td",{class:"num"},String(g.length)),el("td",{class:"num"},kes(e)),el("td",{class:"num"},kes(k)),el("td",{class:"num"},kes(e-k)),el("td",{class:"num"},e?Math.round(k/e*100)+"%":"-"),el("td",{class:"num"},String(o)))}));
+ const fc=$("f-centre"),cur=fc.value||"all";fc.replaceChildren(el("option",{value:"all"},"All centres"),...cens.map(c=>el("option",{value:c},c)));fc.value=cens.includes(cur)?cur:"all";
+ const V=visible(R);
+ $("stu-body").replaceChildren(...V.sort((a,b)=>({overdue:0,owing:1,paid:2}[a.st.k]-{overdue:0,owing:1,paid:2}[b.st.k])||b.st.bal-a.st.bal).map(({s,st})=>{
+  const cp=el("button",{type:"button",class:"btn"},"Copy");cp.onclick=async()=>{try{await navigator.clipboard.writeText(reminder(s,st));cp.textContent="Copied"}catch{cp.textContent="Copy failed"}};
+  const del=el("button",{type:"button",class:"ghost","aria-label":"Remove "+s.student},"Remove");del.onclick=()=>{S.students=S.students.filter(x=>x.id!==s.id);S.payments=S.payments.filter(p=>p.sid!==s.id);save();render()};
+  const pays=S.payments.filter(p=>p.sid===s.id);
+  return el("tr",{},el("th",{scope:"row",style:"font-weight:500"},s.student,s.sid_ref?el("div",{class:"hint"},"ID "+s.sid_ref):""),el("td",{},s.centre),
+   el("td",{},s.parent||el("span",{class:"muted"},"-"),s.phone?el("div",{class:"hint num"},"+"+s.phone):""),
+   el("td",{class:"num"},kes(s.fee)),el("td",{class:"num",title:pays.map(p=>`${kes(p.amount)} ${p.ref} (matched by ${p.how})`).join("\n")},kes(st.paid),pays.length?el("div",{class:"hint"},`${pays.length} payment${pays.length===1?"":"s"}`):""),
+   el("td",{class:"num"},kes(Math.max(0,st.bal))),el("td",{},el("span",{class:"st "+st.c},st.t)),el("td",{},st.k==="paid"?el("span",{class:"muted"},"-"):cp),el("td",{},del))}));
+ renderUnmatched()}
+function visible(R){const c=$("f-centre").value||"all",f=$("f-status").value;return R.filter(x=>(c==="all"||x.s.centre===c)&&(f==="all"||(f==="owing"?x.st.k!=="paid":x.st.k===f)))}
+$("f-centre").onchange=render;$("f-status").onchange=render;
+$("copy-rem").onclick=async()=>{const V=visible(S.students.map(s=>({s,st:status(s)}))).filter(x=>x.st.k!=="paid"),m=$("rem-msg");
+ if(!V.length){m.textContent="Nobody in this list owes anything.";return}
+ const txt=V.map(x=>`${x.s.phone?"+"+x.s.phone:"(no phone)"}\t${reminder(x.s,x.st)}`).join("\n");
+ try{await navigator.clipboard.writeText(txt);m.textContent=`Copied ${V.length} reminder${V.length===1?"":"s"}, one per line with the phone number first, ready for a bulk SMS tool.`}catch{m.textContent="Couldn't copy to the clipboard."}};
+function syncTerm(){$("t-name").value=S.term.name||"";$("t-due").value=S.term.due||"";$("t-paybill").value=S.term.paybill||""}
+for(const[id,k]of[["t-name","name"],["t-due","due"],["t-paybill","paybill"]])$(id).oninput=e=>{S.term[k]=e.target.value;save();render()};
+syncTerm();render();
+})();
+</script>
+</body>
+</html>
