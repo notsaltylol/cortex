@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>At-Risk Ticket Triage | Cortex for Brasswire Software</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f5f6f8;--surface:#fff;--ink:#1b2230;--muted:#5d6879;--line:#dde2ea;--accent:#2b4fd8;--accent-ink:#fff;
+ --red:#b3261e;--red-bg:#fde8e6;--amber:#8a5a00;--amber-bg:#fff1d6;--green:#1d7a46;--green-bg:#e0f4e8;
+ --font-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;--font-num:"IBM Plex Mono",ui-monospace,Menlo,monospace}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#12151c;--surface:#1a1f29;--ink:#e8ecf3;--muted:#9aa5b8;--line:#2b3342;--accent:#7f9bff;--accent-ink:#0b1020;
+ --red:#ff8a80;--red-bg:#3d1c1a;--amber:#f2c261;--amber-bg:#3a2d12;--green:#6fd09a;--green-bg:#16301f}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#12151c;--surface:#1a1f29;--ink:#e8ecf3;--muted:#9aa5b8;--line:#2b3342;--accent:#7f9bff;--accent-ink:#0b1020;
+ --red:#ff8a80;--red-bg:#3d1c1a;--amber:#f2c261;--amber-bg:#3a2d12;--green:#6fd09a;--green-bg:#16301f}
+*{box-sizing:border-box}html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:15px/1.5 var(--font-body)}
+.wrap{max-width:1120px;margin:0 auto;padding:20px 16px 32px;display:grid;gap:16px}
+a{color:var(--accent)}h1{margin:0;font-size:26px;letter-spacing:-.01em}
+h2{margin:0 0 10px;font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600}
+.back{font-size:13px}.sub,.muted{color:var(--muted)}.sub{margin:4px 0 0}
+.eyebrow{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600;margin:0 0 2px}
+.num{font-family:var(--font-num);font-variant-numeric:tabular-nums}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px}
+[hidden]{display:none!important}
+label.field{display:grid;gap:4px;font-size:13px;color:var(--muted)}
+input,button,textarea,select{font:inherit}
+input[type=text],textarea,select{padding:7px 9px;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:8px;width:100%}
+textarea{font-family:var(--font-num);font-size:13px;min-height:110px;resize:vertical}
+.scroll{overflow-x:auto}table{width:100%;border-collapse:collapse;min-width:900px}
+th,td{text-align:left;padding:7px 8px;border-top:1px solid var(--line);vertical-align:top}
+thead th{border-top:0;font-size:12px;color:var(--muted);font-weight:600}td.num,th.num{text-align:right}
+.st{display:inline-block;font-size:11px;font-weight:600;padding:1px 9px;border-radius:999px;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap}
+.st.red{background:var(--red-bg);color:var(--red)}.st.amber{background:var(--amber-bg);color:var(--amber)}.st.green{background:var(--green-bg);color:var(--green)}
+.st.grey{background:var(--bg);color:var(--muted);border:1px solid var(--line)}
+#tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.tile{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--line);border-radius:10px;padding:10px 14px}
+.tile.red{border-left-color:var(--red)}.tile.amber{border-left-color:var(--amber)}.tile.green{border-left-color:var(--green)}.tile.main{border-left-color:var(--accent)}
+.tile-label{color:var(--muted);font-size:13px}.tile-value{font:500 21px var(--font-num)}.hint{font-size:12px;color:var(--muted)}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+button.primary{padding:8px 14px;background:var(--accent);color:var(--accent-ink);border:0;border-radius:8px;font-weight:600;cursor:pointer}
+button.btn{font-size:13px;padding:5px 12px;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:999px;cursor:pointer}
+button.btn.risk{border-color:var(--red);color:var(--red)}
+button.ghost{background:none;border:0;color:var(--muted);cursor:pointer;padding:2px 6px;border-radius:6px}button.ghost:hover{color:var(--red)}
+.msg{font-size:13px;color:var(--muted);margin:0;min-height:1.3em}.msg.warn{color:var(--red)}
+code{font-family:var(--font-num);font-size:12.5px;background:var(--bg);padding:1px 5px;border-radius:4px;border:1px solid var(--line)}
+details summary{cursor:pointer;color:var(--muted);font-size:14px}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+footer{text-align:center;color:var(--muted);font-size:13px;padding:4px 16px 24px}
+.plain{margin:0;font-size:14px}.plain+.plain{margin-top:4px}
+.reason{font-size:13px}.reason+.reason{margin-top:4px}
+.quote{font-family:var(--font-num);font-size:12.5px;color:var(--muted);word-break:break-word}
+.handoff{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px;display:grid;gap:8px}
+.handoff textarea{min-height:150px;background:var(--surface)}
+.verdict-box{margin-top:10px;display:grid;gap:6px}
+td.subj{max-width:280px;word-break:break-word}
+@media (max-width:600px){h1{font-size:22px}.tile-value{font-size:19px}}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <a class="back" href="/">&larr; Back to Cortex</a>
+  <header>
+    <p class="eyebrow">Cortex for Brasswire Software</p>
+    <h1>At-risk ticket triage</h1>
+    <p class="sub">Finds tickets in the general queue that signal an account may cancel or not renew, shows how long they have waited, and hands each one to Customer Success with a factual note and a timestamped record.</p>
+  </header>
+
+  <section class="panel" aria-label="How this works">
+    <p class="plain"><strong>No helpdesk integration:</strong> this works from a ticket export or pasted tickets. Nothing is read from or written back to your helpdesk.</p>
+    <p class="plain"><strong>Where data lives:</strong> tickets, verdicts and the handoff log are saved in this browser only. If the TypeSafe check is on, ticket text (up to 1,500 characters each) is sent to TypeSafe to be classified; untick it to run on rules alone.</p>
+    <p class="plain"><strong>What this moves:</strong> the time from a cancellation warning landing in the general queue to Customer Success seeing it. The tiles below measure that on your own export: hours in queue for flagged tickets, and how many have no CS handoff yet.</p>
+  </section>
+
+  <section class="panel" aria-labelledby="h-load">
+    <h2 id="h-load">Load a ticket export</h2>
+    <form id="exp-form">
+      <label class="field" for="exp-in">Paste a CSV or tab-separated export, first row = column headers<textarea id="exp-in" spellcheck="false" placeholder="ticket_id, created_at, account, arr, plan, subject, body, status, queue&#10;One ticket per row. Paste from your helpdesk export or a spreadsheet."></textarea></label>
+      <div class="row" style="margin-top:8px">
+        <button class="primary" type="submit">Triage tickets</button>
+        <button type="button" class="btn" id="hdr">Copy header row</button>
+        <label class="row" style="gap:6px;font-size:13px;color:var(--muted)"><input type="checkbox" id="use-ts" checked> Also check with TypeSafe (sends ticket text)</label>
+        <button type="button" class="ghost" id="clear">Clear tickets</button>
+      </div>
+      <p id="exp-msg" class="msg" role="status" aria-live="polite"></p>
+    </form>
+    <details><summary>Columns</summary><ul class="muted" style="font-size:14px;margin:8px 0 0">
+      <li><code>ticket_id</code> ticket number (recommended; rows without one are numbered)</li>
+      <li><code>created_at</code> when the ticket was created, e.g. 2026-11-09 08:14 or ISO 8601 (needed for hours in queue)</li>
+      <li><code>account</code> customer company name (needed for the per-account roll-up)</li>
+      <li><code>arr</code> annual recurring revenue in $ (optional), e.g. 48000 or 48k</li>
+      <li><code>plan</code> or <code>tier</code> (optional)</li>
+      <li><code>subject</code> and <code>body</code> or <code>description</code> (at least one is required)</li>
+      <li><code>status</code> (optional), <code>assignee</code> or <code>queue</code> (optional; a queue or assignee naming Customer Success counts as already handed off)</li>
+    </ul></details>
+  </section>
+
+  <section class="panel" aria-labelledby="h-one">
+    <h2 id="h-one">Check one ticket</h2>
+    <label class="field" for="q-in">Type or paste one ticket's text<textarea id="q-in" spellcheck="false" style="min-height:80px" placeholder="Paste the subject and body of a single ticket"></textarea></label>
+    <div class="row" style="margin-top:8px"><button type="button" class="btn" id="q-ts">Also check with TypeSafe</button><span id="q-msg" class="msg" role="status" aria-live="polite"></span></div>
+    <div id="q-out" class="verdict-box" aria-live="polite"></div>
+  </section>
+
+  <section id="tiles" aria-label="Queue metrics" hidden></section>
+
+  <section class="panel" aria-labelledby="h-tix" id="tix-panel" hidden>
+    <div class="row" style="justify-content:space-between;margin-bottom:8px">
+      <h2 id="h-tix" style="margin:0">Tickets</h2>
+      <div class="row"><span id="mode" class="st grey"></span>
+        <select id="f-level" aria-label="Filter by verdict" style="width:auto">
+          <option value="flagged">Account risk and Watch</option><option value="risk">Account risk only</option><option value="watch">Watch only</option><option value="normal">Normal support only</option><option value="all">All tickets</option>
+        </select></div>
+    </div>
+    <p id="ts-msg" class="msg" role="status" aria-live="polite"></p>
+    <div class="scroll"><table><thead><tr><th scope="col">Verdict</th><th scope="col">Ticket</th><th scope="col">Account</th><th scope="col">Subject</th><th scope="col">Why (reason and matched phrase)</th><th scope="col">Rules / TypeSafe</th><th scope="col">CS handoff</th></tr></thead><tbody id="tix-body"></tbody></table></div>
+    <p id="tix-empty" class="muted" hidden>No tickets match this filter.</p>
+  </section>
+
+  <section class="panel" aria-labelledby="h-acc" id="acc-panel" hidden>
+    <h2 id="h-acc">By account</h2>
+    <p class="muted" style="margin:0 0 8px;font-size:14px">An account is raised to Account risk if any ticket is, if it has 2 or more outage complaints, or if it has 3 or more tickets with at least 2 on Watch.</p>
+    <div class="scroll"><table style="min-width:720px"><thead><tr><th scope="col">Account</th><th class="num" scope="col">ARR</th><th class="num" scope="col">Tickets</th><th class="num" scope="col">Risk</th><th class="num" scope="col">Watch</th><th class="num" scope="col">Outage</th><th scope="col">Account verdict</th><th scope="col">Why</th></tr></thead><tbody id="acc-body"></tbody></table></div>
+  </section>
+
+  <section class="panel" aria-labelledby="h-log">
+    <div class="row" style="justify-content:space-between;margin-bottom:8px"><h2 id="h-log" style="margin:0">Handoff log</h2>
+      <button type="button" class="btn" id="log-csv">Download log as CSV</button></div>
+    <div class="scroll"><table style="min-width:720px"><thead><tr><th scope="col">Time</th><th scope="col">Action</th><th scope="col">Ticket</th><th scope="col">Account</th><th scope="col">By</th><th scope="col">Signal</th></tr></thead><tbody id="log-body"></tbody></table></div>
+    <p id="log-empty" class="muted">No handoffs recorded yet.</p>
+  </section>
+</main>
+<footer>Cortex by Pitch, Pray, Ship. Typesafe.</footer>
+<script>
+"use strict";
+(()=>{
+const KEY="brasswire.triage.v1",$=id=>document.getElementById(id);
+const el=(t,a={},...k)=>{const e=document.createElement(t);for(const[x,y]of Object.entries(a))if(y!==null&&y!==undefined&&y!==false)e.setAttribute(x,y);e.append(...k.filter(v=>v!==null&&v!==undefined&&v!==false&&v!==""));return e};
+const LV={normal:0,watch:1,risk:2},LABEL={risk:"Account risk: send to CS now",watch:"Watch",normal:"Normal support"},CHIP={risk:"red",watch:"amber",normal:"green"};
+const max=(a,b)=>LV[b]>LV[a]?b:a;
+const usd=n=>"$"+new Intl.NumberFormat("en-US",{maximumFractionDigits:0}).format(Math.round(n));
+const fmtTime=iso=>{try{return new Intl.DateTimeFormat(undefined,{year:"numeric",month:"short",day:"numeric",hour:"2-digit",minute:"2-digit",timeZoneName:"short"}).format(new Date(iso))}catch{return iso}};
+const hrs=h=>h==null?"-":h<10?h.toFixed(1)+" h":Math.round(h)+" h";
+const COLS=["ticket_id","created_at","account","arr","plan","subject","body","status","queue"];
+
+// ================= rules =================
+const COMP="servicetitan|service titan|housecall pro|housecallpro|jobber|fieldedge|field edge|service fusion|workiz|servicetrade|successware|simpro|kickserv|fieldpulse|servicem8|zuper|buildops|tradify";
+// Things Brasswire's customers cancel inside the product every day (not the subscription).
+const JOB_RE=/\b(?:jobs?|appointments?|appts?|dispatch(?:es)?|work ?orders?|invoices?|visits?|bookings?|estimates?|quotes?|service calls?|(?:maintenance|service|customer|client|homeowner)\s+(?:agreements?|plans?|contracts?|memberships?)|memberships?|recurring|technicians?|techs?|employees?|users?|routes?|reminders?|notifications?|payments?|transactions?|purchase orders?|orders?|events?|shifts?|customers?|clients?|homeowners?|tenants?)\b/i;
+const SUB_RE=/\b(?:subscriptions?|contracts?|accounts?|plans?|licen[cs]es?|seats?|renewal|auto-?renew(?:al)?|brasswire|(?:our|the|your) service(?!\s+(?:calls?|agreements?|plans?|visits?|tickets?|appointments?|requests?|area|techs?|technicians?))|with (?:you|brasswire)|your (?:software|platform|product|app|system|tool)|everything)\b/i;
+const CUST_SIDE=/\bfor (?:a|the|this|that|my|our|one of (?:our|my))? ?(?:customers?|clients?|homeowners?|tenants?)\b|\b(?:customer|client|homeowner)'s\b/i;
+const NEG=/\b(?:not|never|no|don'?t|do not|won'?t|will not|aren'?t|are not|isn'?t|is not|wasn'?t|have no|has no|without|zero)\b/i;
+const BILLING=/\b(?:overcharg\w*|double[- ]?(?:charg|bill)\w*|(?:charged|billed) (?:us |me )?twice|wrong (?:amount|charge)|incorrect (?:charge|amount|bill(?:ing)?)|billing (?:error|mistake))\b/i;
+const OUTAGE=/\b(?:outages?|downtime|went down|(?:is|was|been|are|were|it's|its|app|site|system|brasswire) down|offline|not loading|won'?t load|crash(?:ed|ing|es)?|can'?t log ?in|cannot log ?in|unable to log ?in|(?:50[0-4]) error|error 50[0-4]|unavailable|sync(?:ing)? (?:is )?(?:failing|broken|down)|not syncing)\b/i;
+const OUT_REPEAT=/\b(?:(?:second|third|fourth|fifth|2nd|3rd|4th|5th|\d+(?:st|nd|rd|th)) (?:outage|time|day|week|incident)|(?:multiple|several|repeated|recurring|constant|another|more) (?:outages?|downtime|incidents?)|every (?:week|day|morning|monday|tuesday|wednesday|thursday|friday)|(?:\d+|two|three|four|five|six) (?:outages|incidents|times) (?:this|in|last|since))\b/i;
+const OUT_STILL=/\b(?:still (?:down|not (?:fixed|resolved|working|loading))|again|no (?:fix|root cause|update)|not (?:been )?(?:fixed|resolved))\b/i;
+
+// kind: obj = check what is being cancelled/refunded; neg = a "not"/"no plans to" before it cancels the signal
+const RULES=[
+ {cat:"cancel",lvl:"risk",re:/\bcancel(?:l?ing|l?ed|s|lation)?\b/gi,obj:"cancel",neg:true,why:"Cancellation intent (subscription or contract)"},
+ {cat:"cancel",lvl:"risk",re:/\b(?:(?:cancellation|termination|non-?renewal) (?:notice|letter)|notice (?:of|to) (?:cancel\w*|terminat\w*|non-?renewal)|intent to (?:cancel|terminate))\b/gi,obj:"strong",neg:true,why:"Formal cancellation or termination notice"},
+ {cat:"renew",lvl:"risk",re:/\b(?:(?:won'?t|will not|do not|don'?t|not|no longer)\s+(?:be\s+)?(?:planning\s+(?:on|to)\s+|going\s+to\s+|looking\s+to\s+|intending\s+to\s+)?renew(?:ing|al)?|non-?renewal|decided (?:not|against) (?:to )?renew\w*|let (?:our|the|this) (?:contract|subscription|plan|license) (?:lapse|expire|run out)|opt(?:ing)? out of (?:the )?(?:auto-?)?renewal|turn(?:ing)? off auto-?renew\w*)\b/gi,obj:"strong",neg:false,why:"Non-renewal intent"},
+ {cat:"terminate",lvl:"risk",re:/\bterminat(?:e|es|ed|ing|ion)\b/gi,obj:"soft",neg:true,why:"Contract termination"},
+ {cat:"terminate",lvl:"risk",re:/\bend(?:ing)? (?:our|the|this) (?:contract|subscription|relationship|partnership|agreement with (?:you|brasswire))\b/gi,neg:true,why:"Ending the contract"},
+ {cat:"leave",lvl:"risk",re:/\b(?:leav(?:e|ing)|mov(?:e|ing) (?:away )?(?:from|off)(?: of)?|stop(?:ping)? using|walk(?:ing)? away from|done with|drop(?:ping)?|get(?:ting)? rid of|replac(?:e|ing)|churn(?:ing)? (?:from|off)?)\s+(?:brasswire|your (?:software|platform|product|app|system|tool|service)|you guys|this (?:software|platform|product|system|tool))\b|\bclos(?:e|ing) (?:our|my) (?:brasswire )?account\b|\bwe(?:'ll| will| are going to) churn\b/gi,neg:true,why:"Leaving Brasswire"},
+ {cat:"competitor",lvl:"risk",re:new RegExp("\\b(?:switch(?:ing|ed)?|mov(?:e|ing)|migrat(?:e|ing|ion)|go(?:ing)? with|sign(?:ed|ing)? (?:up )?with|chose|choos(?:e|ing)|transition(?:ing)?)\\b[^.!?\\n]{0,40}?\\b(?:"+COMP+"|another (?:vendor|provider|platform|tool|software|system|solution|product)|a (?:competitor|different (?:vendor|provider|platform|tool|software|system|solution|product))|other (?:software|platforms?|tools?|systems?|solutions?))\\b","gi"),neg:true,why:"Switching to a competitor"},
+ {cat:"competitor",lvl:"risk",re:new RegExp("\\b(?:evaluat\\w+|looking (?:at|into)|trial(?:l?ing)?|demo(?:ing|'d|ed)?|talking to|talked to|comparing|shopping (?:around|for)|considering|exploring)\\b[^.!?\\n]{0,30}?\\b(?:"+COMP+"|alternatives?|competitors?|other (?:software|platforms?|tools?|systems?|solutions?|software vendors?))\\b","gi"),neg:true,why:"Evaluating competitors"},
+ {cat:"refund",lvl:"risk",re:/\brefund(?:s|ed|ing)?\b/gi,obj:"refund",neg:true,why:"Refund of the subscription"},
+ {cat:"downgrade",lvl:"risk",re:/\b(?:downgrad(?:e|es|ed|ing)|reduc(?:e|ing) (?:our |the |number of )*(?:seats?|licen[cs]es?|plan)|fewer (?:seats|licen[cs]es)|cut(?:ting)? (?:back )?(?:our |the )?(?:seats?|licen[cs]es?)|(?:move|moving|drop|dropping) (?:down )?to (?:the )?(?:starter|basic|lite|essentials|lower|cheaper|free) (?:plan|tier))\b/gi,obj:"soft",neg:true,why:"Downgrade or seat reduction"},
+ {cat:"exec",lvl:"risk",re:/\b(?:escalat\w+|bring(?:ing)?|tak(?:e|ing)|rais(?:e|ing)|go(?:ing)?)\b[^.!?\n]{0,25}?\b(?:to|with|over)\b[^.!?\n]{0,20}?\b(?:(?:your|the) (?:ceo|cro|cfo|coo|cto|founders?|president|leadership|executives?|exec team|vp|board|head of \w+)|(?:our|my) (?:ceo|cfo|coo|owner|president|leadership|exec(?:utive)?s?|board))\b|\bgo(?:ing)? over your head\b|\b(?:our|my) (?:ceo|cfo|coo|owner|president) (?:is|has|wants|will|asked|is asking|has asked)\b|\byour (?:ceo|cro|founders?)\b/gi,neg:false,why:"Executive escalation (threat or customer exec involved)"},
+ {cat:"legal",lvl:"risk",re:/\b(?:lawyers?|attorneys?|legal (?:action|team|counsel|department|recourse|review)|lawsuit|litigation|(?:sue|suing) (?:you|brasswire)|breach of (?:contract|the agreement|our agreement|sla)|small claims|demand letter|our counsel|cease and desist)\b/gi,neg:false,why:"Legal threat or legal involvement"},
+ {cat:"competitor",lvl:"watch",re:new RegExp("\\b(?:"+COMP+")\\b","gi"),neg:false,why:"Mentions a competitor"},
+ {cat:"frustration",lvl:"watch",re:/\b(?:frustrat\w+|unacceptable|ridiculous|fed up|disappoint\w*|furious|angry|livid|terrible|horrible|awful|worst|useless|waste of (?:time|money)|sick of|tired of|incompetent|not acceptable|losing (?:money|customers|jobs|business)|costing us|cost us)\b/gi,neg:false,why:"Frustration"},
+ {cat:"repeat",lvl:"watch",re:/\b(?:(?:second|third|fourth|fifth|2nd|3rd|4th|5th) (?:time|ticket|email|request|call|message)|(?:already|previously) (?:reported|told|asked|opened|submitted|contacted|explained)|following up on (?:my|our|this|the) (?:ticket|request|email|issue|case)|same (?:issue|problem|bug|error)|still (?:waiting|broken|having|happening|seeing|not (?:working|fixed|resolved|loading|syncing)|no (?:response|reply|fix|update))|keeps? (?:happening|breaking|failing)|no (?:response|reply|answer)|no one (?:has )?(?:responded|replied|gotten back|got back|called)|nobody (?:has )?(?:responded|replied|called|got back)|haven'?t heard back|been waiting)\b/gi,neg:false,why:"Repeat contact"},
+ {cat:"billing",lvl:"watch",re:/\b(?:overcharg\w*|double[- ]?(?:charg|bill)\w*|(?:charged|billed) (?:us |me )?twice|disput(?:e|es|ed|ing)|chargeback|wrong (?:amount|charge)|incorrect (?:charge|amount|bill(?:ing)?)|unexpected (?:charge|increase)|price increase|didn'?t (?:authorize|agree to)|billing (?:error|mistake|issue|problem))\b/gi,obj:"billing",neg:false,why:"Billing dispute"},
+ {cat:"escalate",lvl:"watch",re:/\b(?:escalat(?:e|ing|ion)|speak (?:to|with) (?:a|your|the) (?:manager|supervisor))\b/gi,neg:false,why:"Asks to escalate"},
+];
+
+const sentences=t=>String(t).split(/(?<=[.!?])\s+|\n+/).map(s=>s.trim()).filter(Boolean);
+const words=(s,n)=>s.trim().split(/\s+/).filter(Boolean).slice(0,n).join(" ");
+const lastWords=(s,n)=>{const w=s.trim().split(/\s+/).filter(Boolean);return w.slice(Math.max(0,w.length-n)).join(" ")};
+// What does the verb act on? Nearest object after it (same clause), else nearest before it.
+function objectOf(sent,start,end){
+ const after=words(sent.slice(end).split(/[.;!?]|,\s|\s(?:but|because|however|so)\s/i)[0],9);
+ const j=after.search(JOB_RE),b=after.search(SUB_RE);
+ if(j>=0&&(b<0||j<=b))return"job";
+ if(b>=0)return CUST_SIDE.test(after)?"job":"sub";
+ const before=lastWords(sent.slice(0,start).split(/[.;!?]|,\s/).pop(),6);
+ const bj=lastIdx(before,JOB_RE),bb=lastIdx(before,SUB_RE);
+ if(bj>bb)return"job";if(bb>bj)return"sub";return"none"}
+function lastIdx(s,re){const g=new RegExp(re.source,"gi");let m,i=-1;while((m=g.exec(s)))i=m.index;return i}
+function negated(sent,start){
+ const clause=sent.slice(0,start).split(/[,;.!?]|\s(?:but|and|so|because|however)\s/i).pop();
+ return NEG.test(lastWords(clause,6))}
+
+function classifyText(text){
+ text=String(text||"");const R=[],seen=new Set();
+ const hasJob=JOB_RE.test(text),hasSub=SUB_RE.test(text);
+ const add=(lvl,cat,why,phrase,sent)=>{const k=lvl+cat+why,o={k,lvl,cat,why,phrase:phrase.trim().replace(/\s+[.,;:!?]+$/,"").slice(0,120),sent:sent.slice(0,280)};
+  if(seen.has(k)){const ex=R.find(x=>x.k===k);if(o.sent.length>ex.sent.length)Object.assign(ex,o);return}seen.add(k);R.push(o)};
+ const custBill=/\b(?:the|a|my|our|their) (?:customers?|homeowners?|clients?)\b/i.test(text)&&!/\b(?:we|us|i)\b[^.!?]{0,20}\b(?:charged|billed)\b|\b(?:charged|billed) (?:us|me)\b|\bour (?:card|bill|subscription)\b/i.test(text);
+ for(const sent of sentences(text)){
+  for(const r of RULES){r.re.lastIndex=0;let m;
+   while((m=r.re.exec(sent))){const s=m.index,e=s+m[0].length;let lvl=r.lvl,why=r.why;
+    if(r.neg&&negated(sent,s)){add("normal","negated","Negated: says they are not doing this",lastWords(sent.slice(0,s),4)+" "+m[0],sent);continue}
+    if(r.obj){const o=objectOf(sent,s,e);
+     if(r.obj==="cancel"){
+      if(o==="job"){add("normal","job","Refers to a job, appointment, dispatch or invoice, not the subscription",m[0]+" "+words(sent.slice(e),5),sent);continue}
+      if(o==="none"){const intent=/\b(?:will|'ll|going to|gonna|ready to|plan(?:ning)? to|decided to|about to)\s*$/i.test(sent.slice(0,s))||/^\s*(?:if|unless)\b/i.test(sent.slice(e));
+       if(hasSub&&!hasJob){}else if(hasJob&&!hasSub){add("normal","job","'Cancel' with no subscription words; reads as a job or appointment",m[0],sent);continue}else if(intent){why="Cancellation threat (no object named)"}else{lvl="watch";why="'Cancel' with unclear object: check whether it is the subscription"}}
+     }else if(r.obj==="strong"||r.obj==="soft"){
+      if(o==="job"){add("normal","job","Refers to a job or a customer's agreement, not the Brasswire subscription",m[0]+" "+words(sent.slice(e),5),sent);continue}
+      if(o==="none"&&r.obj==="soft"&&r.cat==="terminate"){lvl="watch";why="'Terminate' with unclear object"}
+     }else if(r.obj==="refund"){
+      const w=words(sent.slice(e),10)+" "+lastWords(sent.slice(0,s),6);
+      if(BILLING.test(sent)||/\b(?:charge|charged|fee|bill(?:ed|ing)?)\b/i.test(w)){lvl="watch";why="Billing dispute (refund of a charge)"}
+      else if(/\b(?:subscription|remaining|unused|prorat\w*|annual|contract|licen[cs]es?|seats?|plan|term|year|brasswire)\b/i.test(w)&&!CUST_SIDE.test(sent)&&o!=="job"){}
+      else if(o==="job"||CUST_SIDE.test(sent)){add("normal","job","Refund to their own customer (an invoice or payment), not the subscription",m[0]+" "+words(sent.slice(e),5),sent);continue}
+      else{lvl="watch";why="Refund request"}
+     }else if(r.obj==="billing"){
+      if(CUST_SIDE.test(sent)||custBill){add("normal","job","Billing issue between the contractor and their customer",m[0],sent);continue}
+     }}
+    add(lvl,r.cat,why,r.obj?m[0]+" "+words(sent.slice(e),4):m[0],sent)}}}
+ // outages
+ const outage=OUTAGE.test(text);
+ if(outage){const os=sentences(text).find(s=>OUTAGE.test(s))||text;
+  if(OUT_REPEAT.test(text)){const rm=text.match(OUT_REPEAT);add("risk","outage","Repeated unresolved outages",rm[0],sentences(text).find(s=>OUT_REPEAT.test(s))||os)}
+  else if(OUT_STILL.test(text)){const rm=text.match(OUT_STILL);add("watch","outage","Outage complaint, not resolved",(text.match(OUTAGE)||[""])[0]+" / "+rm[0],os)}
+  else add("normal","outage","Outage or access problem reported",(text.match(OUTAGE)||[""])[0],os)}
+ // shouting
+ const caps=(text.match(/\b[A-Z]{4,}\b/g)||[]).filter(w=>!/^(?:HVAC|ASAP|HTTP|HTTPS|JSON|EDIT|NOTE|TODO|URGENT)$/.test(w));
+ if(/!{2,}/.test(text)||caps.length>=3)add("watch","frustration","Shouting (capitals or !!)",(text.match(/[^.!?\n]{0,30}!{2,}/)||[caps.slice(0,3).join(" ")])[0],sentences(text).find(s=>/!{2,}/.test(s))||text);
+ let level="normal";for(const r of R)level=max(level,r.lvl);
+ R.sort((a,b)=>LV[b.lvl]-LV[a.lvl]);
+ return{level,reasons:R,outage}}
+
+// ================= import =================
+function parseTable(text){const d=(text.split(/\r?\n/,1)[0]||"").includes("\t")?"\t":",";const out=[];let row=[],cur="",q=false;
+ for(let i=0;i<text.length;i++){const ch=text[i];
+  if(q){if(ch==='"'&&text[i+1]==='"'){cur+='"';i++}else if(ch==='"')q=false;else cur+=ch}
+  else if(ch==='"'&&cur==="")q=true;else if(ch===d){row.push(cur);cur=""}
+  else if(ch==="\n"||ch==="\r"){if(ch==="\r"&&text[i+1]==="\n")i++;row.push(cur);cur="";if(row.some(x=>x.trim()))out.push(row);row=[]}else cur+=ch}
+ row.push(cur);if(row.some(x=>x.trim()))out.push(row);return out}
+const ALIAS={ticket_id:["ticket_id","id","ticket","ticket_number","number","ticket_no"],created_at:["created_at","created","created_date","date","opened","opened_at","date_created","submitted_at"],
+ account:["account","account_name","company","organization","organisation","org","customer","customer_name"],arr:["arr","arr_usd","annual_recurring_revenue","acv","contract_value"],
+ plan:["plan","tier","plan_tier","plan/tier","subscription_plan"],subject:["subject","title","summary"],body:["body","description","message","text","comment","details","content"],
+ status:["status","state"],queue:["queue","assignee","group","assigned_to","team","assignee_queue","assignee/queue"]};
+function parseArr(v){const s=String(v||"").trim().toLowerCase().replace(/[$,\s]|usd/g,"");if(!s)return null;const m=s.match(/^(\d+(?:\.\d+)?)([km])?$/);if(!m)return null;return Number(m[1])*(m[2]==="k"?1e3:m[2]==="m"?1e6:1)}
+function parseDate(v){const s=String(v||"").trim();if(!s)return null;let t=Date.parse(s);
+ if(isNaN(t)){const m=s.match(/^(\d{4})-(\d{2})-(\d{2})[ T](\d{1,2}):(\d{2})/);if(m)t=new Date(+m[1],+m[2]-1,+m[3],+m[4],+m[5]).getTime()}
+ return isNaN(t)?null:new Date(t).toISOString()}
+function parseExport(text){const t=parseTable(text);if(t.length<2)return{error:"Paste a header row plus at least one ticket."};
+ const h=t[0].map(x=>x.trim().toLowerCase().replace(/[\s-]+/g,"_")),idx={};
+ for(const[k,al]of Object.entries(ALIAS)){const i=h.findIndex(x=>al.includes(x));if(i>=0)idx[k]=i}
+ if(idx.subject==null&&idx.body==null)return{error:"Need a subject or body (description) column. Found: "+h.join(", ")+"."};
+ const rows=[],ids=new Set();let skipped=0;
+ for(let r=1;r<t.length;r++){const g=k=>idx[k]==null?"":String(t[r][idx[k]]??"").trim();
+  const subject=g("subject").slice(0,300),body=g("body").slice(0,5000);if(!subject&&!body){skipped++;continue}
+  const base=g("ticket_id").slice(0,50)||"row-"+r;let id=base,n=1;while(ids.has(id))id=base+"-"+(++n);ids.add(id);
+  rows.push({id,created:parseDate(g("created_at")),createdRaw:g("created_at").slice(0,40),account:g("account").slice(0,120),arr:parseArr(g("arr")),plan:g("plan").slice(0,60),subject,body,status:g("status").slice(0,40),queue:g("queue").slice(0,80),ts:null})}
+ return{rows,skipped,missing:["created_at","account"].filter(k=>idx[k]==null)}}
+
+// ================= state =================
+const blank=()=>({rows:[],handoffs:{},log:[],who:"",useTs:true,tsMode:"none"});
+let S=blank();try{const v=JSON.parse(localStorage.getItem(KEY));if(v&&Array.isArray(v.rows))S={...blank(),...v}}catch{}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch{}};
+const open=new Set();
+const textOf=r=>(r.subject+(r.subject&&r.body?"\n":"")+r.body);
+const ageH=r=>r.created?Math.max(0,(Date.now()-Date.parse(r.created))/36e5):null;
+const CS_Q=/customer success|\bcs\b|\bcsm\b|account manag|retention/i;
+const TS_MAP={risk:"Account at risk of cancelling or not renewing",watch:"Frustrated but no cancellation intent",normal:"Routine support (including cancelling jobs, appointments, dispatches or invoices)"};
+
+function analyze(rows){
+ const A=rows.map(r=>{const c=classifyText(textOf(r));let level=c.level;const tsv=r.ts&&LV[r.ts.verdict]!=null?r.ts.verdict:null;if(tsv)level=max(level,tsv);
+  return{r,c,rules:c.level,tsv,level,reasons:c.reasons.slice(),age:ageH(r)}});
+ const acc=new Map();
+ for(const a of A){const k=(a.r.account||"").trim().toLowerCase();if(!k)continue;if(!acc.has(k))acc.set(k,{name:a.r.account.trim(),items:[],arr:null,plan:""});const g=acc.get(k);g.items.push(a);if(a.r.arr!=null)g.arr=Math.max(g.arr||0,a.r.arr);if(a.r.plan)g.plan=a.r.plan}
+ const accounts=[];
+ for(const g of acc.values()){const n=g.items.length,risk=g.items.filter(a=>a.level==="risk").length,watch=g.items.filter(a=>a.level==="watch").length,out=g.items.filter(a=>a.c.outage).length;
+  let level=risk?"risk":watch?"watch":"normal",why=risk?`${risk} ticket${risk===1?"":"s"} flagged Account risk`:watch?`${watch} ticket${watch===1?"":"s"} on Watch`:"";
+  let raise=null;
+  if(!risk&&out>=2)raise=`${out} outage complaints from this account in this export`;
+  else if(!risk&&n>=3&&watch>=2)raise=`${n} tickets from this account in this export, ${watch} on Watch`;
+  if(raise){level="risk";why="Raised by roll-up: "+raise;
+   for(const a of g.items)if(a.level==="watch"||a.c.outage){a.level="risk";a.reasons.unshift({lvl:"risk",cat:"rollup",why:"Account roll-up: several tickets from this account",phrase:raise,sent:""})}}
+  accounts.push({...g,n,risk:g.items.filter(a=>a.level==="risk").length,watch:g.items.filter(a=>a.level==="watch").length,out,level,why})}
+ accounts.sort((a,b)=>LV[b.level]-LV[a.level]||(b.arr||0)-(a.arr||0)||b.n-a.n);
+ for(const a of A){a.handoff=S.handoffs[a.r.id]||(CS_Q.test(a.r.queue)?{at:null,by:"",viaQueue:a.r.queue}:null);a.acct=acc.get((a.r.account||"").trim().toLowerCase())||null}
+ return{A,accounts}}
+
+function median(xs){if(!xs.length)return null;const s=[...xs].sort((a,b)=>a-b),m=s.length>>1;return s.length%2?s[m]:(s[m-1]+s[m])/2}
+function metrics(A,accounts){const risk=A.filter(a=>a.level==="risk"),ages=risk.map(a=>a.age).filter(x=>x!=null);
+ const riskAcc=accounts.filter(g=>g.level==="risk"),withArr=riskAcc.filter(g=>g.arr!=null);
+ return{total:A.length,risk:risk.length,watch:A.filter(a=>a.level==="watch").length,riskAccounts:riskAcc.length,arr:withArr.reduce((s,g)=>s+g.arr,0),arrKnown:withArr.length,
+  medianH:median(ages),maxH:ages.length?Math.max(...ages):null,noAge:risk.length-ages.length,noHandoff:risk.filter(a=>!a.handoff).length}}
+
+const ACTIONS={cancel:"CSM to call the account's decision-maker today: confirm renewal date, notice terms and the reason, before Support replies in the ticket.",
+ renew:"CSM to call the account's decision-maker today: confirm renewal date and what would change the decision.",
+ terminate:"CSM to call the account's decision-maker today and review contract terms; Support holds the ticket reply until CS has spoken to them.",
+ leave:"CSM to call the account's decision-maker today: find out what is driving the move.",
+ competitor:"CSM to call today: find out which product they are looking at and what gap is driving it.",
+ refund:"CSM to review before Support or Billing processes any refund; confirm what is driving it.",
+ downgrade:"CSM to review before the plan change is processed; confirm what is driving it.",
+ exec:"CS lead to reply to the customer's executive today and bring in Brasswire's executive sponsor for the account.",
+ legal:"Route to the CS lead and Legal before anyone replies in the ticket.",
+ outage:"CSM to contact the account with the incident history and fix status; Support to link the related tickets.",
+ rollup:"CSM to review every ticket from this account and contact the owner.",
+ typesafe:"CSM to read the ticket and contact the account owner today."};
+function handoffNote(a){const r=a.r,top=a.reasons.find(x=>x.lvl==="risk")||null,cat=top?top.cat:"typesafe",others=a.acct?a.acct.items.filter(x=>x.r.id!==r.id).map(x=>x.r.id):[];
+ const quote=(top&&top.sent)||(a.reasons.find(x=>x.sent)||{}).sent||sentences(textOf(r))[0]||"";
+ return["CS handoff: account risk",
+  `Account: ${r.account||"(not in export)"}${a.acct&&a.acct.arr!=null?`, ARR ${usd(a.acct.arr)}`:""}${r.plan?`, plan ${r.plan}`:""}`,
+  `Ticket: ${r.id}${r.created?`, created ${fmtTime(r.created)}`:""}${a.age!=null?`, ${hrs(a.age)} in queue`:""}${r.status?`, status ${r.status}`:""}${r.queue?`, queue ${r.queue}`:""}`,
+  `Signal: ${top?top.why:"TypeSafe: "+TS_MAP.risk}${top&&top.phrase?` (matched "${top.phrase}")`:""}`,
+  `Customer wrote: "${quote}"`,
+  others.length?`Other tickets from this account in this export: ${others.join(", ")}`:null,
+  `Suggested owner action: ${ACTIONS[cat]||ACTIONS.typesafe}`].filter(Boolean).join("\n")}
+
+// ================= TypeSafe =================
+async function tsCheck(items,progress){// items: [{id,text}] -> Map id->{verdict,label,confidence} or throws
+ const out=new Map();
+ for(let i=0;i<items.length;i+=30){const batch=items.slice(i,i+30).map(x=>({id:x.id,text:x.text.slice(0,1500)}));
+  const res=await fetch("/api/ticket-risk",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({tickets:batch})});
+  if(!res.ok)throw new Error("HTTP "+res.status);
+  const j=await res.json();if(!j||!Array.isArray(j.results))throw new Error("bad response");
+  for(const x of j.results)if(x&&LV[x.verdict]!=null)out.set(String(x.id),{verdict:x.verdict,label:String(x.label||TS_MAP[x.verdict]).slice(0,120),confidence:typeof x.confidence==="number"?x.confidence:null});
+  if(progress)progress(`TypeSafe checked ${Math.min(i+30,items.length)} of ${items.length}.`)}
+ return out}
+const setTsMsg=t=>{$("ts-msg").textContent=t};
+async function runTs(){
+ if(!S.useTs||!S.rows.length){S.tsMode=S.rows.length?"off":"none";save();render();return}
+ const todo=S.rows.filter(r=>!r.ts).slice(0,300);
+ if(!todo.length){S.tsMode="ok";save();render();return}
+ S.tsMode="running";render();setTsMsg(`Checking ${todo.length} ticket${todo.length===1?"":"s"} with TypeSafe…`);
+ try{const m=await tsCheck(todo.map(r=>({id:r.id,text:textOf(r)})),setTsMsg);
+  for(const r of S.rows)if(m.has(r.id))r.ts=m.get(r.id);
+  S.tsMode="ok";setTsMsg(`TypeSafe checked ${m.size} ticket${m.size===1?"":"s"}${S.rows.length>300?" (first 300 only)":""}. Where rules and TypeSafe differ, the higher-risk verdict is used and both are shown.`)}
+ catch(e){S.tsMode="failed";setTsMsg("TypeSafe check unavailable, so these are rules-only verdicts.")}
+ save();render()}
+
+// ================= render =================
+const chip=(lvl,text)=>el("span",{class:"st "+CHIP[lvl]},text||LABEL[lvl]);
+function reasonList(reasons,limit){const shown=reasons.filter(x=>x.lvl!=="normal"||x.cat==="negated"||x.cat==="job");
+ if(!shown.length)return[el("div",{class:"reason muted"},"No risk or watch phrases matched.")];
+ return shown.slice(0,limit||6).map(x=>el("div",{class:"reason"},el("span",{class:"st "+CHIP[x.lvl],style:"margin-right:6px"},x.lvl==="normal"?"note":x.lvl==="watch"?"watch":"risk"),x.why,
+  x.phrase?el("div",{class:"quote"},"matched: “"+x.phrase+"”"):null))}
+function compareCell(a){const parts=[el("div",{class:"reason"},"Rules: "+LABEL[a.rules])];
+ if(a.tsv)parts.push(el("div",{class:"reason"},"TypeSafe: "+LABEL[a.tsv]+(a.r.ts.confidence!=null?` (${Math.round(a.r.ts.confidence*100)}% confidence)`:"")));
+ else parts.push(el("div",{class:"reason muted"},S.tsMode==="running"?"TypeSafe: checking…":"TypeSafe: not checked (rules only)"));
+ if(a.tsv&&a.tsv!==a.rules)parts.push(el("div",{class:"hint"},"Disagree: higher-risk verdict used."));
+ return parts}
+function handoffCell(a){
+ if(a.level!=="risk")return el("span",{class:"muted"},"-");
+ if(a.handoff&&a.handoff.viaQueue)return el("div",{},chip("green","In CS queue"),el("div",{class:"hint"},"Export queue: "+a.handoff.viaQueue));
+ if(a.handoff)return el("div",{},chip("green","Handed off"),el("div",{class:"hint"},fmtTime(a.handoff.at)+(a.handoff.by?" by "+a.handoff.by:"")));
+ const b=el("button",{type:"button",class:"btn risk","aria-expanded":open.has(a.r.id)?"true":"false","aria-label":"Send ticket "+a.r.id+" to CS"},open.has(a.r.id)?"Hide note":"Send to CS");
+ b.onclick=()=>{open.has(a.r.id)?open.delete(a.r.id):open.add(a.r.id);render()};return b}
+function handoffRow(a){const note=handoffNote(a),id="note-"+a.r.id.replace(/[^\w-]/g,"_"),nid="who-"+a.r.id.replace(/[^\w-]/g,"_");
+ const ta=el("textarea",{id,readonly:"readonly",spellcheck:"false"});ta.value=note;
+ const msg=el("span",{class:"msg",role:"status","aria-live":"polite"});
+ const cp=el("button",{type:"button",class:"btn"},"Copy note");
+ cp.onclick=async()=>{try{await navigator.clipboard.writeText(note);msg.textContent="Copied.";logAdd("Handoff note copied",a,S.who)}catch{ta.select();msg.textContent="Couldn't copy automatically; the note is selected, press Ctrl/Cmd+C."}};
+ const who=el("input",{type:"text",id:nid,maxlength:"60",placeholder:"Your name",value:S.who||"",style:"width:auto;min-width:160px"});
+ const mk=el("button",{type:"button",class:"primary"},"Mark handed off to CS");
+ mk.onclick=()=>{const by=who.value.trim();if(!by){msg.className="msg warn";msg.textContent="Type your name so the log shows who handed it off.";who.focus();return}
+  S.who=by;const at=new Date().toISOString();S.handoffs[a.r.id]={at,by};open.delete(a.r.id);logAdd("Handed off to CS",a,by,at);save();render()};
+ return el("tr",{},el("td",{colspan:"7"},el("div",{class:"handoff"},el("label",{class:"field",for:id},"Handoff note for ticket "+a.r.id),ta,
+  el("div",{class:"row"},cp,el("label",{class:"field",for:nid,style:"display:flex;gap:6px;align-items:center"},"Handed off by",who),mk,msg))))}
+function logAdd(action,a,by,at){const top=a.reasons.find(x=>x.lvl==="risk");
+ S.log.push({at:at||new Date().toISOString(),action,ticket:a.r.id,account:a.r.account||"",arr:a.acct&&a.acct.arr!=null?a.acct.arr:"",by:by||"",signal:top?top.why:"TypeSafe",ageH:a.age!=null?Math.round(a.age*10)/10:""});
+ if(S.log.length>2000)S.log=S.log.slice(-2000);save();renderLog()}
+function renderLog(){const L=[...S.log].reverse();$("log-empty").hidden=L.length>0;
+ $("log-body").replaceChildren(...L.map(x=>el("tr",{},el("td",{class:"num",style:"white-space:nowrap"},fmtTime(x.at)),el("td",{},x.action),el("td",{class:"num"},x.ticket),el("td",{},x.account||"-"),el("td",{},x.by||"-"),el("td",{},x.signal))))}
+
+function render(){
+ const{A,accounts}=analyze(S.rows),has=A.length>0;
+ $("tiles").hidden=!has;$("tix-panel").hidden=!has;$("acc-panel").hidden=!accounts.length;
+ const mode=$("mode");mode.textContent=S.tsMode==="ok"?"Rules + TypeSafe":S.tsMode==="running"?"Rules, TypeSafe running":"Rules only";
+ if(has){const M=metrics(A,accounts);
+  const tile=(c,l,v,n)=>el("div",{class:"tile "+c},el("div",{class:"tile-label"},l),el("div",{class:"tile-value"},v),n?el("div",{class:"hint"},n):null);
+  $("tiles").replaceChildren(
+   tile(M.risk?"red":"green","Account-risk tickets found",String(M.risk),`of ${M.total} tickets, ${M.riskAccounts} account${M.riskAccounts===1?"":"s"}. ${M.watch} more on Watch.`),
+   tile(M.risk?"red":"","ARR on flagged accounts",M.arrKnown?usd(M.arr):"-",M.arrKnown?`${M.arrKnown} of ${M.riskAccounts} flagged accounts have ARR in the export`:"Add an arr column to see this"),
+   tile(M.maxH!=null&&M.maxH>=24?"red":M.risk?"amber":"","Flagged tickets: hours in queue",M.medianH!=null?`${hrs(M.medianH)} / ${hrs(M.maxH)}`:"-",M.medianH!=null?`median / max since created_at${M.noAge?`; ${M.noAge} without a readable date`:""}`:"Needs a created_at column"),
+   tile(M.noHandoff?"red":M.risk?"green":"","No CS handoff yet",String(M.noHandoff),M.risk?`of ${M.risk} account-risk tickets`:"Nothing to hand off"));
+  const f=$("f-level").value||"flagged",V=A.filter(a=>f==="all"||(f==="flagged"?a.level!=="normal":a.level===f))
+   .sort((a,b)=>LV[b.level]-LV[a.level]||(b.age??-1)-(a.age??-1));
+  $("tix-empty").hidden=V.length>0;
+  const trs=[];for(const a of V){const r=a.r;
+   trs.push(el("tr",{},el("td",{},chip(a.level)),
+    el("td",{},el("div",{class:"num"},r.id),el("div",{class:"hint"},r.created?fmtTime(r.created):r.createdRaw?"Unreadable date: "+r.createdRaw:"No created_at"),a.age!=null?el("div",{class:"hint num"},hrs(a.age)+" in queue"):null,r.status||r.queue?el("div",{class:"hint"},[r.status,r.queue].filter(Boolean).join(" · ")):null),
+    el("td",{},r.account||el("span",{class:"muted"},"-"),a.acct&&a.acct.arr!=null?el("div",{class:"hint num"},"ARR "+usd(a.acct.arr)):null,r.plan?el("div",{class:"hint"},r.plan):null,a.acct&&a.acct.n>1?el("div",{class:"hint"},a.acct.n+" tickets in export"):null),
+    el("td",{class:"subj"},r.subject||el("span",{class:"muted"},(r.body||"").slice(0,80))),
+    el("td",{},...reasonList(a.reasons)),el("td",{},...compareCell(a)),el("td",{},handoffCell(a))));
+   if(a.level==="risk"&&!a.handoff&&open.has(r.id))trs.push(handoffRow(a))}
+  $("tix-body").replaceChildren(...trs);
+  $("acc-body").replaceChildren(...accounts.map(g=>el("tr",{},el("th",{scope:"row",style:"font-weight:500"},g.name,g.plan?el("div",{class:"hint"},g.plan):null),
+   el("td",{class:"num"},g.arr!=null?usd(g.arr):"-"),el("td",{class:"num"},String(g.n)),el("td",{class:"num"},String(g.risk)),el("td",{class:"num"},String(g.watch)),el("td",{class:"num"},String(g.out)),
+   el("td",{},chip(g.level,g.level==="risk"?"Account risk":g.level==="watch"?"Watch":"Normal")),el("td",{class:"reason"},g.why||"-"))))}
+ renderLog()}
+
+// ================= events =================
+$("use-ts").checked=S.useTs!==false;
+$("use-ts").onchange=e=>{S.useTs=e.target.checked;save();if(S.useTs)runTs();else{S.tsMode=S.rows.length?"off":"none";save();render()}};
+$("exp-form").onsubmit=e=>{e.preventDefault();const m=$("exp-msg");m.className="msg warn";
+ const p=parseExport($("exp-in").value);if(p.error){m.textContent=p.error;return}
+ if(!p.rows.length){m.textContent="No tickets with a subject or body found.";return}
+ S.rows=p.rows;S.tsMode="none";open.clear();save();$("exp-in").value="";
+ m.className="msg";m.textContent=`Loaded ${p.rows.length} ticket${p.rows.length===1?"":"s"}${p.skipped?`, skipped ${p.skipped} empty row${p.skipped===1?"":"s"}`:""}.${p.missing.length?" Missing column"+(p.missing.length>1?"s":"")+": "+p.missing.join(", ")+" (age or roll-up will be blank).":""}`;
+ render();return runTs()};
+$("hdr").onclick=async()=>{const h=COLS.join("\t");try{await navigator.clipboard.writeText(h);$("exp-msg").className="msg";$("exp-msg").textContent="Header row copied."}catch{$("exp-in").value=h}};
+$("clear").onclick=()=>{S.rows=[];S.tsMode="none";open.clear();save();render();$("exp-msg").className="msg";$("exp-msg").textContent="Tickets cleared. The handoff log is kept."};
+$("f-level").onchange=render;
+$("log-csv").onclick=()=>{if(!S.log.length)return;const q=v=>/[",\n]/.test(String(v))?'"'+String(v).replace(/"/g,'""')+'"':String(v);
+ const csv=["logged_at_local,logged_at_utc,action,ticket_id,account,arr,by,signal,hours_in_queue_at_log",...S.log.map(x=>[fmtTime(x.at),x.at,x.action,x.ticket,x.account,x.arr,x.by,x.signal,x.ageH].map(q).join(","))].join("\n");
+ const a=el("a",{href:URL.createObjectURL(new Blob([csv],{type:"text/csv"})),download:"brasswire-cs-handoff-log.csv"});document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000)};
+let qTs=null;
+function renderQuick(){const t=$("q-in").value.trim(),out=$("q-out");if(!t){out.replaceChildren();$("q-msg").textContent="";qTs=null;return}
+ const c=classifyText(t),lvl=qTs?max(c.level,qTs.verdict):c.level;
+ out.replaceChildren(el("div",{},chip(lvl)),...reasonList(c.reasons,8),el("div",{class:"hint"},"Rules: "+LABEL[c.level]+(qTs?` · TypeSafe: ${LABEL[qTs.verdict]}${qTs.confidence!=null?` (${Math.round(qTs.confidence*100)}% confidence)`:""}${qTs.verdict!==c.level?" · disagree, higher-risk verdict used":""}`:" · TypeSafe: not checked")))}
+$("q-in").oninput=()=>{qTs=null;$("q-msg").textContent="";renderQuick()};
+$("q-ts").onclick=async()=>{const t=$("q-in").value.trim();if(!t)return;$("q-msg").textContent="Checking with TypeSafe…";
+ try{const m=await tsCheck([{id:"q",text:t}]);qTs=m.get("q")||null;$("q-msg").textContent=qTs?"":"TypeSafe returned no verdict; rules only."}catch{qTs=null;$("q-msg").textContent="TypeSafe check unavailable: rules only."}
+ renderQuick()};
+window.BrasswireTriage={classifyText,parseExport,analyze,metrics,handoffNote,state:()=>S};
+render();if(S.rows.length&&S.tsMode==="running")runTs();
+})();
+</script>
+</body>
+</html>

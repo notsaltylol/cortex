@@ -1,4 +1,5 @@
 import { handlePlaid } from "./plaid.js";
+import { handleTicketRisk } from "./ticketrisk.js";
 import { choice, noul, TypeSafeClient } from "@typesafe-ai/sdk";
 
 const json = (body, status = 200) =>
@@ -12,6 +13,7 @@ export default {
     if (url.pathname === "/api/classify-stock") return classifyStock(request, env);
     if (url.pathname === "/api/ro-auth") return roAuth(request, env);
     if (url.pathname === "/api/elimu-intake") return elimuIntake(request, env);
+    if (url.pathname === "/api/ticket-risk") return handleTicketRisk(request, env);
     if (url.pathname !== "/api/categorize") return env.ASSETS.fetch(request);
     if (request.method !== "POST") return json({ error: "POST only" }, 405);
     if (!env.TYPESAFE_API_KEY) return json({ error: "TYPESAFE_API_KEY not configured" }, 503);
