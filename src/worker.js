@@ -262,7 +262,7 @@ const STC_PHI_RULES = [
   ["Specific date", /\b(?:0?[1-9]|1[0-2])\/(?:0?[1-9]|[12]\d|3[01])(?:\/\d{2,4})?\b|\b\d{4}-\d{2}-\d{2}\b|\b(?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|June?|July?|Aug(?:ust)?|Sept?(?:ember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)\.?\s+\d{1,2}(?:st|nd|rd|th)?\b/i],
   ["Street address", /\b\d{1,5}\s+(?:[A-Z][a-z]+\s+){1,3}(?:Street|St|Avenue|Ave|Road|Rd|Boulevard|Blvd|Lane|Ln|Drive|Dr|Way|Court|Ct|Place|Pl)\b/],
   ["ZIP code", /\b\d{5}(?:-\d{4})?\b/],
-  ["Patient name", /\b(?:Mrs?|Ms)\.?\s+[A-Z][a-z]+|\b(?:[Pp]atient|[Pp]t|[Rr]esident|[Ff]amily of)\.?:?\s+[A-Z][a-z]+/],
+  ["Patient name", /\b(?:Mrs?|Ms|Miss)\.?\s+[A-Z][a-z'-]+(?:\s+[A-Z][a-z'-]+){0,2}|\b(?:[Pp]atient|[Pp]t|[Rr]esident|[Ff]amily of|[Nn]ame:?)\.?:?\s+[A-Z][a-z'-]+(?:\s+[A-Z][a-z'-]+){0,2}/],
 ];
 
 async function stcRequest(request, env) {
@@ -272,20 +272,23 @@ async function stcRequest(request, env) {
   try { body = await request.json(); } catch { return json({ error: "Invalid JSON" }, 400); }
   const text = typeof body?.text === "string" ? body.text.trim().slice(0, 1500) : "";
   if (!text) return json({ error: "text required" }, 400);
-  // Server-side identifier gate: never echo the text back, only categories.
-  const hits = STC_PHI_RULES.filter(([, re]) => re.test(text)).map(([cat]) => cat);
-  if (hits.length) return json({ blocked: true, categories: hits });
+  // Server-side redaction: identifiers are replaced with [REDACTED]; nothing about what was removed is returned.
+  let clean = text;
+  for (const [, re] of STC_PHI_RULES) clean = clean.replace(new RegExp(re.source, re.flags.includes("g") ? re.flags : re.flags + "g"), "[REDACTED]");
+  const redacted = clean !== text;
   try {
     const client = new TypeSafeClient({ apiKey: env.TYPESAFE_API_KEY });
     const gate = await client.systemOne({
-      state: { request: text },
+      state: { request: clean },
       questions: {
-        identifies: noul("Does `request` contain information that could identify a specific patient or person receiving care, such as their name, date of birth, record or account number, address, phone number, or details unique to one patient? Staff names and room numbers alone do not count."),
+        identifies: noul("Ignoring any [REDACTED] markers, does `request` still contain information that could identify a specific patient or person receiving care, such as their name, date of birth, record or account number, address, phone number, or details unique to one patient? Staff names and room numbers alone do not count."),
       },
     });
-    if ((gate.answers.identifies?.noul ?? 1) >= 0.3) return json({ blocked: true, categories: ["Possible patient identifier (server AI check)"] });
+    if ((gate.answers.identifies?.noul ?? 1) >= 0.3) {
+      return json({ text: null, redacted: true, withheld: true, kind: null, confidence: null, urgent: null, clinical: null });
+    }
     const { answers } = await client.systemOne({
-      state: { request: text },
+      state: { request: clean },
       questions: {
         kind: choice("`request` is an internal, non-clinical operational request at a hospital system. Which type of request is it?", STC_KINDS),
         urgent: noul("Does `request` describe something that stops work now, affects safety or security, or needs action today?"),
@@ -293,6 +296,9 @@ async function stcRequest(request, env) {
       },
     });
     return json({
+      text: clean,
+      redacted,
+      withheld: false,
       kind: answers.kind?.choice ?? null,
       confidence: answers.kind?.confidence ?? null,
       urgent: answers.urgent?.noul ?? null,
